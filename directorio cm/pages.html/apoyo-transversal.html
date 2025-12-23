@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Apoyo y Áreas Transversales | CM Colombia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="/LOGO_CM.png" />
+
+<style>
+:root{
+  --verde:#0f7c0c;
+  --verde-oscuro:#429825;
+  --gris:#f4f6f8;
+  --blanco:#fff;
+}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--gris)}
+/* ===== HEADER ===== */
+header{
+  background:var(--blanco);
+  border-bottom:4px solid var(--verde);
+  padding:18px 30px;
+}
+header h1{margin:0;color:var(--verde-oscuro);font-size:28px;font-weight:900;}
+header .sub{color:#666;font-size:13px;margin-top:4px;}
+
+.badge{
+  display:inline-block;
+  margin-left:10px;
+  background:rgba(108,192,74,.15);
+  color:var(--verde-oscuro);
+  border:1px solid rgba(108,192,74,.25);
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:12px;
+}
+
+
+/* ===== LOGO CLICKEABLE  ===== */
+.logo-link{
+  display:inline-flex;
+  align-items:center;
+  text-decoration:none;
+}
+.logo-img{
+  height:80px;      /* mantiene el mismo tamaño */
+  width:auto;
+  display:block;
+}
+
+/* ===== BUSCADOR ===== */
+.search-box{max-width:1200px;margin:26px auto 10px;padding:0 15px;}
+.search-box input{
+  width:100%;
+  padding:15px 18px;
+  border-radius:12px;
+  border:1px solid #d9d9d9;
+  font-size:16px;
+  background:#fff;
+  outline:none;
+}
+.search-box input:focus{
+  border-color:rgba(76,163,44,.7);
+  box-shadow:0 0 0 4px rgba(108,192,74,.15);
+}
+
+/* ===== GRID ===== */
+.grid{
+  max-width:1200px;
+  margin:18px auto 70px;
+  padding:0 15px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:22px;
+  align-items:stretch;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:var(--blanco);
+  border-radius:16px;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
+  padding:24px;
+  transition:.25s ease;
+  width:100%;
+  height:100%;
+  display:flex;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 26px rgba(0,0,0,.14);
+}
+
+.top{
+  display:flex;
+  gap:20px;
+  width:100%;
+  align-items:flex-start;
+}
+
+/* FOTO CUADRADA GRANDE */
+.photo{
+  width:160px;
+  height:160px;
+  border-radius:14px;
+  object-fit:cover;
+  border:4px solid var(--verde);
+  background:#eee;
+  flex-shrink:0;
+}
+
+.info{flex:1;min-width:0;}
+.info h3{margin:0;font-size:18px;line-height:1.2;}
+.info .cargo{margin:8px 0;color:#555;font-size:14px;font-weight:700;}
+
+.meta{margin-top:14px;display:grid;gap:8px;}
+.meta a{
+  color:var(--verde-oscuro);
+  text-decoration:none;
+  font-weight:800;
+  font-size:14px;
+  word-break:break-word;
+}
+.meta a:hover{text-decoration:underline;}
+
+.muted{
+  color:#777;
+  font-size:13px;
+  font-weight:600;
+}
+
+.footer{
+  background:linear-gradient(90deg,var(--verde-oscuro),var(--verde));
+  color:#fff;
+  padding:26px 16px;
+  text-align:center;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:20px;">
+     <!--  LOGO CLICKEABLE: VUELVE AL INDEX -->
+    <a href="../index.html" class="logo-link" title="Volver al inicio">
+      <img src="/LOGO_CM.png" alt="CM Colombia Dispensario" class="logo-img">
+    </a>
+      <h1>Apoyo y Áreas Transversales <span class="badge">Sede Administrativa</span></h1>
+      <div class="sub">Directorio del área de Apoyo y Áreas Transversales</div>
+    </div>
+  </div>
+</header>
+
+<div class="search-box">
+  <input id="search" type="text" placeholder="Buscar por nombre o cargo..." />
+</div>
+
+<div class="grid" id="employees"></div>
+
+<div class="footer">© 2025 CM Colombia Dispensario S.A.S 
+<script>
+  // ✅ APOYO Y ÁREAS TRANSVERSALES (EMPLEADOS.xlsx - SEDE ADMINISTRATIVA)
+  const DATA = [
+    {
+      nombre: "WALTER PAREDES",
+      cargo: "Apoyo a Diversas Áreas",
+      telefono: "",
+      tel_href: "",
+      email: "gestiondocumental.cmcol@gmail.com",
+      foto: "fotos/walter-paredes.jpg"
+    }
+  ];
+
+  const grid = document.getElementById('employees');
+  const search = document.getElementById('search');
+
+  function avatarUrl(name){
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6cc04a&color=fff&size=256`;
+  }
+
+  function render(list){
+    grid.innerHTML='';
+    list.forEach(p=>{
+      const telHtml = (p.telefono && p.tel_href)
+        ? `<a href="https://wa.me/57${p.tel_href}" target="_blank">📱 WhatsApp: ${p.telefono}</a>`
+        : `<div class="muted">📞 Teléfono no registrado</div>`;
+
+      const mailHtml = (p.email)
+        ? `<a href="https://mail.google.com/mail/?view=cm&fs=1&to=${p.email}" target="_blank">📧 Gmail: ${p.email}</a>`
+        : `<div class="muted">✉️ Correo no registrado</div>`;
+
+      const card=document.createElement('div');
+      card.className='card';
+      card.innerHTML=`
+        <div class="top">
+          <img class="photo" src="${p.foto}" alt="${p.nombre}"
+            onerror="this.onerror=null;this.src='${avatarUrl(p.nombre)}';">
+          <div class="info">
+            <h3>${p.nombre}</h3>
+            <div class="cargo">${p.cargo}</div>
+            <div class="meta">
+              ${telHtml}
+              ${mailHtml}
+            </div>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  function filter(){
+    const q=(search.value||'').toLowerCase();
+    render(DATA.filter(p=>`${p.nombre} ${p.cargo}`.toLowerCase().includes(q)));
+  }
+
+  search.addEventListener('input',filter);
+  render(DATA);
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
