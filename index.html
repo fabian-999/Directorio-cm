@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Directorio de Sedes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="LOGO_CM.png" />
+
+  <style>
+    :root{
+      --verde-principal:#0f7c0c;
+      --verde-oscuro:#429825;
+      --verde-claro:#eaf6e6;
+      --blanco:#ffffff;
+      --gris:#f4f6f8;
+    }
+
+    body {font-family: 'Segoe UI', Arial, sans-serif; margin:0; background:var(--gris);}
+
+    header {
+      background:var(--blanco);
+      border-bottom:4px solid var(--verde-principal);
+      padding:15px 30px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    header img{
+      height:80px;
+      object-fit:contain;
+    }
+    header h1 {
+      margin:0;
+      color:var(--verde-oscuro);
+      font-size:26px;
+      font-weight:700;
+    }
+    header span{
+      color:#555;
+      font-size:14px;
+    }
+
+    .socials {
+      display:flex;
+      gap:15px;
+    }
+
+    .socials a {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      background:#f0f0f0;
+      transition:.3s ease;
+      text-decoration:none;
+    }
+    .socials a:hover {
+      background:var(--verde-principal);
+      transform:scale(1.1);
+    }
+    .socials a:hover svg path {
+      fill:#fff;
+    }
+
+    .container {max-width:1200px; margin:30px auto; padding:0 15px;}
+    .card {background:var(--blanco); border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.08); padding:25px; margin-bottom:30px;}
+    .card h2 {margin-top:0; color:var(--verde-oscuro);}
+
+    /* =========================
+       SLIDER (PRO) - debajo del header
+       ========================= */
+    .hero-slider-wrap{
+      max-width:1200px;
+      margin:18px auto 0;
+      padding:0 15px;
+    }
+    .hero-slider{
+      position:relative;
+      background:#fff;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 10px 22px rgba(0,0,0,.10);
+      border:1px solid rgba(0,0,0,.06);
+      height: 320px;            /* ✅ altura única del slider */
+    }
+    .hero-slide{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition:opacity .55s ease; /* ✅ transición suave */
+      pointer-events:none;
+      height:100%;
+    }
+    .hero-slide.active{
+      opacity:1;
+      pointer-events:auto;
+      position:relative;
+    }
+
+    /* Por defecto: cover (para banners horizontales) */
+    .hero-slide img{
+      width:100%;
+      height:100%;              /* ✅ ahora todas se adaptan igual */
+      object-fit:cover;         /* ✅ recorta proporcional (para banner) */
+      object-position:center;   /* ✅ centrado */
+      display:block;
+    }
+
+    /* Para imágenes tipo logo / vertical: contain + fondo */
+    .hero-slide.is-contain{
+      background: linear-gradient(135deg, rgba(0,0,0,.08), rgba(0,0,0,.02));
+    }
+    .hero-slide.is-contain img{
+      object-fit:contain;       /* ✅ NO se deforma, NO se zoom */
+      padding:18px;             /* aire alrededor */
+    }
+
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, rgba(0,0,0,.20), rgba(0,0,0,0));
+      pointer-events:none;
+    }
+    .hero-controls{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 10px;
+      pointer-events:none;
+    }
+    .hero-btn{
+      pointer-events:auto;
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.65);
+      background:rgba(255,255,255,.18);
+      backdrop-filter: blur(6px);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:.2s ease;
+    }
+    .hero-btn:hover{
+      transform:scale(1.04);
+      background:rgba(255,255,255,.28);
+    }
+    .hero-btn span{
+      color:#fff;
+      font-size:22px;
+      line-height:1;
+      font-weight:900;
+      text-shadow:0 2px 10px rgba(0,0,0,.25);
+      user-select:none;
+    }
+
+    .hero-dots{
+      position:absolute;
+      left:50%;
+      bottom:12px;
+      transform:translateX(-50%);
+      display:flex;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.20);
+      backdrop-filter: blur(6px);
+      border:1px solid rgba(255,255,255,.35);
+    }
+    .hero-dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:rgba(255,255,255,.55);
+      border:none;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .hero-dot.active{
+      background:#fff;
+      transform:scale(1.15);
+    }
+
+    /* =========================
+       BUSCADOR GLOBAL (PERSONAS)
+       ========================= */
+    .global-search-wrap{
+      max-width:1200px;
+      margin:14px auto 0;
+      padding:0 15px;
+    }
+    .global-search{ position:relative; }
+
+    .global-search input{
+      width:100%;
+      padding:14px 16px;
+      border-radius:12px;
+      border:1px solid #d9d9d9;
+      background:#fff;
+      font-size:16px;
+      outline:none;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+    }
+    .global-search input:focus{
+      border-color: rgba(76,163,44,.7);
+      box-shadow:0 0 0 4px rgba(108,192,74,.18);
+    }
+
+    .global-results{
+      position:absolute;
+      left:0;
+      right:0;
+      top:52px;
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 14px 34px rgba(0,0,0,.14);
+      border:1px solid #eee;
+      overflow:hidden;
+      display:none;
+      z-index:999;
+    }
+    .global-results a{
+      display:block;
+      padding:12px 14px;
+      text-decoration:none;
+      color:#222;
+      border-bottom:1px solid #f0f0f0;
+    }
+    .global-results a:hover{ background:#f7fff4; }
+    .global-results small{ display:block; margin-top:2px; color:#666; }
+    .global-results .empty{
+      padding:14px;
+      color:#666;
+    }
+
+    .accordion {border-radius:10px; overflow:hidden;}
+    .accordion-item {border-bottom:1px solid #ddd;}
+    .accordion-header{
+      background:var(--verde-principal);
+      color:#fff;
+      padding:16px 20px;
+      cursor:pointer;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-weight:700;
+      user-select:none;
+    }
+    .accordion-header:hover{background:var(--verde-oscuro);}
+
+    /* flecha */
+    .accordion-header .chev{
+      display:inline-block;
+      transition:transform .25s ease;
+      font-size:18px;
+      line-height:1;
+    }
+
+    /* contenido animado (cerrado) */
+    .accordion-content{
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transform:translateY(-6px);
+      transition:
+        max-height .35s ease,
+        opacity .25s ease,
+        transform .25s ease;
+      background:var(--verde-claro);
+      padding:0 20px;
+    }
+
+    /* contenido animado (abierto) */
+    .accordion-content.open{
+      opacity:1;
+      transform:translateY(0);
+      padding:20px;
+    }
+
+    /* flecha rota al abrir */
+    .accordion-header.open .chev{
+      transform:rotate(180deg);
+    }
+
+    .dept-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:15px;
+    }
+    .dept-card{
+      background:var(--blanco);
+      border-left:6px solid var(--verde-principal);
+      padding:15px;
+      border-radius:10px;
+      text-decoration:none;
+      color:#333;
+      font-weight:600;
+      box-shadow:0 3px 8px rgba(0,0,0,.08);
+      transition:.2s ease;
+    }
+    .dept-card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 6px 14px rgba(0,0,0,.15);
+      background:#f7fff4;
+    }
+
+    /* =========================
+       ACCESIBILIDAD (DESPLEGABLE)
+       ========================= */
+    .a11y-wrap{
+      position:fixed;
+      top:110px;
+      left:14px;
+      z-index:9999;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .a11y-btn{
+      width:44px;
+      height:44px;
+      border:none;
+      border-radius:12px;
+      background:#0f7c0c;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+      transition:.2s ease;
+    }
+    .a11y-btn:hover{ transform:translateY(-1px); }
+    .a11y-btn svg{ width:26px; height:26px; }
+    .a11y-btn svg path{ fill:#fff; }
+
+    .a11y-panel{
+      width:280px;
+      background:#fff;
+      border-radius:10px;
+      box-shadow:0 10px 26px rgba(0,0,0,.18);
+      border:1px solid #e6e6e6;
+      overflow:hidden;
+      transform-origin: top left;
+      opacity:0;
+      transform:scale(.98);
+      pointer-events:none;
+      transition:.18s ease;
+    }
+    .a11y-panel.open{
+      opacity:1;
+      transform:scale(1);
+      pointer-events:auto;
+    }
+
+    .a11y-head{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-bottom:1px solid #ececec;
+      font-weight:800;
+      color:#666;
+    }
+    .a11y-head .dot{
+      width:18px; height:18px; border-radius:50%;
+      background:#0f7c0c;
+      display:inline-block;
+      position:relative;
+    }
+    .a11y-head .dot:after{
+      content:"";
+      position:absolute;
+      inset:4px;
+      border-radius:50%;
+      background:#fff;
+      opacity:.9;
+    }
+
+    .a11y-actions{
+      display:flex;
+      justify-content:space-around;
+      padding:12px;
+      gap:10px;
+    }
+
+    .a11y-action{
+      width:56px;
+      height:44px;
+      border-radius:10px;
+      border:1px solid #e6e6e6;
+      background:#fff;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#0f7c0c;
+      transition:.18s ease;
+      user-select:none;
+    }
+    .a11y-action:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 14px rgba(0,0,0,.10);
+    }
+
+    /* Alto contraste */
+    body.high-contrast{
+      background:#000 !important;
+      color:#fff !important;
+    }
+    body.high-contrast header,
+    body.high-contrast .card,
+    body.high-contrast .accordion-content{
+      background:#111 !important;
+      color:#fff !important;
+    }
+    body.high-contrast .dept-card{
+      background:#111 !important;
+      color:#fff !important;
+      border-left-color:#fff !important;
+    }
+    body.high-contrast .accordion-header{
+      background:#222 !important;
+      color:#fff !important;
+    }
+
+    /* Tamaño de fuente global (se ajusta por JS) */
+    html{ font-size:16px; }
+
+    /* =========================
+       FOOTER PRO
+       ========================= */
+    .footer-pro{
+      background:#0f7c0c;
+      color:#fff;
+      padding:40px 22px 18px;
+      margin-top:50px;
+    }
+    .footer-pro a{ color:#fff; text-decoration:none; }
+    .footer-pro a:hover{ text-decoration:underline; }
+
+    .footer-wrap{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap:28px;
+    }
+
+    .footer-brand img{
+      height:120px;
+      object-fit:contain;
+      margin-bottom:18px;
+    }
+
+    .footer-item{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin:10px 0;
+      line-height:1.4;
+      opacity:.95;
+    }
+    .footer-item .ico{
+      width:22px;
+      flex:0 0 22px;
+      text-align:center;
+      font-size:18px;
+      line-height:1;
+    }
+
+    .footer-social{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    .footer-social a{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.55);
+      transition:.2s ease;
+      font-weight:800;
+      text-transform:lowercase;
+    }
+    .footer-social a:hover{
+      background:rgba(255,255,255,.12);
+      transform:translateY(-2px);
+    }
+
+    .footer-col h3{
+      margin:0 0 14px 0;
+      font-size:18px;
+      font-weight:900;
+    }
+    .footer-links{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:10px;
+    }
+    .footer-links li{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .footer-links li::before{
+      content:"›";
+      font-size:22px;
+      line-height:1;
+      opacity:.9;
+    }
+
+    .footer-divider{
+      max-width:1200px;
+      margin:26px auto 12px;
+      height:1px;
+      background:rgba(255,255,255,.25);
+    }
+
+    .footer-bottom{
+      max-width:1200px;
+      margin:0 auto;
+      font-size:13px;
+      opacity:.9;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width: 980px){
+      .footer-wrap{ grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width: 560px){
+      .footer-wrap{ grid-template-columns:1fr; }
+    }
+
+    /* Contraste también para el footer pro */
+    body.high-contrast .footer-pro{
+      background:#111 !important;
+      color:#fff !important;
+    }
+    body.high-contrast .footer-divider{
+      background:rgba(255,255,255,.35) !important;
+    }
+    body.high-contrast .footer-social a{
+      border-color:rgba(255,255,255,.75) !important;
+    }
+
+    /* MAPA */
+    .map-section {
+      background: var(--blanco);
+      padding: 50px 0;
+      text-align: center;
+    }
+    .map-section h2 {
+      color: var(--verde-oscuro);
+      margin-bottom: 10px;
+    }
+    .map-section p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .map-container {
+      max-width: 100%;
+      height: 400px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 3px solid var(--verde-principal);
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+      transition: box-shadow 0.3s ease;
+    }
+    .map-container:hover {
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 768px) {
+      header {
+        padding: 10px 15px;
+        flex-direction: column;
+        gap: 10px;
+      }
+      header h1 {
+        font-size: 20px;
+      }
+      header img {
+        height: 60px;
+      }
+      .socials {
+        gap: 10px;
+      }
+      .container {
+        padding: 0 10px;
+        margin: 20px auto;
+      }
+      .card {
+        padding: 15px;
+      }
+      .accordion-header {
+        padding: 12px 15px;
+        font-size: 14px;
+      }
+      .accordion-content {
+        padding: 15px;
+      }
+      .dept-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-wrap {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .footer-brand img {
+        height: 80px;
+      }
+      .map-section {
+        padding: 20px 0;
+      }
+      .map-container {
+        height: 300px;
+      }
+
+      .hero-slider{ height:220px; } /* ✅ */
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 18px;
+      }
+      header img {
+        height: 50px;
+      }
+      .socials a {
+        width: 35px;
+        height: 35px;
+      }
+      .card {
+        padding: 10px;
+      }
+      .accordion-header {
+        padding: 10px 12px;
+      }
+      .footer-item {
+        font-size: 13px;
+      }
+      .footer-links li {
+        font-size: 13px;
+      }
+      .map-container {
+        height: 250px;
+      }
+
+      .hero-slider{ height:190px; } /* ✅ */
+    }
+  </style>
+</head>
+<body>
+
+<!-- ACCESIBILIDAD -->
+<div class="a11y-wrap">
+  <button class="a11y-btn" id="a11yToggle" aria-label="Abrir accesibilidad" title="Accesibilidad">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm9 6.5H3a1 1 0 0 0 0 2h6v3.5l-2.7 6.1a1 1 0 1 0 1.83.8L11 15.3V22a1 1 0 0 0 2 0v-6.7l2.87 6.1a1 1 0 1 0 1.81-.85L15 14.5V11h6a1 1 0 1 0 0-2Z"/>
+    </svg>
+  </button>
+
+  <div class="a11y-panel" id="a11yPanel" role="dialog" aria-label="Panel de accesibilidad">
+    <div class="a11y-head">
+      <span class="dot" aria-hidden="true"></span>
+      ACCESIBILIDAD:
+    </div>
+
+    <div class="a11y-actions">
+      <button class="a11y-action" id="btnContrast" title="Alto contraste" aria-label="Alto contraste">◐</button>
+      <button class="a11y-action" id="btnInc" title="Aumentar letra" aria-label="Aumentar letra">A+</button>
+      <button class="a11y-action" id="btnReset" title="Restablecer letra" aria-label="Restablecer letra">A</button>
+      <button class="a11y-action" id="btnDec" title="Disminuir letra" aria-label="Disminuir letra">A-</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div style="display:flex; align-items:center; gap:20px;">
+    <a href="index.html" style="display:inline-flex; align-items:center;">
+      <img src="LOGO_CM.png" alt="CM Colombia Dispensario">
+    </a>
+    <div>
+      <h1>Directorio Institucional</h1>
+      <span>CM Colombia Dispensario S.A.S</span>
+    </div>
+  </div>
+
+  <div class="socials">
+    <a href="https://www.facebook.com" target="_blank" title="Facebook">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+      </svg>
+    </a>
+    <a href="https://www.instagram.com" target="_blank" title="Instagram">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="#E4405F"/>
+      </svg>
+    </a>
+    <a href="https://www.twitter.com" target="_blank" title="Twitter">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" fill="#1DA1F2"/>
+      </svg>
+    </a>
+    <a href="https://www.linkedin.com" target="_blank" title="LinkedIn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="#0077B5"/>
+      </svg>
+    </a>
+    <a href="https://www.youtube.com" target="_blank" title="YouTube">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<!-- SLIDER (debajo del header) -->
+<div class="hero-slider-wrap">
+  <div class="hero-slider" id="heroSlider" aria-label="Slider institucional">
+
+    <!-- Slide 1 (banner grande) -->
+    <div class="hero-slide active">
+      <img src="slider/slider 1.jpg" alt="Banner institucional">
+      <div class="hero-overlay"></div>
+    </div>
+
+    <!-- Slide 2 (logo / pieza pequeña) -->
+    <div class="hero-slide is-contain">
+      <img src="slider/slider 2.jpeg" alt="Logo CM Colombia">
+      <div class="hero-overlay"></div>
+    </div>
+
+    <div class="hero-controls" aria-hidden="false">
+      <button class="hero-btn" id="heroPrev" aria-label="Anterior"><span>‹</span></button>
+      <button class="hero-btn" id="heroNext" aria-label="Siguiente"><span>›</span></button>
+    </div>
+
+    <div class="hero-dots" id="heroDots" aria-label="Indicadores del slider">
+      <button class="hero-dot active" aria-label="Slide 1"></button>
+      <button class="hero-dot" aria-label="Slide 2"></button>
+    </div>
+  </div>
+</div>
+
+<!-- BUSCADOR GLOBAL -->
+<div class="global-search-wrap">
+  <div class="global-search">
+    <input id="globalSearchInput" type="text" placeholder="Buscar persona (nombre / cargo / sede)..." autocomplete="off">
+    <div id="globalSearchResults" class="global-results" aria-label="Resultados de búsqueda"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Sede Nacional</h2>
+    <p><strong>Teléfono:</strong> 01 8000 000 000</p>
+    <p><strong>Horario:</strong> Lunes a Viernes 8:00 am - 5:00 pm</p>
+    <p><strong>Dirección:</strong> CL 2 13 55 </p>
+    <p><strong>Email:</strong> contacto@empresa.com</p>
+  </div>
+
+  <div class="card">
+    <h2>Sedes Nacionales</h2>
+
+    <div class="accordion">
+
+      <!-- SEDE ADMINISTRATIVA -->
+      <div class="accordion-item">
+        <div class="accordion-header">SEDE ADMINISTRATIVA <span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <div class="dept-grid">
+            <a class="dept-card" href="/pages.html/sede administrativa.html">Administrativo</a>
+            <a class="dept-card" href="/pages.html/gestion humana.html">Gestión Humana</a>
+            <a class="dept-card" href="/pages.html/sgsst.html">SGSST</a>
+            <a class="dept-card" href="/pages.html/servicios generales.html">Servicios Generales</a>
+            <a class="dept-card" href="/pages.html/sistemas.html">Sistemas</a>
+            <a class="dept-card" href="/pages.html/contabilidad.html">Contabilidad</a>
+            <a class="dept-card" href="/pages.html/cartera.html">Cartera</a>
+            <a class="dept-card" href="/pages.html/tesoreria.html">Tesorería</a>
+            <a class="dept-card" href="/pages.html/facturacion.html">Facturación</a>
+            <a class="dept-card" href="/pages.html/logistica-ventas.html">Logística y Ventas</a>
+            <a class="dept-card" href="/pages.html/compras.html">Compras</a>
+            <a class="dept-card" href="/pages.html/direccion-tecnica.html">Dirección Técnica Nacional</a>
+            <a class="dept-card" href="/pages.html/cumplimiento-normativo.html">Cumplimiento Normativo</a>
+            <a class="dept-card" href="/pages.html/operativonacional.html">Operativo Nacional</a>
+            <a class="dept-card" href="/pages.html/siau.html">SIAU</a>
+            <a class="dept-card" href="/pages.html/direccion-tecnica.html">Dirección Técnica</a>
+            <a class="dept-card" href="/pages.html/puntos-aliados.html">Puntos Aliados</a>
+            <a class="dept-card" href="/pages.html/juridica.html">Jurídica</a>
+            <a class="dept-card" href="/pages.html/gestion-documental.html">Gestión Documental</a>
+            <a class="dept-card" href="/pages.html/archivo.html">Archivo</a>
+            <a class="dept-card" href="/pages.html/auditoria.html">Auditoría</a>
+            <a class="dept-card" href="/pages.html/call-center.html">Call Center</a>
+            <a class="dept-card" href="/pages.html/apoyo-transversal.html">Apoyo / Áreas Transversales</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RISARALDA -->
+      <div class="accordion-item">
+        <div class="accordion-header">RISARALDA <span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <div class="dept-grid">
+            <a class="dept-card" href="/pages risaralda/sanandresito.html">San Andresito</a>
+            <a class="dept-card" href="/pages risaralda/dosquebradas.html">Dosquebradas</a>
+            <a class="dept-card" href="/pages risaralda/cuba.html">Cuba</a>
+            <a class="dept-card" href="/pages risaralda/santa-rosa.html">Santa Rosa</a>
+            <a class="dept-card" href="/pages risaralda/belen-de-umbria.html">Belén de Umbría</a>
+            <a class="dept-card" href="/pages risaralda/quinchia.html">Quinchía</a>
+            <a class="dept-card" href="/pages risaralda/guatica.html">Guática</a>
+            <a class="dept-card" href="/pages risaralda/la-virginia.html">La Virginia</a>
+            <a class="dept-card" href="/pages risaralda/apia.html">Apía</a>
+            <a class="dept-card" href="/pages risaralda/marsella.html">Marsella</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- NARIÑO -->
+      <div class="accordion-item">
+        <div class="accordion-header">NARIÑO<span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <a class="dept-card" href="/nuevos puntos/tumaco.html">Tumaco</a>
+          <a class="dept-card" href="/nuevos puntos/el-rosario.html">El Rosario</a>
+          <a class="dept-card" href="/nuevos puntos/ricaurte.html">Ricaurte</a>
+          <a class="dept-card" href="/nuevos puntos/sandonia.html">Sandona</a>
+          <a class="dept-card" href="/nuevos puntos/la -union.html">La Unión</a>
+          <a class="dept-card" href="/nuevos puntos/el-tambo.html">El Tambo</a>
+          <a class="dept-card" href="/nuevos puntos/pasto.html">Pasto</a>
+        </div>
+      </div>
+
+      <!-- CESAR -->
+      <div class="accordion-item">
+        <div class="accordion-header">CESAR<span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <a class="dept-card" href="/nuevos puntos/aguachica.html">Aguachica</a>
+        </div>
+      </div>
+
+      <!-- HUILA -->
+      <div class="accordion-item">
+        <div class="accordion-header">HUILA<span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <a class="dept-card" href="/nuevos puntos/pitalito.html">Pitalito</a>
+        </div>
+      </div>
+
+      <!-- OTROS -->
+      <div class="accordion-item">
+        <div class="accordion-header">OTROS <span class="chev">▼</span></div>
+        <div class="accordion-content">
+          <div class="dept-grid">
+            <a class="dept-card" href="/pages otros/bogota.html">Bogotá</a>
+            <a class="dept-card" href="/pages otros/ipiales.html">Ipiales</a>
+            <a class="dept-card" href="/pages otros/asistir-ocaña.html">Asistir Ocaña</a>
+            <a class="dept-card" href="/pages otros/asistir-cucuta.html">Asistir Cúcuta</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- MAPA DE AGUACHICA -->
+<div class="map-section">
+  <div class="container">
+    <h2>Ubicación en Aguachica</h2>
+    <p>CL 2 13 55 Barrio el Bosque, Aguachica</p>
+    <div class="map-container">
+      <iframe src="https://www.google.com/maps?q=CL+2+13+55+Barrio+el+bosque+aguachica&output=embed" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER PRO -->
+<footer class="footer-pro">
+  <div class="footer-wrap">
+
+    <div class="footer-brand">
+      <img src="/logo cm colombia footer.png" alt="CM Colombia">
+
+      <div class="footer-item">
+        <div class="ico">📍</div>
+        <div>Cra. 4 No. 18N-46<br>Popayán - Colombia</div>
+      </div>
+
+      <div class="footer-item">
+        <div class="ico">📞</div>
+        <div>Desde fijo: <a href="tel:018000000000">01 8000 000 000</a><br>Desde celular: <a href="https://wa.me/6020000000">(60) 2 000 0000</a></div>
+      </div>
+
+      <div class="footer-item">
+        <div class="ico">✉️</div>
+        <div><a href="mailto:contacto@empresa.com">contacto@empresa.com</a></div>
+      </div>
+
+      <div class="footer-social" aria-label="Redes sociales">
+        <a href="#" target="_blank" title="Facebook">f</a>
+        <a href="#" target="_blank" title="Instagram">ig</a>
+        <a href="#" target="_blank" title="YouTube">▶</a>
+        <a href="#" target="_blank" title="X">x</a>
+        <a href="#" target="_blank" title="WhatsApp">wa</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h3>Datos Importantes</h3>
+      <ul class="footer-links">
+        <li><a href="https://www.asmetsalud.com/nuevo-prestador-medicamentos">CM como prestador de Servicio de entrega de medicamentos</a></li>
+        <li><a href="https://dle.rae.es/dispensario">¿que es un dispensario?</a></li>
+        <li><a href="https://www.sefac.org/sites/default/files/sefac2010/private/documentos_sefac/documentos/BBPP_dispensaciondemedicamentosyproductsosanitarios.pdf">¿Que hace un dispensario?</a></li>
+        <li><a href="#">SARLAFT</a></li>
+        <li><a href="#">Términos y condiciones</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Destacados</h3>
+      <ul class="footer-links">
+        <li><a href="#">Portal de empleados</a></li>
+        <li><a href="#">Ley de transparencia</a></li>
+        <li><a href="#">Participa</a></li>
+        <li><a href="#">Formación</a></li>
+        <li><a href="#">Petición de protección de datos</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>De Interés</h3>
+      <ul class="footer-links">
+        <li><a href="#">Preguntas frecuentes</a></li>
+        <li><a href="#">Procedimientos de atención</a></li>
+        <li><a href="#">Instituciones y recursos</a></li>
+        <li><a href="#">Mecanismos para autorizaciones</a></li>
+      </ul>
+
+      <div style="margin-top:18px;">
+        <h3>Ayudas de accesibilidad</h3>
+        <ul class="footer-links">
+          <li><a href="#">Centro de relevo</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-bottom">
+    <div>© 2025 - Directorio Web CM Colombia Dispensario S.A.S</div>
+    <div>Todos los derechos reservados.</div>
+  </div>
+</footer>
+
+<script>
+  /* =========================
+     SLIDER PRO
+     ========================= */
+  (function initHeroSlider(){
+    const slider = document.getElementById("heroSlider");
+    if(!slider) return;
+
+    const slides = slider.querySelectorAll(".hero-slide");
+    const dotsWrap = document.getElementById("heroDots");
+    const dots = dotsWrap ? dotsWrap.querySelectorAll(".hero-dot") : [];
+    const prev = document.getElementById("heroPrev");
+    const next = document.getElementById("heroNext");
+
+    let idx = 0;
+    let timer = null;
+
+    function show(i){
+      idx = (i + slides.length) % slides.length;
+      slides.forEach((s, k)=> s.classList.toggle("active", k === idx));
+      dots.forEach((d, k)=> d.classList.toggle("active", k === idx));
+    }
+
+    function start(){
+      stop();
+      timer = setInterval(()=> show(idx + 1), 5500);
+    }
+    function stop(){
+      if(timer) clearInterval(timer);
+      timer = null;
+    }
+
+    prev && prev.addEventListener("click", ()=> { show(idx - 1); start(); });
+    next && next.addEventListener("click", ()=> { show(idx + 1); start(); });
+
+    dots.forEach((d, k)=>{
+      d.addEventListener("click", ()=> { show(k); start(); });
+    });
+
+    slider.addEventListener("mouseenter", stop);
+    slider.addEventListener("mouseleave", start);
+
+    show(0);
+    start();
+  })();
+
+  /* =========================
+     BUSCADOR GLOBAL (PERSONAS)
+     ========================= */
+  (async function initGlobalPeopleSearch(){
+    const input = document.getElementById("globalSearchInput");
+    const box   = document.getElementById("globalSearchResults");
+    if(!input || !box) return;
+
+    const norm = (s) => (s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    let PEOPLE = [];
+    try{
+      const res = await fetch("search-data.json", { cache: "no-store" });
+      if(!res.ok) throw new Error("No se encontró search-data.json");
+      PEOPLE = await res.json();
+
+      if (PEOPLE && !Array.isArray(PEOPLE) && Array.isArray(PEOPLE.people)) {
+        PEOPLE = PEOPLE.people;
+      }
+
+      PEOPLE = (PEOPLE || []).map(p => ({
+        nombre: p.nombre || p.NOMBRE || p.nombres || p["NOMBRES Y APELLIDOS"] || p["NOMBRES"] || "",
+        cargo:  p.cargo  || p.CARGO  || p["CARGO"] || "",
+        sede:   p.sede   || p.SEDE   || p["SEDE"]  || "",
+        url:    p.url    || p.URL    || p["url"]   || p["URL"] || "#"
+      }));
+
+    }catch(e){
+      PEOPLE = [];
+      console.error("No se pudo cargar search-data.json:", e);
+    }
+
+    function render(list, qRaw){
+      const q = (qRaw || "").trim();
+      if(q.length < 2){
+        box.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
+      if(list.length === 0){
+        box.style.display = "block";
+        box.innerHTML = `<div class="empty">No encontré resultados para <strong>${q}</strong></div>`;
+        return;
+      }
+      box.style.display = "block";
+      box.innerHTML = list.slice(0, 12).map(p => `
+        <a href="${p.url || '#'}">
+          <strong>${p.nombre || ""}</strong>
+          <small>${[p.cargo, p.sede].filter(Boolean).join(" · ")}</small>
+        </a>
+      `).join("");
+    }
+
+    input.addEventListener("input", () => {
+      const qRaw = input.value;
+      const q = norm(qRaw.trim());
+      const list = PEOPLE.filter(p => {
+        const text = norm(`${p.nombre} ${p.cargo} ${p.sede}`);
+        return text.includes(q);
+      });
+      render(list, qRaw);
+    });
+
+    document.addEventListener("click", (e) => {
+      if(e.target !== input && !box.contains(e.target)){
+        box.style.display = "none";
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        box.style.display = "none";
+        input.blur();
+      }
+    });
+  })();
+
+  /* =========================
+     ACORDEÓN (animación + rotación)
+     ========================= */
+  const headers = document.querySelectorAll('.accordion-header');
+
+  function closeAll(){
+    document.querySelectorAll('.accordion-content').forEach(c=>{
+      c.classList.remove('open');
+      c.style.maxHeight = null;
+    });
+    headers.forEach(h=>h.classList.remove('open'));
+  }
+
+  headers.forEach(h => {
+    h.addEventListener('click', () => {
+      const content = h.nextElementSibling;
+      const isOpen = h.classList.contains('open');
+
+      closeAll();
+
+      if(!isOpen){
+        h.classList.add('open');
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    const opened = document.querySelector('.accordion-content.open');
+    if(opened){
+      opened.style.maxHeight = opened.scrollHeight + "px";
+    }
+  });
+
+  /* =========================
+     ACCESIBILIDAD (panel)
+     ========================= */
+  const a11yToggle = document.getElementById('a11yToggle');
+  const a11yPanel  = document.getElementById('a11yPanel');
+
+  a11yToggle.addEventListener('click', () => {
+    a11yPanel.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    const wrap = document.querySelector('.a11y-wrap');
+    if (!wrap.contains(e.target)) a11yPanel.classList.remove('open');
+  });
+
+  let baseSize = 16;
+  const minSize = 14;
+  const maxSize = 20;
+
+  const applyFont = () => {
+    document.documentElement.style.fontSize = baseSize + "px";
+    localStorage.setItem("cm_font_size", baseSize);
+  };
+
+  const savedSize = parseInt(localStorage.getItem("cm_font_size"), 10);
+  if (!isNaN(savedSize)) { baseSize = savedSize; applyFont(); }
+
+  document.getElementById('btnInc').addEventListener('click', () => {
+    baseSize = Math.min(maxSize, baseSize + 1);
+    applyFont();
+  });
+
+  document.getElementById('btnDec').addEventListener('click', () => {
+    baseSize = Math.max(minSize, baseSize - 1);
+    applyFont();
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    baseSize = 16;
+    applyFont();
+  });
+
+  const applyContrast = (on) => {
+    document.body.classList.toggle('high-contrast', on);
+    localStorage.setItem("cm_contrast", on ? "1" : "0");
+  };
+
+  const savedContrast = localStorage.getItem("cm_contrast");
+  if (savedContrast === "1") applyContrast(true);
+
+  document.getElementById('btnContrast').addEventListener('click', () => {
+    const on = !document.body.classList.contains('high-contrast');
+    applyContrast(on);
+  });
+</script>
+
+</body>
+</html>
