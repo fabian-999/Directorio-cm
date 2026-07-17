@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>CM Colombia | Auditorías</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root{
+      --green:#2e7d32;
+      --green2:#7cc242;
+      --bg:#f5fbf6;
+      --card:#ffffff;
+      --text:#0f1a12;
+      --muted:#6b7a6f;
+      --border:#dfeee3;
+      --danger:#c62828;
+      --shadow: 0 10px 28px rgba(0,0,0,.08);
+      --r:16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 60%);
+    }
+
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:240px;
+    }
+    .brand img{
+      width:44px;
+      height:44px;
+      object-fit:contain;
+      border-radius:10px;
+      background:#fff;
+      border:1px solid var(--border);
+      padding:6px;
+    }
+    .brand-title b{ display:block; color:var(--green); font-size:16px; }
+    .brand-title span{ display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+
+    .chip{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      max-width:360px;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .wrap{
+      max-width:1440px;
+      margin:0 auto;
+      padding:22px 18px 40px;
+    }
+
+    /* ✅ CAMBIO: Desktop en 1 columna para que el form quede ABAJO */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;   /* antes: 1.45fr .55fr */
+      gap:22px;
+      align-items:start;
+    }
+    /* (opcional) refuerza que el form vaya debajo */
+    #panelForm{ order:2; }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      .brand{ min-width:auto; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    h1{
+      font-size:22px;
+      margin:0 0 6px 0;
+      color:var(--green);
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0 0 14px 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin:10px 0;
+      flex-wrap:wrap;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      outline:none;
+      background:#fff;
+      font-size:14px;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(46,125,50,.55);
+      box-shadow: 0 0 0 4px rgba(124,194,66,.18);
+    }
+    textarea{ min-height:88px; resize:vertical; }
+
+    .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 680px){
+      .two{ grid-template-columns: 1fr; }
+    }
+
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px 2px;
+      font-weight:600;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:800;
+      font-size:13px;
+      letter-spacing:.2px;
+      transition: transform .05s ease, opacity .15s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{
+      background: linear-gradient(180deg, var(--green2), var(--green));
+      color:#fff;
+    }
+    .btn-ghost{
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--green);
+    }
+    .btn-danger{
+      background:#fff;
+      border:1px solid rgba(198,40,40,.35);
+      color:var(--danger);
+    }
+
+    .actions-wrap{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .btn-icon-danger{
+      background:#fff;
+      border:1px solid rgba(198,40,40,.35);
+      color:var(--danger);
+      padding:10px 12px;
+      border-radius:999px;
+      font-weight:900;
+      line-height:1;
+    }
+    .btn-icon-danger:hover{ opacity:.9; }
+
+    /* Iconos compactos (SVG) */
+    .actions-wrap-mini{ display:flex; gap:6px; align-items:center; }
+    .icon-mini{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+      padding:0;
+    }
+    .icon-mini:active{ transform: translateY(1px); }
+    .icon-mini:hover{
+      background:rgba(124,194,66,.14);
+      border-color:rgba(46,125,50,.35);
+    }
+    .icon-mini svg{ width:18px; height:18px; display:block; }
+    .icon-mini.danger{
+      border:1px solid rgba(198,40,40,.35);
+      color:var(--danger);
+    }
+    .icon-mini.danger:hover{
+      background:rgba(198,40,40,.08);
+      border-color:rgba(198,40,40,.45);
+    }
+    .icon-mini[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+    .icon-mini[disabled]:hover{
+      background:#fff;
+      border-color:var(--border);
+    }
+
+    /* Animación al eliminar */
+    .row-removing{
+      opacity:0;
+      transform: translateX(-6px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    /* Modal confirmación (eliminar inspección) */
+    .confirm-backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.35);
+      display:flex; align-items:center; justify-content:center;
+      padding:18px; z-index:9998;
+    }
+    .confirm-backdrop.hidden{ display:none; }
+    .confirm-card{
+      width:min(520px, 96vw);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 18px 60px rgba(0,0,0,.18);
+      overflow:hidden;
+      border:1px solid rgba(31,122,53,.18);
+    }
+    .confirm-head{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:16px 16px 10px;
+      border-bottom:1px solid rgba(31,122,53,.10);
+    }
+    .confirm-icon{
+      width:44px; height:44px; border-radius:14px;
+      background:rgba(198,40,40,.10);
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+    }
+    .confirm-title{ font-weight:900; font-size:18px; color:#0f2f1b; }
+    .confirm-sub{ font-size:13px; color:#4b6b57; margin-top:2px; line-height:1.35; }
+    .confirm-body{ padding:12px 16px 2px; }
+    .confirm-actions{
+      display:flex; justify-content:flex-end; gap:10px;
+      padding:12px 16px 16px;
+    }
+    .btn.secondary{
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--green);
+    }
+    .btn.primary{
+      background: linear-gradient(180deg, var(--green2), var(--green));
+      color:#fff;
+    }
+    .btn.danger{
+      background:#fff;
+      border:1px solid rgba(198,40,40,.35);
+      color:var(--danger);
+    }
+
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      margin-top:12px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:14px;
+    }
+    .table th{
+      text-align:left;
+      font-size:12px;
+      padding:10px 12px;
+      background: rgba(124,194,66,.12);
+      color:var(--green);
+      border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    .table td{
+      padding:10px 12px;
+      border-bottom:1px solid var(--border);
+      font-size:13px;
+      vertical-align:top;
+    }
+    .table tr:last-child td{ border-bottom:none; }
+
+    .pill{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:12px;
+      color:var(--green);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .muted{ color:var(--muted); }
+    .error{
+      margin-top:10px;
+      color:var(--danger);
+      font-size:12px;
+      min-height:18px;
+      white-space:pre-wrap;
+    }
+    .ok{
+      margin-top:10px;
+      color:var(--green);
+      font-size:12px;
+      min-height:18px;
+      font-weight:800;
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .clickRow{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    .clickRow:hover{ background: rgba(124,194,66,.08); }
+
+    .small{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .divider{
+      height:1px;
+      background:var(--border);
+      margin:14px 0;
+    }
+
+    /* Modal (picker de plantillas) */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); display:flex; align-items:center; justify-content:center; padding:18px; z-index:9999;}
+    .modal-backdrop.hidden{ display:none; }
+    .modal-card{ width:min(760px, 96vw); background:#fff; border-radius:18px; box-shadow:0 18px 60px rgba(0,0,0,.18); overflow:hidden; border:1px solid rgba(31,122,53,.18); }
+    .modal-head{ display:flex; gap:12px; align-items:flex-start; padding:16px 16px 10px; border-bottom:1px solid rgba(31,122,53,.10); }
+    .modal-icon{ width:44px; height:44px; border-radius:14px; background:rgba(31,122,53,.10); display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .modal-title{ font-weight:800; font-size:18px; color:#0f2f1b; }
+    .modal-sub{ font-size:13px; color:#4b6b57; margin-top:2px; }
+    .icon-btn{ margin-left:auto; border:none; background:rgba(0,0,0,.04); border-radius:12px; width:38px; height:38px; cursor:pointer; font-size:16px; }
+    .modal-body{ padding:14px 16px 6px; max-height:52vh; overflow:auto; }
+    .tpl-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+    @media (max-width: 700px){ .tpl-grid{ grid-template-columns:1fr; } }
+    .tpl-item{ display:flex; gap:10px; align-items:flex-start; padding:12px; border:1px solid rgba(31,122,53,.16); border-radius:14px; background:rgba(245,251,247,.9); cursor:pointer; }
+    .tpl-item:hover{ background:rgba(245,251,247,1); border-color:rgba(31,122,53,.28); }
+    .tpl-item input{ margin-top:3px; }
+    .tpl-name{ font-weight:700; color:#0f2f1b; }
+    .tpl-desc{ font-size:12px; color:#4b6b57; margin-top:2px; }
+    .modal-actions{ display:flex; justify-content:flex-end; gap:10px; padding:12px 16px 16px; }
+
+    /* ===== Drawer / Form panel ===== */
+    body.form-open #panelForm{ transform:translateX(0); }
+
+    .btn-close-drawer{
+      display:inline-flex;
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:40px; height:40px;
+      align-items:center; justify-content:center;
+      border-radius:12px;
+      border:1px solid rgba(20,90,42,.18);
+      background:#fff;
+      font-weight:900;
+    }
+
+    /* ✅ FIX: En desktop SIEMPRE debe ser interactivo */
+    @media (min-width: 901px){
+      #panelForm{ pointer-events:auto !important; }
+    }
+
+    /* Backdrop (móvil) */
+    .btn-burger{ display:none; }
+    .btn-close-drawer{ display:none; }
+
+    .backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.4);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease;
+      z-index:80;
+    }
+
+    body.form-open .backdrop{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    @media (max-width: 900px){
+      /* Muestra botón hamburguesa */
+      #btnForm{ display:inline-flex !important; }
+
+      /* ✅ En móvil dejamos 1 columna */
+      .grid, .content-grid, .page-grid{
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Drawer */
+      #panelForm{
+        position:fixed !important;
+        top:0;
+        right:0;
+        bottom:0;
+        width:100%;
+        max-width:420px;
+        background:#fff;
+        overflow:auto;
+        transform:translateX(105%);
+        transition:transform .25s ease;
+        z-index:90;
+        border-radius:20px 0 0 20px;
+        box-shadow:-15px 0 40px rgba(0,0,0,.2);
+      }
+      body.form-open #panelForm{
+        transform:translateX(0);
+      }
+
+      .btn-close-drawer{
+        display:flex;
+        position:sticky;
+        top:10px;
+        margin-left:auto;
+        margin-right:10px;
+        width:40px;
+        height:40px;
+        align-items:center;
+        justify-content:center;
+        border-radius:12px;
+        border:1px solid var(--border, rgba(20,90,42,.18));
+        background:#fff;
+        font-weight:900;
+        cursor:pointer;
+        z-index:95;
+      }
+
+      /* ✅ FIX: SOLO en móvil se bloquea cuando está cerrado */
+      body:not(.form-open) #panelForm{ pointer-events:none; }
+      body.form-open #panelForm{ pointer-events:auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <button id="btnForm" class="btn btn-ghost btn-burger" type="button" aria-label="Abrir formulario">☰ Formulario</button>
+
+      <div class="brand">
+        <img src="/LOGO_CM.png" alt="CM Colombia">
+        <div class="brand-title">
+          <b>CM Colombia</b>
+          <span>Auditorías</span>
+        </div>
+      </div>
+
+      <div class="row" style="margin:0;">
+        <div id="chipUser" class="chip">Cargando sesión...</div>
+        <button id="btnDash" class="btn btn-ghost">Dashboard</button>
+        <button id="btnLogout" class="btn btn-danger">Salir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- LISTA -->
+      <div class="card">
+        <h1>Listado de auditorías</h1>
+        <p class="sub">Aquí solo verás lo que tu RLS te permita ver.</p>
+
+        <div class="row">
+          <input id="q" placeholder="Buscar por título / punto / estado..." />
+          <button id="btnReload" class="btn btn-primary">Actualizar</button>
+        </div>
+
+        <div class="hint">
+          <b>Tip:</b> si no aparece nada pero hay auditorías, tu RLS de <code>public.audits</code>
+          no está permitiendo <b>SELECT</b> para tu rol.
+        </div>
+
+        <div class="error" id="listErr"></div>
+        <table class="table" id="tbl">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Punto de Dispensación</th>
+              <th>Estado</th>
+              <th>Fechas</th>
+              <th>Ir a</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="5" class="muted">Cargando...</td></tr>
+          </tbody>
+        </table>
+
+        <div class="small" id="count"></div>
+      </div>
+
+      <!-- CREAR / EDITAR -->
+      <div class="card" id="panelForm">
+        <h1 id="rightTitle">Crear auditoría</h1>
+        <button id="btnCloseForm" class="btn-close-drawer" type="button" aria-label="Cerrar formulario">✕</button>
+        <p class="sub" id="rightSub">Solo podrás guardar si tu RLS permite INSERT.</p>
+
+        <div class="divider"></div>
+
+        <div class="two">
+          <div class="field">
+            <label>Título</label>
+            <input id="title" placeholder="Ej: Auditoría interna - Enero" />
+          </div>
+          <div class="field">
+            <label>Punto de Dispensación</label>
+            <input id="punto" placeholder="Ej: Auditoría interna" />
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="field" style="display:none">
+            <label>Proceso</label>
+            <input id="process" placeholder="Ej: Calidad / Inventarios" />
+          </div>
+          <div class="field" style="display:none">
+            <label>Estado</label>
+            <select id="status"></select>
+            <div class="small" style="margin-top:6px;">
+              (Estos estados deben coincidir con el CHECK de <code>audits.status</code>)
+            </div>
+          </div>
+
+          <div class="field" style="display:none">
+            <label>Plantilla (Checklist)</label>
+            <select id="template_id"></select>
+          </div>
+
+          <div class="field">
+            <label>Inspección</label>
+            <div class="row" style="margin:0;">
+              <button id="btnInspection" class="btn btn-ghost" type="button">📝 Ir a inspección</button>
+              <span class="pill" id="inspPill">—</span>
+            </div>
+            <div class="small" style="margin-top:6px;">Al guardar una auditoría con plantilla, se crea (o vincula) una inspección.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Objetivo</label>
+          <textarea id="objective" placeholder="¿Qué se busca validar con esta auditoría?"></textarea>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label>Fecha inicio</label>
+            <input id="start_date" type="date" />
+          </div>
+          <div class="field">
+            <label>Fecha fin</label>
+            <input id="end_date" type="date" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Criterio / Alcance (opcional)</label>
+          <textarea id="criteria" placeholder="Norma, políticas internas, etc."></textarea>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <button id="btnSave" class="btn btn-primary">Guardar</button>
+          <button id="btnNew" class="btn btn-ghost">Nuevo</button>
+        </div>
+
+        <div class="ok" id="ok"></div>
+        <div class="error" id="err"></div>
+
+        <div class="divider"></div>
+
+        <div class="hint">
+          <b>Cómo funciona:</b><br>
+          - Si haces click en una auditoría del listado, se carga aquí para editar.<br>
+          - Se guarda “por usuario” llenando <code>created_by</code> y <code>lead_user_id</code> con tu UID.<br>
+          - Si tu RLS no permite INSERT/UPDATE, verás el error aquí en rojo.
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    // =============================
+    // UI: Panel formulario tipo "hamburguesa" (móvil)
+    // =============================
+    function _isMobileFormMode(){
+      return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+    }
+
+    function syncBackdrop(){
+      const bd = document.getElementById("formBackdrop");
+      if(!bd) return;
+      if(document.body.classList.contains("form-open")) bd.removeAttribute("hidden");
+      else bd.setAttribute("hidden", "");
+    }
+
+    window.toggleForm = function(open){
+      if(!_isMobileFormMode()) return;
+      const shouldOpen = (open === undefined) ? !document.body.classList.contains("form-open") : !!open;
+      document.body.classList.toggle("form-open", shouldOpen);
+      syncBackdrop();
+    };
+
+    function _wireFormDrawer(){
+      const btnForm = document.getElementById("btnForm");
+      const btnClose = document.getElementById("btnCloseForm");
+      const backdrop = document.getElementById("formBackdrop");
+
+      if(btnForm) btnForm.addEventListener("click", ()=> window.toggleForm(true));
+      if(btnClose) btnClose.addEventListener("click", ()=> window.toggleForm(false));
+      if(backdrop) backdrop.addEventListener("click", ()=> window.toggleForm(false));
+
+      document.addEventListener("keydown", (e)=>{
+        if(e.key === "Escape") window.toggleForm(false);
+      });
+
+      window.addEventListener("resize", ()=>{
+        if(!_isMobileFormMode()){
+          document.body.classList.remove("form-open");
+          syncBackdrop();
+        }
+      });
+    }
+
+    // =============================
+    // CONFIG
+    // =============================
+    const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+
+    const STATUS_VALUES = [
+      { value: "open",        label: "open" },
+      { value: "in_progress", label: "in_progress" },
+      { value: "closed",      label: "closed" },
+    ];
+    const DEFAULT_STATUS = "open";
+
+    // =============================
+    // DOM HELPERS
+    // =============================
+    const $ = (id) => document.getElementById(id);
+
+    const listErr = $("listErr");
+    const tbody  = $("tbody");
+    const count  = $("count");
+    const okBox  = $("ok");
+    const errBox = $("err");
+
+    const form = {
+      id: null,
+      title: $("title"),
+      punto: $("punto"),
+      process: $("process"),
+      status: $("status"),
+      template_id: $("template_id"),
+      objective: $("objective"),
+      start_date: $("start_date"),
+      end_date: $("end_date"),
+      criteria: $("criteria"),
+    };
+
+    let session = null;
+    let inspectionsByAudit = {}; // audit_id -> {id,status,template_id}
+
+    function setListError(msg){ listErr.textContent = msg || ""; }
+    function setOk(msg){ okBox.textContent = msg || ""; }
+    function setErr(msg){ errBox.textContent = msg || ""; }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // =============================
+    // STATUS SELECT
+    // =============================
+    function mountStatuses(){
+      form.status.innerHTML = STATUS_VALUES
+        .map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.label)}</option>`)
+        .join("");
+      form.status.value = DEFAULT_STATUS;
+      form.template_id.value = '';
+      $('inspPill').textContent = '—';
+    }
+
+    // =============================
+    // TEMPLATES (CHECKLIST)
+    // =============================
+    async function mountTemplates(){
+      form.template_id.innerHTML = `<option value="">(Sin plantilla)</option>`;
+      const { data, error } = await sb
+        .from("checklist_templates")
+        .select("id,name,is_active")
+        .order("name", { ascending: true });
+
+      if(error){
+        console.warn("No pude cargar plantillas:", error.message);
+        return;
+      }
+
+      const opts = (data || [])
+        .filter(t => t.is_active)
+        .map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)}</option>`)
+        .join("");
+
+      form.template_id.innerHTML = `<option value="">(Sin plantilla)</option>` + opts;
+    }
+
+    // =============================
+    // FORM
+    // =============================
+    function resetForm(){
+      form.id = null;
+      $("rightTitle").textContent = "Crear auditoría";
+      $("rightSub").textContent = "Solo podrás guardar si tu RLS permite INSERT.";
+      form.title.value = "";
+      form.punto.value = "";
+      form.process.value = "";
+      form.objective.value = "";
+      form.criteria.value = "";
+      form.start_date.value = "";
+      form.end_date.value = "";
+      form.status.value = DEFAULT_STATUS;
+      setOk("");
+      setErr("");
+    }
+
+    function fillForm(a){
+      form.id = a.id;
+      $("rightTitle").textContent = "Editar auditoría";
+      $("rightSub").textContent = "Guardar aplicará UPDATE (si tu RLS lo permite).";
+      form.title.value = a.title || "";
+      form.punto.value = a.punto || "";
+      form.process.value = a.process || "";
+      form.status.value = a.status || DEFAULT_STATUS;
+      form.objective.value = a.objective || "";
+      form.criteria.value = a.criteria || "";
+      form.start_date.value = a.start_date || "";
+      form.end_date.value = a.end_date || "";
+
+      const insp = inspectionsByAudit[a.id];
+      if(insp){
+        form.template_id.value = insp.template_id || '';
+        $('inspPill').textContent = insp.status || '—';
+      } else {
+        $('inspPill').textContent = '—';
+      }
+
+      setOk("");
+      setErr("");
+    }
+
+    function fmtDate(d){ return d ? d : "—"; }
+
+    function rowHtml(a){
+      const status = a.status || "—";
+      const title  = a.title || "(sin título)";
+      const punto  = a.punto || "—";
+      const dates  = `${fmtDate(a.start_date)} → ${fmtDate(a.end_date)}`;
+
+      const iconSearch = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M10 4a6 6 0 104.472 10.027l3.25 3.25a1 1 0 001.414-1.414l-3.25-3.25A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z"/>
+        </svg>`;
+      const iconTrash = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M9 3a1 1 0 00-1 1v1H5a1 1 0 000 2h1v13a2 2 0 002 2h8a2 2 0 002-2V7h1a1 1 0 100-2h-3V4a1 1 0 00-1-1H9zm1 2h4v0H10v0zm-1 4a1 1 0 011 1v9a1 1 0 11-2 0v-9a1 1 0 011-1zm6 0a1 1 0 011 1v9a1 1 0 11-2 0v-9a1 1 0 011-1z"/>
+        </svg>`;
+
+      return `
+        <tr class="clickRow" data-id="${a.id}">
+          <td>
+            <b>${escapeHtml(title)}</b><br>
+            <span class="small muted">${escapeHtml(a.id)}</span>
+          </td>
+          <td>${escapeHtml(punto)}</td>
+          <td><span class="pill">${escapeHtml(status)}</span></td>
+          <td class="muted">${escapeHtml(dates)}</td>
+          <td>
+            <div class="actions-wrap-mini">
+              <button class="icon-mini"
+                type="button"
+                title="Abrir inspección"
+                onclick="event.stopPropagation(); goToInspection('${a.id}')">
+                ${iconSearch}
+              </button>
+
+              <button class="icon-mini danger"
+                type="button"
+                title="Eliminar auditoría"
+                onclick="event.stopPropagation(); openDeleteAuditModal('${a.id}')">
+                ${iconTrash}
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    // =============================
+    // INSPECCIONES
+    // =============================
+    async function ensureInspectionForAudit(auditId, templateId){
+      if(!templateId) return null;
+
+      const cached = inspectionsByAudit[auditId];
+      if(cached && cached.template_id === templateId) return cached;
+
+      const { data: existing, error: e1 } = await sb
+        .from("inspections")
+        .select("id,audit_id,template_id,status,created_at")
+        .eq("audit_id", auditId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if(e1) throw new Error("No pude consultar inspecciones: " + e1.message);
+
+      if(existing && existing.length){
+        const insp = existing[0];
+
+        if(insp.template_id !== templateId){
+          const { error: eUp } = await sb
+            .from("inspections")
+            .update({ template_id: templateId })
+            .eq("id", insp.id);
+
+          if(eUp) throw new Error("No pude actualizar plantilla en inspección: " + eUp.message);
+          insp.template_id = templateId;
+        }
+
+        inspectionsByAudit[auditId] = insp;
+        return insp;
+      }
+
+      const payload = {
+        audit_id: auditId,
+        template_id: templateId,
+        inspector_id: session.user.id,
+        status: "draft"
+      };
+
+      const { data: created, error: e2 } = await sb
+        .from("inspections")
+        .insert(payload)
+        .select("id,audit_id,template_id,status,created_at")
+        .single();
+
+      if(e2) throw new Error("No pude crear inspección (RLS/validación): " + e2.message);
+
+      inspectionsByAudit[auditId] = created;
+      return created;
+    }
+
+    function goToInspection(auditId){
+      window.location.href = `plantillas_select.html?audit_id=${encodeURIComponent(auditId)}`;
+    }
+
+    // =============================
+    // DELETE MODAL
+    // =============================
+    let _pendingDeleteAuditId = null;
+
+    function showConfirmModal(show){
+      const modal = document.getElementById("confirmModal");
+      if(!modal) return;
+      modal.classList.toggle("hidden", !show);
+      modal.setAttribute("aria-hidden", show ? "false" : "true");
+    }
+
+    function openDeleteAuditModal(auditId){
+      setErr(""); setOk("");
+      _pendingDeleteAuditId = auditId;
+      const detail = document.getElementById("confirmDetail");
+      if(detail) detail.textContent = `Audit ID: ${auditId}`;
+      showConfirmModal(true);
+    }
+
+    async function performDeleteAudit(auditId){
+      const tr = tbody.querySelector(`tr[data-id="${auditId}"]`);
+      if(tr) tr.classList.add("row-removing");
+
+      const { error: inspErr } = await sb.from("inspections").delete().eq("audit_id", auditId);
+      if(inspErr){
+        if(tr) tr.classList.remove("row-removing");
+        showConfirmModal(false);
+        const msg = "No pude eliminar inspecciones (RLS/validación): " + inspErr.message;
+        setErr(msg); alert(msg);
+        return;
+      }
+
+      const { error: auditErr } = await sb.from("audits").delete().eq("id", auditId);
+      if(auditErr){
+        if(tr) tr.classList.remove("row-removing");
+        showConfirmModal(false);
+        const msg = "No pude eliminar la auditoría (RLS/validación): " + auditErr.message;
+        setErr(msg); alert(msg);
+        return;
+      }
+
+      delete inspectionsByAudit[auditId];
+      if(form.id === auditId){
+        resetForm();
+        $("inspPill").textContent = "—";
+      }
+
+      showConfirmModal(false);
+      setOk("✅ Auditoría eliminada.");
+      await loadAudits();
+    }
+
+    function bindConfirmModalEvents(){
+      const modal = document.getElementById("confirmModal");
+      const closeBtn = document.getElementById("confirmClose");
+      const cancelBtn = document.getElementById("confirmCancel");
+      const yesBtn = document.getElementById("confirmYes");
+
+      if(closeBtn) closeBtn.addEventListener("click", ()=>showConfirmModal(false));
+      if(cancelBtn) cancelBtn.addEventListener("click", ()=>showConfirmModal(false));
+      if(modal) modal.addEventListener("click", (e)=>{ if(e.target === modal) showConfirmModal(false); });
+
+      if(yesBtn){
+        yesBtn.addEventListener("click", async ()=>{
+          if(!_pendingDeleteAuditId) return;
+          const aid = _pendingDeleteAuditId;
+          _pendingDeleteAuditId = null;
+          await performDeleteAudit(aid);
+        });
+      }
+
+      document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") showConfirmModal(false); });
+    }
+
+    // =============================
+    // AUTH GUARD
+    // =============================
+    async function requireSession(){
+      const { data, error } = await sb.auth.getSession();
+      if(error) throw error;
+      if(!data.session){
+        window.location.replace("/index.html");
+        return null;
+      }
+      return data.session;
+    }
+
+    // =============================
+    // LIST
+    // =============================
+    let debounceT = null;
+    function debounceLoad(){
+      clearTimeout(debounceT);
+      debounceT = setTimeout(loadAudits, 250);
+    }
+
+    async function loadAudits(){
+      setListError("");
+      tbody.innerHTML = `<tr><td colspan="5" class="muted">Cargando...</td></tr>`;
+      count.textContent = "";
+
+      const q = $("q").value.trim().toLowerCase();
+
+      const { data, error } = await sb
+        .from("audits")
+        .select("id,title,punto,process,objective,criteria,status,start_date,end_date,created_at,created_by,lead_user_id")
+        .order("created_at", { ascending:false });
+
+      if(error){
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">—</td></tr>`;
+        setListError("No pude listar auditorías: " + error.message);
+        return;
+      }
+
+      inspectionsByAudit = {};
+      const auditIds = (data || []).map(a => a.id);
+      if(auditIds.length){
+        const { data: inspRows, error: inspErr } = await sb
+          .from("inspections")
+          .select("id,audit_id,template_id,status,created_at")
+          .in("audit_id", auditIds)
+          .order("created_at", { ascending: false });
+
+        if(!inspErr && inspRows){
+          for(const r of inspRows){
+            if(!inspectionsByAudit[r.audit_id]) inspectionsByAudit[r.audit_id] = r;
+          }
+        }
+      }
+
+      const filtered = !q ? data : data.filter(a => {
+        const blob = `${a.title||""} ${a.punto||""} ${a.status||""}`.toLowerCase();
+        return blob.includes(q);
+      });
+
+      if(!filtered.length){
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">No hay auditorías visibles para tu usuario.</td></tr>`;
+        count.textContent = "0 auditorías";
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(rowHtml).join("");
+      count.textContent = `${filtered.length} auditoría(s)`;
+    }
+
+    async function loadAuditById(id){
+      setErr("");
+      setOk("");
+
+      const { data, error } = await sb
+        .from("audits")
+        .select("id,title,punto,process,objective,criteria,status,start_date,end_date,created_at,created_by,lead_user_id")
+        .eq("id", id)
+        .single();
+
+      if(error){
+        setErr("No pude cargar la auditoría: " + error.message);
+        return;
+      }
+
+      try{
+        const { data: inspRows, error: ie } = await sb
+          .from("inspections")
+          .select("id,audit_id,template_id,status,created_at")
+          .eq("audit_id", id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if(!ie && inspRows && inspRows.length){
+          inspectionsByAudit[id] = inspRows[0];
+          form.template_id.value = inspRows[0].template_id || '';
+          $("inspPill").textContent = inspRows[0].status || '—';
+        }
+      }catch(_e){}
+
+      fillForm(data);
+    }
+
+    // =============================
+    // SAVE (INSERT/UPDATE)
+    // =============================
+    function explainStatusCheckIfNeeded(msg){
+      if(!msg) return msg;
+      if(msg.includes("audits_status_check")){
+        return (
+          msg +
+          "\n\n✅ Esto significa que el valor de 'status' NO coincide con el CHECK de tu tabla.\n" +
+          "👉 Solución rápida: cambia STATUS_VALUES en este archivo para que coincida con tu BD."
+        );
+      }
+      return msg;
+    }
+
+    async function saveAudit(){
+      setErr("");
+      setOk("");
+
+      const payload = {
+        title: form.title.value.trim(),
+        punto: form.punto.value.trim(),
+        process: form.process.value.trim(),
+        status: form.status.value,
+        objective: form.objective.value.trim() || null,
+        criteria: form.criteria.value.trim() || null,
+        start_date: form.start_date.value || null,
+        end_date: form.end_date.value || null,
+        created_by: session.user.id,
+        lead_user_id: session.user.id,
+      };
+
+      if(!payload.title){
+        setErr("El título es obligatorio.");
+        return;
+      }
+
+      if(!form.id){
+        const { data, error } = await sb
+          .from("audits")
+          .insert(payload)
+          .select("id")
+          .single();
+
+        if(error){
+          setErr(explainStatusCheckIfNeeded("No pude crear auditoría (RLS/validación): " + error.message));
+          return;
+        }
+
+        setOk("✅ Auditoría creada.");
+        form.id = data.id;
+
+        const tplId = form.template_id.value;
+        if(tplId){
+          try{
+            const insp = await ensureInspectionForAudit(form.id, tplId);
+            $('inspPill').textContent = insp.status || '—';
+          }catch(e){ console.warn(e); }
+        }
+
+        await loadAudits();
+        return;
+      }
+
+      delete payload.created_by;
+
+      const { error } = await sb
+        .from("audits")
+        .update(payload)
+        .eq("id", form.id);
+
+      if(error){
+        setErr(explainStatusCheckIfNeeded("No pude actualizar auditoría (RLS/validación): " + error.message));
+        return;
+      }
+
+      setOk("✅ Auditoría actualizada.");
+
+      const tplId2 = form.template_id.value;
+      if(tplId2){
+        try{
+          const insp = await ensureInspectionForAudit(form.id, tplId2);
+          $('inspPill').textContent = insp.status || '—';
+        }catch(e){ console.warn(e); }
+      }
+
+      await loadAudits();
+    }
+
+    // =============================
+    // EVENTS
+    // =============================
+    $("btnDash").onclick = () => window.location.href = "/pages/dashboard.html";
+    $("btnLogout").onclick = async () => {
+      await sb.auth.signOut();
+      window.location.replace("/index.html");
+    };
+
+    $("btnReload").onclick = () => loadAudits();
+    $("q").addEventListener("input", debounceLoad);
+
+    $("btnSave").onclick = () => saveAudit();
+    $("btnNew").onclick = () => resetForm();
+
+    $("btnInspection").onclick = async () => {
+      setErr(""); setOk("");
+      if(!form.id){
+        setErr("Primero guarda la auditoría para poder iniciar la inspección.");
+        return;
+      }
+      const tpl = form.template_id.value;
+      if(!tpl){
+        setErr("Selecciona una plantilla antes de iniciar la inspección.");
+        return;
+      }
+      try{
+        const insp = await ensureInspectionForAudit(form.id, tpl);
+        $("inspPill").textContent = insp.status || "—";
+        goToInspection(form.id);
+      }catch(e){
+        setErr(e?.message || String(e));
+      }
+    };
+
+    tbody.addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if(!tr) return;
+      loadAuditById(tr.getAttribute("data-id"));
+      // Si estás en móvil, abre el drawer al seleccionar una auditoría
+      if(_isMobileFormMode()) window.toggleForm(true);
+    });
+
+    sb.auth.onAuthStateChange((event) => {
+      if(event === "SIGNED_OUT") window.location.replace("/index.html");
+    });
+
+    window.goToInspection = goToInspection;
+    window.openDeleteAuditModal = openDeleteAuditModal;
+
+    // =============================
+    // INIT
+    // =============================
+    (async function init(){
+      mountStatuses();
+      _wireFormDrawer();
+
+      session = await requireSession();
+      if(!session) return;
+
+      $("chipUser").textContent = session.user.email;
+      await mountTemplates();
+      bindConfirmModalEvents();
+
+      resetForm();
+      await loadAudits();
+      syncBackdrop();
+    })();
+  </script>
+
+  <!-- CONFIRM DELETE MODAL -->
+  <div id="confirmModal" class="confirm-backdrop hidden" aria-hidden="true">
+    <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="confirm-head">
+        <div class="confirm-icon">🗑️</div>
+        <div>
+          <div id="confirmTitle" class="confirm-title">Eliminar auditoría</div>
+          <div class="confirm-sub">Se eliminarán también las inspecciones asociadas. Esta acción no se puede deshacer.</div>
+        </div>
+        <button id="confirmClose" class="icon-btn" title="Cerrar" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="confirm-body">
+        <div class="small muted" id="confirmDetail"></div>
+      </div>
+      <div class="confirm-actions">
+        <button id="confirmCancel" class="btn secondary" type="button">Cancelar</button>
+        <button id="confirmYes" class="btn danger" type="button">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="formBackdrop" class="backdrop" hidden></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("btnForm");
+      const close = document.getElementById("btnCloseForm");
+      const bd = document.getElementById("formBackdrop");
+
+      if(btn) btn.addEventListener("click", (e)=>{ e.preventDefault(); window.toggleForm(true); });
+      if(close) close.addEventListener("click", (e)=>{ e.preventDefault(); window.toggleForm(false); });
+      if(bd) bd.addEventListener("click", ()=> window.toggleForm(false));
+
+      window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") window.toggleForm(false); });
+      window.addEventListener("resize", ()=>{ if(window.innerWidth > 900) window.toggleForm(false); });
+
+      syncBackdrop();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Seleccionar plantillas • CM Colombia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#f3fbf6;
+      --card:#ffffff;
+      --ink:#0e1a12;
+      --muted:#5b6b61;
+      --line:#cfe7d8;
+      --green:#1f8a3a;
+      --green2:#2ea44f;
+      --shadow:0 18px 50px rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter;background:#f7fff9;color:var(--ink)}
+    header{display:flex;justify-content:space-between;padding:18px;border-bottom:1px solid var(--line);background:#fff}
+    .btn{border:1px solid var(--line);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .btn.primary{background:var(--green);color:#fff}
+    .wrap{max-width:1000px;margin:20px auto}
+    .tplRow{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff;display:flex;gap:12px;align-items:flex-start}
+    .tplName{font-weight:800}
+    .tplMeta{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div><b>CM Colombia</b></div>
+  <div>
+    <button class="btn" id="backBtn">← Volver</button>
+    <button class="btn" id="logoutBtn">Salir</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2>Selecciona plantillas</h2>
+
+  <input id="q" type="text" placeholder="Buscar..." style="width:100%;padding:10px;margin-bottom:10px">
+
+  <div id="tplList"></div>
+
+  <div style="margin-top:10px">
+    <button class="btn" id="clearBtn">Limpiar</button>
+    <button class="btn primary" id="startBtn">Empezar</button>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const tplList = document.getElementById("tplList");
+const q = document.getElementById("q");
+const backBtn = document.getElementById("backBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let templates = [];
+let selected = new Set();
+
+function render(){
+  const term = (q.value || "").toLowerCase().trim();
+  tplList.innerHTML = "";
+
+  templates
+    .filter(t => (t.name || "").toLowerCase().includes(term))
+    .forEach(t => {
+      const row = document.createElement("div");
+      row.className = "tplRow";
+
+      const chk = document.createElement("input");
+      chk.type = "checkbox";
+      chk.checked = selected.has(t.id);
+
+      chk.onchange = () => {
+        if(chk.checked) selected.add(t.id);
+        else selected.delete(t.id);
+      };
+
+      const meta = document.createElement("div");
+
+      const nm = document.createElement("div");
+      nm.className = "tplName";
+      nm.textContent = t.name || "Plantilla";
+
+      const idLine = document.createElement("div");
+      idLine.className = "tplMeta";
+      idLine.textContent = "ID: " + t.id;
+
+      const extra = document.createElement("div");
+      extra.className = "tplMeta";
+      extra.textContent = t.created_at || "";
+
+      meta.appendChild(nm);
+      meta.appendChild(idLine);
+      meta.appendChild(extra);
+
+      row.appendChild(chk);
+      row.appendChild(meta);
+
+      tplList.appendChild(row);
+    });
+}
+
+async function loadTemplates(){
+  const { data, error } = await sb
+    .from("checklist_templates")
+    .select("*")
+    .order("name");
+
+  if(error){
+    tplList.innerHTML = `<div style="color:#b91c1c">No se pudieron cargar las plantillas: ${error.message}</div>`;
+    return;
+  }
+
+  templates = data || [];
+  render();
+}
+
+document.getElementById("clearBtn").onclick = () => {
+  selected.clear();
+  render();
+};
+
+document.getElementById("startBtn").onclick = () => {
+  const auditId = new URLSearchParams(location.search).get("audit_id");
+
+  if(!selected.size){
+    alert("Selecciona al menos una plantilla.");
+    return;
+  }
+
+  localStorage.setItem(
+    "cm_tpl_queue_" + auditId,
+    JSON.stringify([...selected])
+  );
+
+  location.href = "inspecciones.html?mode=queue&merge=1&audit_id=" + encodeURIComponent(auditId || "");
+};
+
+q.oninput = render;
+
+backBtn.onclick = () => history.back();
+logoutBtn.onclick = async () => {
+  try { await sb.auth.signOut(); } catch(_e){}
+  location.href = "/index.html";
+};
+
+loadTemplates();
+</script>
+
+</body>
+</html>

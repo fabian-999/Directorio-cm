@@ -1,0 +1,1663 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CM Colombia • Inspecciones</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg1:#f3fbf5;
+      --bg2:#eef7f1;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#cfe6d6;
+      --border2:#e7f3eb;
+      --brand:#1e7a34;
+      --brand2:#2f9a4a;
+      --danger:#d92d20;
+      --shadow: 0 18px 45px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 0%, var(--bg1), transparent),
+                  radial-gradient(900px 500px at 90% 10%, var(--bg2), transparent),
+                  #f7faf8;
+      min-height:100vh;
+    }
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border2);
+    }
+    .topbar{
+      max-width:1200px;
+      margin:0 auto;
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:240px;}
+    .brand img{height:38px; width:auto}
+    .brand .title{font-weight:900; color:var(--brand); line-height:1}
+    .brand .subtitle{font-size:12px; color:var(--muted); margin-top:3px}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px; border-radius:999px;
+      border:1px solid var(--border); background:#f3fbf5;
+      font-size:13px; white-space:nowrap;
+    }
+    .pill b{color:var(--brand)}
+    .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+
+    main{max-width:1200px; margin:0 auto; padding: 18px 16px 40px;}
+    .grid{display:grid; grid-template-columns: 1fr 380px; gap:14px; align-items:start;}
+    @media(max-width: 1050px){.grid{grid-template-columns:1fr;}}
+
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border:1px solid var(--border2);
+      padding: 16px;
+    }
+    .card h3{margin:0 0 10px; font-size:18px; letter-spacing:.2px;}
+    .muted{color:var(--muted); font-size:13px; margin:6px 0 0}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding: 10px 14px; border-radius:999px;
+      border:1px solid var(--border); background:#fff;
+      cursor:pointer; font-weight:900; font-size:14px;
+      transition: transform .05s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:hover{box-shadow: 0 10px 18px rgba(0,0,0,.08)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      background: linear-gradient(180deg, var(--brand2), var(--brand));
+      border-color: rgba(30,122,52,.35);
+      color:#fff;
+    }
+    .btn.danger{
+      background:#fff;
+      border-color: rgba(217,45,32,.35);
+      color: var(--danger);
+    }
+    .btn.small{padding: 8px 12px; font-size:13px}
+    .btn.ghost{background:#f8faf9; border-color: var(--border2); color:#0f172a;}
+    .btn:disabled{opacity:.55; cursor:not-allowed}
+
+    .status{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background: #f6fffa;
+      font-size: 13px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+    .status.error{border-color: rgba(217,45,32,.35); background:#fff5f5; color: var(--danger);}
+    .status.ok{border-color: rgba(30,122,52,.35); background:#f1fff6; color:#14532d;}
+    .hidden{display:none !important}
+
+    .qcard{
+      border:1px solid var(--border2);
+      border-radius: 16px;
+      padding: 12px;
+      background:#fff;
+      margin-bottom:10px;
+    }
+    .qhead{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+    .qtitle{font-weight:900}
+    .badge{
+      display:inline-flex; align-items:center;
+      padding: 4px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background:#f3fbf5;
+      font-weight:900; font-size:12px;
+      color: var(--brand);
+      text-transform: lowercase;
+      white-space:nowrap;
+    }
+    .badge.gray{color:#334155; background:#f6f7f8; border-color:#e5e7eb}
+    .badge.blue{color:#1d4ed8; background:#eff6ff; border-color:#dbeafe}
+
+    .choices{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border2);
+      background:#fff;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip input{width:auto}
+    .chip.yes{border-color: rgba(30,122,52,.25); background:#f1fff6}
+    .chip.no{border-color: rgba(217,45,32,.25); background:#fff5f5}
+    .chip.na{border-color:#e5e7eb; background:#f6f7f8}
+    .chip.lik{border-color:#dbeafe; background:#eff6ff}
+
+    textarea, input{
+      width:100%; padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      outline:none; font-size:14px; background:#fff;
+    }
+    textarea{min-height:70px; resize:vertical}
+    textarea:focus, input:focus{border-color: rgba(30,122,52,.45); box-shadow: 0 0 0 4px rgba(47,154,74,.12);}
+
+    .sideRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .kv{font-size:13px; color:var(--muted);}
+    .kv b{color:var(--text)}
+
+    .tpl-sep{
+      margin: 18px 0 12px;
+      padding: 14px 14px;
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(47,154,74,.10), rgba(255,255,255,1));
+    }
+    .tpl-sep .row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .tpl-sep .name{
+      font-weight: 950;
+      font-size: 16px;
+      color: var(--brand);
+      letter-spacing: .2px;
+    }
+    .tpl-sep .meta{
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .tpl-sep .badge{
+      align-self:flex-start;
+    }
+
+    .epic-backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:99999;
+      padding:16px;
+    }
+    .epic-backdrop.show{display:flex;}
+    .epic-card{
+      width:min(560px,100%);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 20px 70px rgba(0,0,0,.35);
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.06);
+    }
+    .epic-head{display:flex; gap:12px; align-items:flex-start; padding:16px 18px 10px;}
+    .epic-ico{
+      width:44px; height:44px;
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; font-weight:900;
+      background:rgba(34,197,94,.12); color:#16a34a;
+      flex:0 0 auto;
+    }
+    .epic-title{margin:0; font-size:18px; font-weight:950;}
+    .epic-body{padding:0 18px 14px; color:#334155;}
+    .epic-body p{margin:8px 0 0; line-height:1.35;}
+    .epic-list{margin:10px 0 0; padding-left:18px;}
+    .epic-foot{
+      display:flex; gap:10px; justify-content:flex-end;
+      padding:12px 18px 16px;
+      background:rgba(15,23,42,.03);
+    }
+    .btn.epic{border-radius:12px; padding:10px 14px; font-weight:900;}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <img src="/LOGO_CM.png" alt="CM Colombia" onerror="this.style.display='none'">
+      <div>
+        <div class="title">CM Colombia</div>
+        <div class="subtitle">Inspección</div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="pill" id="who"><b>—</b><span id="whoRole">—</span></div>
+      <button class="btn ghost" id="btnBack">← Volver</button>
+      <button class="btn danger" id="btnLogout">Salir</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap">
+        <div>
+          <h3 id="tplTitle">Cargando…</h3>
+          <div class="muted" id="tplSub">—</div>
+        </div>
+        <div class="sideRow">
+          <span class="badge blue" id="score">—</span>
+          <button class="btn" id="btnSave">Guardar</button>
+          <button class="btn primary" id="btnFinalize">Finalizar</button>
+        </div>
+      </div>
+
+      <div id="qList" style="margin-top:12px"></div>
+      <div id="mainStatus" class="status hidden"></div>
+    </section>
+
+    <aside class="card">
+      <h3>Resumen</h3>
+      <div class="kv">Auditoría: <b id="auditLabel">—</b></div>
+      <div class="kv">Inspección ID: <b id="inspId">—</b></div>
+      <div class="kv">Estado: <b id="inspStatus">—</b></div>
+      <div class="kv">Respondidas: <b id="answered">0</b></div>
+      <div class="kv">✅ Sí: <b id="yesCount">0</b></div>
+      <div class="kv">❌ No: <b id="noCount">0</b></div>
+      <div style="margin-top:12px" class="status">
+        <b>Tip</b><br/>
+        Las respuestas ❌ pueden generar <b>hallazgos + acciones</b> automáticamente al finalizar.
+      </div>
+
+      <label style="display:block; margin-top:12px; font-size:12px; color:var(--muted)">Modo Safety</label>
+      <label class="chip" style="margin-top:8px">
+        <input type="checkbox" id="autoIssues" checked />
+        Crear hallazgos/acciones por cada ❌ NO
+      </label>
+
+      <div id="sideStatus" class="status hidden"></div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const SHORT_MAX = 255;
+  const LONG_MAX  = 500;
+  const COMMENT_MAX = 500;
+
+  const $ = (id) => document.getElementById(id);
+
+  function setText(id, value) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = value ?? "";
+  }
+
+  function enforceMax(el, max){
+    if(!el) return;
+    const v = String(el.value || "");
+    if(v.length > max) el.value = v.slice(0, max);
+  }
+
+  function updateCounterFor(el){
+    if(!el) return;
+    const max = parseInt(el.getAttribute("maxlength") || "0", 10);
+    if(!(max > 0)) return;
+
+    const parent = el.parentElement || el;
+
+    const looksLikeCounter = (node) => {
+      if(!node || node.nodeType !== 1) return false;
+      if(node.classList.contains("charcount")) return false;
+      const t = String(node.textContent || "").trim();
+      return /^\d+\s*\/\s*\d+$/.test(t);
+    };
+
+    let cur = el.nextElementSibling;
+    let steps = 0;
+    while(cur && steps < 5){
+      const next = cur.nextElementSibling;
+      if(looksLikeCounter(cur)) cur.remove();
+      cur = next;
+      steps++;
+    }
+
+    let counters = [];
+    const next = el.nextElementSibling;
+    if(next && next.classList.contains("charcount")) counters.push(next);
+    counters = counters.concat(Array.from(parent.querySelectorAll(".charcount")));
+    counters = Array.from(new Set(counters));
+
+    let cc = (next && next.classList.contains("charcount")) ? next : (counters[0] || null);
+    for(const c of counters){
+      if(c !== cc) c.remove();
+    }
+
+    if(!cc){
+      cc = document.createElement("div");
+      cc.className = "muted charcount";
+      cc.style.fontSize = "12px";
+      cc.style.marginTop = "6px";
+      el.insertAdjacentElement("afterend", cc);
+    }
+
+    const n = String(el.value || "").length;
+    cc.textContent = `${n}/${max}`;
+  }
+
+  function syncAllCounters(){
+    document.querySelectorAll("input[maxlength], textarea[maxlength]").forEach(updateCounterFor);
+  }
+
+  function bindCharCounterOnce(){
+    if(window.__charCounterBound) return;
+    window.__charCounterBound = true;
+
+    document.addEventListener("input", (e) => {
+      const el = e.target;
+      if(!(el instanceof HTMLElement)) return;
+      if(el.matches("input[maxlength], textarea[maxlength]")){
+        updateCounterFor(el);
+      }
+    });
+
+    setTimeout(syncAllCounters, 0);
+  }
+
+  function esc(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function setBox(id, msg, isError=false){
+    const el = $(id);
+    if(!el) return;
+    el.classList.remove('hidden','error','ok');
+    el.classList.add(isError ? 'error' : 'ok');
+    el.textContent = msg || '';
+    if(!msg) el.classList.add('hidden');
+  }
+
+  function showEpicAlert({type="success", title="Listo", message="", items=null, okText="OK", cancelText=null}){
+    const modal = document.getElementById("epicModal");
+    const ico = document.getElementById("epicIco");
+    const t = document.getElementById("epicTitle");
+    const msg = document.getElementById("epicMsg");
+    const ok = document.getElementById("epicOk");
+    const cancel = document.getElementById("epicCancel");
+
+    const cfg = {
+      success:{bg:"rgba(34,197,94,.12)", fg:"#16a34a", glyph:"✓"},
+      error:{bg:"rgba(239,68,68,.12)", fg:"#dc2626", glyph:"✕"},
+      warn:{bg:"rgba(245,158,11,.12)", fg:"#d97706", glyph:"!"}
+    }[type] || {bg:"rgba(34,197,94,.12)", fg:"#16a34a", glyph:"✓"};
+
+    ico.style.background = cfg.bg;
+    ico.style.color = cfg.fg;
+    ico.textContent = cfg.glyph;
+
+    t.textContent = title;
+
+    let html = "";
+    if(message) html += `<p>${esc(message)}</p>`;
+    if(items && items.length){
+      html += `<ul class="epic-list">` + items.map(x=>`<li>${esc(x)}</li>`).join("") + `</ul>`;
+    }
+    msg.innerHTML = html || "<p>—</p>";
+
+    ok.textContent = okText || "OK";
+    if(cancelText){
+      cancel.style.display = "";
+      cancel.textContent = cancelText;
+    }else{
+      cancel.style.display = "none";
+    }
+
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+
+    return new Promise((resolve)=>{
+      const cleanup = (val)=>{
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden","true");
+        ok.removeEventListener("click", onOk);
+        cancel.removeEventListener("click", onCancel);
+        modal.removeEventListener("click", onBackdrop);
+        document.removeEventListener("keydown", onKey);
+        resolve(val);
+      };
+      const onOk = ()=> cleanup(true);
+      const onCancel = ()=> cleanup(false);
+      const onBackdrop = (e)=> { if(e.target === modal) cleanup(false); };
+      const onKey = (e)=> { if(e.key === "Escape") cleanup(false); };
+
+      ok.addEventListener("click", onOk);
+      cancel.addEventListener("click", onCancel);
+      modal.addEventListener("click", onBackdrop);
+      document.addEventListener("keydown", onKey);
+    });
+  }
+
+  const queueKeyForAudit = (aid) => aid ? `cm_tpl_queue_${aid}` : "cm_tpl_queue__no_audit";
+  function loadTplQueue(aid){
+    try{
+      const raw = localStorage.getItem(queueKeyForAudit(aid));
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function clearTplQueue(aid){
+    try{ localStorage.removeItem(queueKeyForAudit(aid)); }catch(e){}
+  }
+
+  function cleanUuidParam(v){
+    const s = String(v ?? "").trim();
+    if (!s || s === "null" || s === "undefined") return null;
+    return s;
+  }
+
+  function getFirstTemplateFromQueue(aid){
+    try{
+      const raw = localStorage.getItem(queueKeyForAudit(aid));
+      const arr = raw ? JSON.parse(raw) : [];
+      if(Array.isArray(arr) && arr.length){
+        const first = arr[0];
+        if(typeof first === "string"){
+          const s = cleanUuidParam(first);
+          if(s) return s;
+        }
+        if(first && typeof first === "object"){
+          const s = cleanUuidParam(first.id || first.template_id || first.value);
+          if(s) return s;
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+
+  let session = null;
+  let meProfile = null;
+
+  let auditId = null;
+  let templateId = null;
+  let inspectionId = null;
+
+  let flowMode = "single";
+  let mergeMode = false;
+  let templateIdsMerged = [];
+  let templatesById = new Map();
+
+  let template = null;
+  let questions = [];
+  let answers = new Map();
+
+  let evidenceCountByQuestion = new Map();
+
+  async function requireSession(){
+    const { data, error } = await sb.auth.getSession();
+    if(error) throw error;
+    if(!data.session) throw new Error("No hay sesión. Inicia sesión.");
+    session = data.session;
+    return session;
+  }
+
+  async function loadMyProfile(){
+    const uid = session.user.id;
+    const { data, error } = await sb
+      .from("profiles")
+      .select("id, full_name, role, area, is_active")
+      .eq("id", uid)
+      .maybeSingle();
+    if(error) throw new Error("Error leyendo profiles: " + error.message);
+    if(!data) throw new Error("No existe perfil en profiles para tu usuario.");
+    meProfile = data;
+    $("who").innerHTML = `<b>${session.user.email}</b>`;
+    setText("whoRole", `• ${meProfile.role || 'user'}`);
+  }
+
+  function ensureUrlHasInspectionId(){
+    const u = new URL(window.location.href);
+    if(u.searchParams.get("inspection_id")) return;
+
+    if(!inspectionId) return;
+    u.searchParams.set("inspection_id", inspectionId);
+
+    if(auditId && !u.searchParams.get("audit_id")) u.searchParams.set("audit_id", auditId);
+    if(flowMode === "queue") u.searchParams.set("mode", "queue");
+    if(mergeMode) u.searchParams.set("merge", "1");
+    if(mergeMode && templateIdsMerged.length) u.searchParams.set("tpls", templateIdsMerged.join(","));
+
+    window.history.replaceState({}, "", u.toString());
+  }
+
+  function buildReturnUrlWithInspection(){
+    const u = new URL(window.location.href);
+    if(inspectionId) u.searchParams.set("inspection_id", inspectionId);
+    if(auditId) u.searchParams.set("audit_id", auditId);
+    if(flowMode === "queue") u.searchParams.set("mode", "queue");
+    if(mergeMode) u.searchParams.set("merge", "1");
+    if(mergeMode && templateIdsMerged.length) u.searchParams.set("tpls", templateIdsMerged.join(","));
+    return u.toString();
+  }
+
+  async function loadTemplateSingle(){
+    templateId = cleanUuidParam(templateId);
+
+    if(!templateId){
+      throw new Error("No pude cargar plantilla: template_id inválido o vacío.");
+    }
+
+    const { data, error } = await sb
+      .from("checklist_templates")
+      .select("id,name,description,area,is_active")
+      .eq("id", templateId)
+      .single();
+    if(error) throw new Error("No pude cargar plantilla: " + error.message);
+    template = data;
+
+    const q = await sb
+      .from("checklist_questions")
+      .select("id,template_id,position,text,qtype,config,severity_if_no,requires_evidence,requires_comment,is_active")
+      .eq("template_id", templateId)
+      .eq("is_active", true)
+      .order("position", { ascending:true });
+
+    if(q.error) throw new Error("No pude cargar preguntas: " + q.error.message);
+
+    questions = (q.data || []).map(x => ({
+      ...x,
+      template_name: template?.name || "",
+      template_area: template?.area || "—"
+    }));
+
+    setText("tplTitle", template.name || "Plantilla");
+    setText("tplSub", `${template.area || '—'} · ${template.description || ''}`);
+  }
+
+  async function loadTemplatesAndQuestionsMerged(templateIds){
+    templatesById = new Map();
+    questions = [];
+
+    if(!Array.isArray(templateIds) || !templateIds.length){
+      throw new Error("No hay plantillas en la cola para mostrar.");
+    }
+
+    const uniqueIds = [...new Set(templateIds.map(String))];
+
+    const { data: tpls, error: tErr } = await sb
+      .from("checklist_templates")
+      .select("id,name,description,area,is_active")
+      .in("id", uniqueIds);
+
+    if(tErr) throw new Error("No pude cargar plantillas: " + tErr.message);
+
+    for(const t of (tpls || [])){
+      templatesById.set(String(t.id), t);
+    }
+
+    for(const tid of uniqueIds){
+      const tpl = templatesById.get(String(tid));
+      const { data: qs, error: qErr } = await sb
+        .from("checklist_questions")
+        .select("id,template_id,position,text,qtype,config,severity_if_no,requires_evidence,requires_comment,is_active")
+        .eq("template_id", tid)
+        .eq("is_active", true)
+        .order("position", { ascending:true });
+
+      if(qErr) throw new Error("No pude cargar preguntas: " + qErr.message);
+
+      (qs || []).forEach(q=>{
+        questions.push({
+          ...q,
+          template_name: tpl?.name || "(Plantilla)",
+          template_area: tpl?.area || "—"
+        });
+      });
+    }
+
+    setText("tplTitle", "Inspección unificada");
+    const names = uniqueIds.map(id => templatesById.get(String(id))?.name).filter(Boolean);
+    setText("tplSub", `Plantillas: ${names.length} · ${names.join(" · ")}`);
+  }
+
+  async function ensureInspection(){
+    const sp = new URLSearchParams(location.search);
+    const iid = sp.get("inspection_id") || sp.get("inspectionId");
+
+    if(iid){
+      inspectionId = iid;
+      const { data, error } = await sb
+        .from("inspections")
+        .select("id,audit_id,template_id,inspector_id,status,created_at")
+        .eq("id", inspectionId)
+        .single();
+
+      if(error) throw new Error("No pude cargar inspección: " + error.message);
+
+      auditId = data.audit_id || auditId;
+      templateId = cleanUuidParam(data.template_id || templateId);
+      setText("inspStatus", data.status || "draft");
+      return;
+    }
+
+    let tplForInspection = null;
+
+    if(mergeMode && Array.isArray(templateIdsMerged) && templateIdsMerged.length){
+      tplForInspection = templateIdsMerged[0];
+    }else{
+      tplForInspection = templateId;
+    }
+
+    tplForInspection = cleanUuidParam(tplForInspection);
+
+    if(!tplForInspection){
+      tplForInspection = getFirstTemplateFromQueue(auditId);
+    }
+
+    if(!tplForInspection){
+      throw new Error("No pude crear inspección. No hay template_id válido. Vuelve a la selección de plantillas y selecciona al menos una plantilla.");
+    }
+
+    const payload = {
+      template_id: tplForInspection,
+      inspector_id: session.user.id,
+      status: "draft"
+    };
+
+    if(auditId) payload.audit_id = auditId;
+
+    const { data, error } = await sb
+      .from("inspections")
+      .insert(payload)
+      .select("id,status")
+      .single();
+
+    if(error){
+      throw new Error("No pude crear inspección.\n" + error.message);
+    }
+
+    inspectionId = data.id;
+    templateId = tplForInspection;
+    setText("inspStatus", data.status || "draft");
+  }
+
+  async function loadAnswers(){
+    answers.clear();
+    const { data, error } = await sb
+      .from("inspection_answers")
+      .select("id,inspection_id,question_id,answer,comment,created_at")
+      .eq("inspection_id", inspectionId);
+
+    if(error){
+      setBox("mainStatus", "No pude cargar inspection_answers.\n" + error.message, true);
+      return;
+    }
+    for(const r of (data || [])){
+      answers.set(r.question_id, r);
+    }
+  }
+
+  function getAnswerValue(qid){ return answers.get(qid)?.answer || ""; }
+  function getCommentValue(qid){ return answers.get(qid)?.comment || ""; }
+
+  function getConfigObject(q){
+    let cfg = q?.config ?? {};
+    if(typeof cfg === "string"){
+      try{ cfg = JSON.parse(cfg); }catch(e){ cfg = {}; }
+    }
+    return cfg || {};
+  }
+
+  function safeJsonParseArray(v){
+    try{
+      const x = JSON.parse(v);
+      return Array.isArray(x) ? x : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function getChecklistOptions(q){
+    const cfg = getConfigObject(q);
+    const raw =
+      cfg.options ??
+      cfg.items ??
+      cfg.choices ??
+      cfg.values ??
+      cfg.list ??
+      [];
+
+    if(Array.isArray(raw)) return raw.map(x => String(x)).filter(Boolean);
+    if(Array.isArray(cfg.options)) return cfg.options.map(o => String(o?.label ?? o?.value ?? o)).filter(Boolean);
+    return [];
+  }
+
+  function renderAnswerInput(q){
+    const val = getAnswerValue(q.id);
+    const qtype = (q.qtype || "yes_no").toLowerCase();
+
+    if(qtype === "checklist"){
+      const selected = safeJsonParseArray(val);
+      const options = getChecklistOptions(q);
+
+      if(!options.length){
+        return `<div class="muted" style="margin-top:10px">⚠️ Este checklist no tiene opciones configuradas.</div>`;
+      }
+
+      const chips = options.map(opt => {
+        const checked = selected.includes(opt);
+        return `
+          <label class="chip" style="gap:10px">
+            <input type="checkbox" ${checked ? "checked" : ""} data-option="${esc(opt)}" onchange="onChecklistToggle('${q.id}', this.dataset.option, this.checked)">
+            ${esc(opt)}
+          </label>
+        `;
+      }).join("");
+
+      return `<div class="choices" style="background-color: #f0f0f0; padding: 10px; border-radius: 4px;"><div style="font-weight: bold; margin-bottom: 8px; color: #333; font-size: 12px;">selección múltiple</div>${chips}</div>`;
+    }
+
+    if(qtype === "photo"){
+      return `
+        <div class="muted" style="margin-top:10px">
+          📷 Esta pregunta se responde subiendo evidencia (foto/archivo) y dejando comentario.
+        </div>
+      `;
+    }
+
+    if(qtype === "choice"){
+      const cfg = getConfigObject(q);
+      const options = getChecklistOptions(q);
+
+      if(!options.length){
+        return `<div class="muted" style="margin-top:10px">⚠️ Esta pregunta no tiene opciones configuradas.</div>`;
+      }
+
+      const multiple = (cfg.multiple === true || cfg.allow_multiple === true || cfg.multi === true || Number(cfg.max_select||0) > 1);
+      const maxSel = Number(cfg.max_select||0) || 0;
+
+      if(multiple){
+        const selected = new Set(safeJsonParseArray(val));
+        const choices = options.map(opt => {
+          const checked = selected.has(opt);
+          return `
+            <label class="chip" style="gap:10px">
+              <input type="checkbox" ${checked ? "checked" : ""} data-option="${esc(opt)}"
+                onchange="onChoiceToggle('${q.id}', this.dataset.option, this.checked)">
+              ${esc(opt)}
+            </label>
+          `;
+        }).join("");
+
+        const hint = maxSel>0 ? `máx. ${maxSel}` : `sin límite`;
+        return `<div class="choices" style="background-color:#f0f0f0; padding:10px; border-radius:4px;">
+                  <div style="font-weight:bold; margin-bottom:8px; color:#333; font-size:12px;">selección múltiple (${hint})</div>
+                  ${choices}
+                </div>`;
+      }
+
+      const choices = options.map(opt => {
+        const checked = val === opt;
+        return `
+          <label class="chip">
+            <input type="radio" name="ans_${q.id}" value="${esc(opt)}" ${checked ? "checked" : ""} onchange="onPick('${q.id}', '${esc(opt)}')">
+            ${esc(opt)}
+          </label>
+        `;
+      }).join("");
+
+      return `<div class="choices">${choices}</div>`;
+    }
+
+    if(qtype === "yes_no"){
+      return `
+        <div class="choices">
+          <label class="chip yes">
+            <input type="radio" name="ans_${q.id}" value="yes" ${val==="yes"?"checked":""} onchange="onPick('${q.id}', 'yes')">
+            ✅ Sí
+          </label>
+          <label class="chip no">
+            <input type="radio" name="ans_${q.id}" value="no" ${val==="no"?"checked":""} onchange="onPick('${q.id}', 'no')">
+            ❌ No
+          </label>
+        </div>
+      `;
+    }
+
+    if(qtype === "likert"){
+      const cfg = q?.config || {};
+      const min = Number.isFinite(cfg.min) ? cfg.min : 1;
+      const max = Number.isFinite(cfg.max) ? cfg.max : 5;
+      const labels = Array.isArray(cfg.labels) ? cfg.labels : null;
+
+      const items = [];
+      for(let i=min; i<=max; i++){
+        const label = labels?.[i-min] ?? String(i);
+        items.push(`
+          <label class="chip lik">
+            <input type="radio" name="ans_${q.id}" value="${i}" ${String(val)===String(i)?"checked":""}
+              onchange="onPick('${q.id}', '${i}')">
+            ${esc(label)}
+          </label>
+        `);
+      }
+      return `<div class="choices">${items.join("")}</div>`;
+    }
+
+    if(qtype === "text"){
+      const cfg = q?.config || {};
+      const isLong = !!cfg.multiline;
+      if(!isLong){
+        return `
+          <div style="margin-top:10px">
+            <div class="muted" style="font-size:12px; margin-bottom:6px">Respuesta (máx. ${SHORT_MAX})</div>
+            <input data-role="answer" maxlength="${SHORT_MAX}" value="${esc(val)}"
+              oninput="enforceMax(this, SHORT_MAX)"
+              onblur="onPick('${q.id}', this.value)"
+              placeholder="Escribe tu respuesta..." />
+            <div class="muted" style="font-size:12px; margin-top:6px">${(String(val||'').length)}/${SHORT_MAX}</div>
+          </div>
+        `;
+      }
+      return `
+        <div style="margin-top:10px">
+          <div class="muted" style="font-size:12px; margin-bottom:6px">Respuesta (máx. ${LONG_MAX})</div>
+          <textarea data-role="answer" maxlength="${LONG_MAX}"
+            oninput="enforceMax(this, LONG_MAX)"
+            onblur="onPick('${q.id}', this.value)"
+            placeholder="Escribe tu respuesta...">${esc(val)}</textarea>
+          <div class="muted" style="font-size:12px; margin-top:6px">${(String(val||'').length)}/${LONG_MAX}</div>
+        </div>
+      `;
+    }
+
+    return `
+      <div style="margin-top:10px">
+        <div class="muted" style="font-size:12px; margin-bottom:6px">Respuesta</div>
+        <input data-role="answer" maxlength="${SHORT_MAX}" value="${esc(val)}" onblur="onPick('${q.id}', this.value)" placeholder="Escribe tu respuesta..." />
+      </div>
+    `;
+  }
+
+  async function upsertAnswer(questionId, patch){
+    const payload = { inspection_id: inspectionId, question_id: questionId, ...patch };
+    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+    if ("comment" in payload && (payload.comment === "" || payload.comment === null)) payload.comment = null;
+
+    const resp = await sb
+      .from("inspection_answers")
+      .upsert(payload, { onConflict: "inspection_id,question_id" })
+      .select("id,inspection_id,question_id,answer,comment,created_at")
+      .single();
+
+    if (resp.error) throw new Error(resp.error.message);
+
+    answers.set(questionId, resp.data);
+    return resp.data;
+  }
+
+  async function ensureAnswerRow(questionId){
+    const existing = answers.get(questionId);
+    if(existing?.id) return existing;
+
+    const { data, error } = await sb
+      .from("inspection_answers")
+      .upsert({ inspection_id: inspectionId, question_id: questionId }, { onConflict: "inspection_id,question_id" })
+      .select("id,inspection_id,question_id,answer,comment,created_at")
+      .single();
+
+    if(error) throw new Error(error.message);
+    answers.set(questionId, data);
+    return data;
+  }
+
+  async function refreshEvidenceBadges(){
+    try{
+      evidenceCountByQuestion = new Map();
+      const evSets = new Map();
+
+      const answerIdToQuestionId = new Map();
+      const answerIds = [];
+
+      for(const q of (questions || [])){
+        const a = answers.get(q.id);
+        if(a && a.id){
+          answerIds.push(a.id);
+          answerIdToQuestionId.set(String(a.id), String(q.id));
+        }
+      }
+
+      if(answerIds.length){
+        const { data: links, error } = await sb
+          .from("inspection_answer_evidence")
+          .select("id,answer_id,evidence_id")
+          .in("answer_id", answerIds);
+
+        if(!error){
+          for(const r of (links || [])){
+            const qid = answerIdToQuestionId.get(String(r.answer_id));
+            if(!qid) continue;
+
+            const evid = String(r.evidence_id || r.id || "");
+            const key = qid;
+            if(!evSets.has(key)) evSets.set(key, new Set());
+            if(evid && evSets.get(key).has(evid)) continue;
+            if(evid) evSets.get(key).add(evid);
+
+            evidenceCountByQuestion.set(qid, (evSets.get(key)?.size) || 0);
+          }
+        }else{
+          console.warn("No pude leer inspection_answer_evidence:", error);
+        }
+      }
+
+      for(const q of (questions || [])){
+        const badge = document.getElementById(`ev_${q.id}`);
+        if(!badge) continue;
+
+        const qt = (q.qtype || "yes_no").toLowerCase();
+        const required = !!q.requires_evidence || qt === "photo";
+        const count = evidenceCountByQuestion.get(String(q.id)) || 0;
+
+        if(count > 0){
+          badge.textContent = `con evidencia (${count})`;
+          badge.style.color = "var(--brand)";
+          badge.style.fontWeight = "800";
+        }else{
+          badge.textContent = required ? "falta evidencia" : "sin evidencia";
+          badge.style.color = required ? "var(--danger)" : "var(--muted)";
+          badge.style.fontWeight = required ? "900" : "500";
+        }
+      }
+    }catch(e){
+      console.warn("refreshEvidenceBadges error:", e);
+    }
+  }
+
+  async function goEvidence(questionId){
+    try{
+      if(!inspectionId){
+        await showEpicAlert({type:"error", title:"No hay inspección", message:"No hay inspection_id. Abre/crea la inspección primero.", okText:"Entendido"});
+        return;
+      }
+
+      const ans = await ensureAnswerRow(questionId);
+
+      const params = new URLSearchParams();
+      params.set("inspection_id", inspectionId);
+      params.set("question_id", questionId);
+      params.set("answer_id", ans.id);
+      params.set("return_to", encodeURIComponent(buildReturnUrlWithInspection()));
+
+      if(auditId){
+        params.set("audit_id", auditId);
+        params.set("kind", "audit");
+        params.set("id", auditId);
+      }
+      if(templateId) params.set("template_id", templateId);
+      if(mergeMode && templateIdsMerged.length) params.set("tpls", templateIdsMerged.join(","));
+
+      window.location.href = `evidencias.html?${params.toString()}`;
+    }catch(e){
+      console.warn("goEvidence error:", e);
+      await showEpicAlert({type:"error", title:"No pude abrir evidencias", message:(e?.message || String(e)), okText:"OK"});
+    }
+  }
+
+  function isAnswered(q){
+    const qt = (q.qtype || "yes_no").toLowerCase();
+
+    if(qt === "photo"){
+      const ev = evidenceCountByQuestion.get(String(q.id)) || 0;
+      return ev > 0;
+    }
+
+    const v = getAnswerValue(q.id);
+    if(v === null || v === undefined) return false;
+    if(typeof v === "string" && v.trim() === "") return false;
+
+    if(typeof v === "string" && v.trim().startsWith("[")){
+      try{
+        const arr = JSON.parse(v);
+        if(Array.isArray(arr)) return arr.length > 0;
+      }catch(e){}
+    }
+    return true;
+  }
+
+  function refreshStats(){
+    let answered=0, yes=0, no=0;
+    for(const q of questions){
+      if(!isAnswered(q)) continue;
+      answered++;
+
+      const v = getAnswerValue(q.id);
+      const qt = (q.qtype || "yes_no").toLowerCase();
+      if(qt === "yes_no"){
+        if(v==="yes") yes++;
+        if(v==="no") no++;
+      }
+
+      if(qt === "choice"){
+        const t = String(v||"").trim();
+        if(t) {
+          try{
+            const arr = JSON.parse(t);
+            if(Array.isArray(arr)){
+              if(arr.length>0) yes++;
+            }else{
+              yes++;
+            }
+          }catch(e){
+            yes++;
+          }
+        }
+      }
+
+      if(qt === "checklist"){
+        try{
+          const arr = JSON.parse(v);
+          if(Array.isArray(arr) && arr.length > 0){
+            yes++;
+          }
+        }catch(e){}
+      }
+    }
+    setText("answered", String(answered));
+    setText("yesCount", String(yes));
+    setText("noCount", String(no));
+
+    const total = Math.max(1, questions.length);
+    const pct = Math.round((answered / total) * 100);
+    setText("score", `Progreso ${pct}%`);
+  }
+
+  function renderQuestions(){
+    if(mergeMode && templateIdsMerged.length > 1){
+      const byTpl = new Map();
+      for(const q of (questions || [])){
+        const tid = String(q.template_id || "");
+        if(!byTpl.has(tid)){
+          byTpl.set(tid, { tplName:q.template_name||"Plantilla", tplArea:q.template_area||"—", items:[] });
+        }
+        byTpl.get(tid).items.push(q);
+      }
+
+      const orderedTplIds = templateIdsMerged.length ? templateIdsMerged.map(x=>String(x)) : Array.from(byTpl.keys());
+      let globalIdx = 0;
+      let html = "";
+
+      for(const tid of orderedTplIds){
+        const group = byTpl.get(String(tid));
+        if(!group) continue;
+
+        html += `
+          <div class="tpl-sep">
+            <div class="row">
+              <div>
+                <div class="name">${esc(group.tplName)}</div>
+                <div class="meta">Área: ${esc(group.tplArea)} · Preguntas: ${group.items.length}</div>
+              </div>
+              <span class="badge gray">plantilla</span>
+            </div>
+          </div>
+        `;
+
+        for(const q of group.items){
+          globalIdx++;
+          const comment = getCommentValue(q.id);
+          const sev = q.severity_if_no ? `<span class="badge">${esc(q.severity_if_no)}</span>` : `<span class="badge gray">—</span>`;
+          const qt = (q.qtype || "yes_no").toLowerCase();
+          const needsEvidence = !!q.requires_evidence || qt === "photo";
+          const needsComment  = !!q.requires_comment;
+
+          const rules = [
+            needsEvidence ? `<span class="badge">evidencia</span>` : `<span class="badge gray">sin evidencia</span>`,
+            needsComment  ? `<span class="badge">comentario</span>` : `<span class="badge gray">sin comentario</span>`,
+          ].join(" ");
+
+          const evidenceBlock = needsEvidence ? `
+            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+              <button class="btn small" onclick="goEvidence('${q.id}')">📎 Agregar evidencia</button>
+              <span class="muted" id="ev_${q.id}" style="align-self:center"></span>
+            </div>
+          ` : `
+            <div style="margin-top:10px">
+              <span class="muted" id="ev_${q.id}">sin evidencia</span>
+            </div>
+          `;
+
+          html += `
+            <div class="qcard" id="q_${q.id}">
+              <div class="qhead">
+                <div>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">${sev} ${rules}</div>
+                  <div class="qtitle" style="margin-top:6px">${globalIdx}. ${esc(q.text)}</div>
+                </div>
+                <span class="badge blue">${esc(q.qtype || 'yes_no')}</span>
+              </div>
+
+              ${renderAnswerInput(q)}
+
+              ${!["text","short_text","long_text","textarea","open"].includes(qt) ? `
+              <div style="margin-top:10px">
+                <div class="muted" style="font-size:12px; margin-bottom:6px">Comentario</div>
+                <textarea data-role="comment" maxlength="${COMMENT_MAX}" placeholder="Opcional (o requerido según la pregunta)…" oninput="enforceMax(this, COMMENT_MAX)" onblur="onComment('${q.id}', this.value)">${esc(comment)}</textarea>
+                <div class="muted" style="font-size:12px; margin-top:6px">${(String(comment||'').length)}/${COMMENT_MAX}</div>
+              </div>
+              ` : ``}
+
+              ${evidenceBlock}
+            </div>
+          `;
+        }
+      }
+
+      $("qList").innerHTML = html || `<div class="muted">Sin preguntas activas.</div>`;
+      refreshEvidenceBadges();
+      refreshStats();
+      syncAllCounters();
+      return;
+    }
+
+    const list = questions.map((q, idx)=>{
+      const comment = getCommentValue(q.id);
+      const sev = q.severity_if_no ? `<span class="badge">${esc(q.severity_if_no)}</span>` : `<span class="badge gray">—</span>`;
+      const qt = (q.qtype || "yes_no").toLowerCase();
+      const needsEvidence = !!q.requires_evidence || qt === "photo";
+      const needsComment  = !!q.requires_comment;
+
+      const rules = [
+        needsEvidence ? `<span class="badge">evidencia</span>` : `<span class="badge gray">sin evidencia</span>`,
+        needsComment  ? `<span class="badge">comentario</span>` : `<span class="badge gray">sin comentario</span>`,
+      ].join(" ");
+
+      const evidenceBlock = needsEvidence ? `
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn small" onclick="goEvidence('${q.id}')">📎 Agregar evidencia</button>
+          <span class="muted" id="ev_${q.id}" style="align-self:center"></span>
+        </div>
+      ` : `
+        <div style="margin-top:10px">
+          <span class="muted" id="ev_${q.id}">sin evidencia</span>
+        </div>
+      `;
+
+      return `
+        <div class="qcard" id="q_${q.id}">
+          <div class="qhead">
+            <div>
+              <div class="qtitle">${idx+1}. ${esc(q.text)}</div>
+              <div class="muted" style="margin-top:4px">${sev} ${rules}</div>
+            </div>
+            <span class="badge blue">${esc(q.qtype || 'yes_no')}</span>
+          </div>
+
+          ${renderAnswerInput(q)}
+
+          <div style="margin-top:10px">
+            <div class="muted" style="font-size:12px; margin-bottom:6px">Comentario</div>
+            <textarea data-role="comment" maxlength="${COMMENT_MAX}" placeholder="Opcional (o requerido según la pregunta)…" oninput="enforceMax(this, COMMENT_MAX)" onblur="onComment('${q.id}', this.value)">${esc(comment)}</textarea>
+            <div class="muted" style="font-size:12px; margin-top:6px">${(String(comment||'').length)}/${COMMENT_MAX}</div>
+          </div>
+
+          ${evidenceBlock}
+        </div>
+      `;
+    }).join("");
+
+    $("qList").innerHTML = list || `<div class="muted">Sin preguntas activas.</div>`;
+    refreshEvidenceBadges();
+    refreshStats();
+  }
+
+  async function flushDraftFromDom(){
+    try{
+      for(const q of (questions || [])){
+        const card = document.getElementById(`q_${q.id}`);
+        if(!card) continue;
+
+        const commentTa = card.querySelector('textarea[data-role="comment"]');
+        if(commentTa){
+          const domComment = String(commentTa.value || "");
+          const curComment = String(getCommentValue(q.id) || "");
+          if(domComment !== curComment){
+            await upsertAnswer(q.id, { comment: domComment });
+          }
+        }
+
+        const ansInput = card.querySelector('input[data-role="answer"]');
+        const ansTa = card.querySelector('textarea[data-role="answer"]');
+        const domAns = ansInput ? String(ansInput.value || "") : (ansTa ? String(ansTa.value || "") : null);
+
+        if(domAns !== null){
+          const curVal = String(getAnswerValue(q.id) || "");
+          if(domAns !== curVal){
+            await upsertAnswer(q.id, { answer: domAns });
+          }
+        }
+      }
+
+      await refreshEvidenceBadges();
+      refreshStats();
+    }catch(e){
+      console.warn("flushDraftFromDom error:", e);
+    }
+  }
+
+  async function validateBeforeFinalize(){
+    const errors = [];
+    for(const q of questions){
+      const a = answers.get(q.id);
+      const val = a?.answer || "";
+      const comment = (a?.comment || "").trim();
+      const qt0 = (q.qtype || "yes_no").toLowerCase();
+
+      if(qt0 === "photo"){
+      }else if(qt0 === "checklist"){
+        const picked = safeJsonParseArray(val);
+        if(picked.length === 0){
+          errors.push(`Falta seleccionar al menos una opción: "${q.text}"`);
+          continue;
+        }
+      }else if(qt0 === "choice"){
+        const cfg = getConfigObject(q);
+        const multiple = (cfg.multiple === true || cfg.allow_multiple === true || cfg.multi === true || Number(cfg.max_select||0) > 1);
+        if(multiple){
+          const picked = safeJsonParseArray(val);
+          if(picked.length === 0){
+            errors.push(`Falta seleccionar al menos una opción: "${q.text}"`);
+            continue;
+          }
+        }else{
+          if(!val){
+            errors.push(`Falta responder: "${q.text}"`);
+            continue;
+          }
+        }
+      }else{
+        if(!val){
+          errors.push(`Falta responder: "${q.text}"`);
+          continue;
+        }
+      }
+
+      const qt = (q.qtype || "yes_no").toLowerCase();
+      const mustComment = !!q.requires_comment;
+      const mustEvidence = !!q.requires_evidence || qt === "photo";
+
+      if(mustComment && !comment){
+        errors.push(`Falta comentario (requerido): "${q.text}"`);
+      }
+      const evCount = evidenceCountByQuestion.get(String(q.id)) || 0;
+      if(mustEvidence && evCount <= 0){
+        errors.push(`Falta evidencia (requerida): "${q.text}"`);
+      }
+    }
+    return errors;
+  }
+
+  function normalizeSeverity(sev){
+    const s = String(sev || "").trim().toLowerCase();
+    const map = { baja:"low", low:"low", media:"medium", medio:"medium", medium:"medium", alta:"high", high:"high", critica:"critical", "crítica":"critical", critical:"critical" };
+    return map[s] || "medium";
+  }
+
+  function dueDateBySeverity(sev){
+    const d = new Date();
+    const s = normalizeSeverity(sev);
+    const addDays = s==="critical" ? 2 : s==="high" ? 7 : s==="medium" ? 14 : 30;
+    d.setDate(d.getDate() + addDays);
+    return d.toISOString().slice(0,10);
+  }
+
+  async function insertActionWithValidStatus(payload){
+    const candidateStatuses = ["open","new","pending","in_progress","draft"];
+    let lastErr = null;
+
+    for(const st of candidateStatuses){
+      const { error } = await sb.from("actions").insert({ ...payload, status: st });
+      if(!error) return { ok:true, status: st };
+      lastErr = error;
+    }
+    return { ok:false, error: lastErr };
+  }
+
+  async function createIssuesFromNoAnswers(){
+    const noOnes = questions.filter(q => (answers.get(q.id)?.answer === "no"));
+    if(!noOnes.length) return { created: 0 };
+
+    let audit = null;
+    if(auditId){
+      const a = await sb.from("audits").select("id,lead_user_id,title").eq("id", auditId).maybeSingle();
+      if(!a.error) audit = a.data;
+    }
+    const ownerId = audit?.lead_user_id || session.user.id;
+
+    let created = 0;
+
+    for(const q of noOnes){
+      const marker = `[INSPECTION:${inspectionId} TPL:${q.template_id} Q:${q.id}]`;
+
+      if(auditId){
+        const ex = await sb.from("findings")
+          .select("id,condition")
+          .eq("audit_id", auditId)
+          .ilike("condition", `%${marker}%`)
+          .limit(1);
+        if(!ex.error && (ex.data||[]).length) continue;
+      }
+
+      const tplName = q.template_name || template?.name || "-";
+      const condition = `${marker} ${q.text}`;
+      const criteria = `Plantilla: ${tplName} · Respuesta: NO`;
+      const severity = normalizeSeverity(q.severity_if_no || "medium");
+      const due_date = dueDateBySeverity(severity);
+
+      const fIns = await sb.from("findings").insert({
+        audit_id: auditId,
+        severity,
+        status: "draft",
+        condition,
+        criteria,
+        recommendation: "Corregir el ítem marcado como NO y adjuntar evidencia de cierre.",
+        owner_user_id: ownerId,
+        due_date
+      }).select("id").single();
+
+      if(fIns.error) throw new Error("Creando hallazgo: " + fIns.error.message);
+
+      const findingId = fIns.data.id;
+
+      const actionRes = await insertActionWithValidStatus({
+        finding_id: findingId,
+        description: `Acción correctiva: ${q.text}`,
+        responsible_user_id: ownerId,
+        due_date,
+        closure_notes: null
+      });
+
+      if(!actionRes.ok){
+        throw new Error("Creando acción: " + (actionRes.error?.message || "No se pudo insertar acción"));
+      }
+
+      created++;
+    }
+
+    return { created };
+  }
+
+  function buildHallazgosUrl(){
+    const u = new URL("hallazgos.html", window.location.href);
+    if(auditId) u.searchParams.set("audit_id", auditId);
+
+    if(mergeMode && Array.isArray(templateIdsMerged) && templateIdsMerged.length){
+      u.searchParams.set("tpls", templateIdsMerged.join(","));
+    } else if(templateId){
+      u.searchParams.set("tpls", String(templateId));
+    }
+
+    return u.toString();
+  }
+
+  async function finalizeInspection(){
+    setBox("mainStatus","",false);
+    await flushDraftFromDom();
+    const errs = await validateBeforeFinalize();
+
+    if(errs.length){
+      setBox("mainStatus", "No puedo finalizar: faltan datos.", true);
+      await showEpicAlert({
+        type:"warn",
+        title:"Te falta algo para finalizar",
+        message:"Completa lo siguiente:",
+        items: errs,
+        okText:"Voy a completar"
+      });
+      return;
+    }
+
+    $("btnFinalize").disabled = true;
+    try{
+      if($("autoIssues").checked){
+        setBox("sideStatus", "Creando hallazgos/acciones…", false);
+        const res = await createIssuesFromNoAnswers();
+        setBox("sideStatus", `Listo ✅ (creadas: ${res.created})`, false);
+      }
+
+      const { error } = await sb.from("inspections")
+        .update({ status: "completed" })
+        .eq("id", inspectionId);
+
+      if(error) throw new Error(error.message);
+
+      setText("inspStatus", "completed");
+      setText("score", "Progreso 100%");
+      setText("answered", String(questions.length));
+      setBox("mainStatus", "Inspección finalizada ✅", false);
+
+      if(mergeMode) clearTplQueue(auditId);
+
+      await showEpicAlert({
+        type:"success",
+        title:"¡Inspección finalizada! 🏁",
+        message:"Redirigiendo a hallazgos…",
+        okText:"OK"
+      });
+
+      window.location.href = buildHallazgosUrl();
+    }catch(e){
+      setBox("mainStatus", e?.message || String(e), true);
+      await showEpicAlert({type:"error", title:"No se pudo finalizar", message:(e?.message || String(e)), okText:"Entendido"});
+    }finally{
+      $("btnFinalize").disabled = false;
+    }
+  }
+
+  async function saveAll(){
+    const btn = $("btnSave");
+    btn.disabled = true;
+    try{
+      const { error } = await sb.from("inspections")
+        .update({ status: "in_progress" })
+        .eq("id", inspectionId);
+
+      if(error) throw new Error(error.message);
+
+      setText("inspStatus", "in_progress");
+      setBox("mainStatus","Guardado ✅", false);
+      await showEpicAlert({type:"success", title:"Guardado", message:"Se guardó la inspección.", okText:"OK"});
+    }catch(e){
+      setBox("mainStatus", e?.message || String(e), true);
+      await showEpicAlert({type:"error", title:"No se pudo guardar", message:(e?.message || String(e)), okText:"Entendido"});
+    }finally{
+      btn.disabled = false;
+    }
+  }
+
+  async function onPick(questionId, val){
+    try{
+      await upsertAnswer(questionId, { answer: val });
+      await refreshEvidenceBadges();
+      refreshStats();
+    }catch(e){
+      setBox("mainStatus", "Error guardando respuesta: " + (e?.message || e), true);
+      await showEpicAlert({type:"error", title:"Error guardando respuesta", message:(e?.message || String(e)), okText:"OK"});
+    }
+  }
+
+  async function onComment(questionId, txt){
+    try{
+      await upsertAnswer(questionId, { comment: txt || "" });
+    }catch(e){
+      setBox("mainStatus", "Error guardando comentario: " + (e?.message || e), true);
+      await showEpicAlert({type:"error", title:"Error guardando comentario", message:(e?.message || String(e)), okText:"OK"});
+    }
+  }
+
+  async function onChoiceToggle(questionId, option, checked){
+    try{
+      const q = (questions || []).find(x => String(x.id) === String(questionId));
+      const cfg = getConfigObject(q);
+      const maxSel = Number(cfg.max_select||0) || 0;
+
+      const current = safeJsonParseArray(getAnswerValue(questionId));
+      let next = checked
+        ? Array.from(new Set([...current, option]))
+        : current.filter(x => x !== option);
+
+      if(maxSel > 0 && next.length > maxSel){
+        next = current;
+        await showEpicAlert({type:"warn", title:"Límite de selección", message:`Solo puedes seleccionar ${maxSel} opciones.`, okText:"Entendido"});
+        renderQuestions();
+        return;
+      }
+
+      await upsertAnswer(questionId, { answer: JSON.stringify(next) });
+      await refreshEvidenceBadges();
+      refreshStats();
+    }catch(e){
+      setBox("mainStatus", "Error guardando selección múltiple: " + (e?.message || e), true);
+      await showEpicAlert({type:"error", title:"Error guardando selección múltiple", message:(e?.message || String(e)), okText:"OK"});
+    }
+  }
+
+  async function onChecklistToggle(questionId, option, checked){
+    try{
+      const current = safeJsonParseArray(getAnswerValue(questionId));
+      const next = checked
+        ? Array.from(new Set([...current, option]))
+        : current.filter(x => x !== option);
+
+      await upsertAnswer(questionId, { answer: JSON.stringify(next) });
+      await refreshEvidenceBadges();
+      refreshStats();
+    }catch(e){
+      setBox("mainStatus", "Error guardando checklist: " + (e?.message || e), true);
+      await showEpicAlert({type:"error", title:"Error guardando checklist", message:(e?.message || String(e)), okText:"OK"});
+    }
+  }
+
+  window.onPick = onPick;
+  window.onComment = onComment;
+  window.onChecklistToggle = onChecklistToggle;
+  window.onChoiceToggle = onChoiceToggle;
+  window.goEvidence = goEvidence;
+
+  async function init(){
+    try{
+      const sp = new URLSearchParams(location.search);
+      auditId = cleanUuidParam(sp.get("audit_id"));
+      templateId = cleanUuidParam(sp.get("template_id"));
+      inspectionId = cleanUuidParam(sp.get("inspection_id") || sp.get("inspectionId"));
+
+      flowMode = (sp.get("mode") || "single").toLowerCase();
+      mergeMode = (sp.get("merge") === "1" || (sp.get("merge") || "").toLowerCase() === "true");
+
+      if(mergeMode){
+        templateIdsMerged = loadTplQueue(auditId);
+
+        const fromUrl = cleanUuidParam(sp.get("tpls"));
+        if((!templateIdsMerged || !templateIdsMerged.length) && fromUrl){
+          templateIdsMerged = fromUrl.split(",").map(s => cleanUuidParam(s)).filter(Boolean);
+        }
+
+        if(!templateIdsMerged.length && templateId){
+          templateIdsMerged = [templateId];
+        }
+
+        templateIdsMerged = [...new Set((templateIdsMerged || []).filter(Boolean).map(String))];
+        console.log("templateIdsMerged:", templateIdsMerged);
+      }
+
+      await requireSession();
+      await loadMyProfile();
+
+      $("btnBack").onclick = ()=>history.back();
+      $("btnLogout").onclick = async ()=>{ await sb.auth.signOut(); location.href="/index.html"; };
+
+      setText("auditLabel", auditId || "(sin auditoría)");
+
+      await ensureInspection();
+      setText("inspId", inspectionId);
+      ensureUrlHasInspectionId();
+
+      if(mergeMode && templateIdsMerged.length > 1){
+        await loadTemplatesAndQuestionsMerged(templateIdsMerged);
+      }else if(mergeMode && templateIdsMerged.length === 1){
+        templateId = templateIdsMerged[0];
+        await loadTemplateSingle();
+      }else{
+        await loadTemplateSingle();
+      }
+
+      await loadAnswers();
+      renderQuestions();
+      bindCharCounterOnce();
+      syncAllCounters();
+
+      const refreshEvSafe = async () => {
+        try{
+          await loadAnswers();
+          await refreshEvidenceBadges();
+          refreshStats();
+        }catch(e){}
+      };
+      window.addEventListener("focus", refreshEvSafe);
+      window.addEventListener("pageshow", refreshEvSafe);
+      document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshEvSafe(); });
+
+      $("btnSave").onclick = saveAll;
+      $("btnFinalize").onclick = finalizeInspection;
+
+      setBox("mainStatus", "Listo ✅", false);
+    }catch(e){
+      setBox("mainStatus", e?.message || String(e), true);
+      await showEpicAlert({type:"error", title:"No se pudo iniciar", message:(e?.message || String(e)), okText:"Entendido"});
+    }
+  }
+
+  init();
+</script>
+
+<div id="epicModal" class="epic-backdrop" aria-hidden="true">
+  <div class="epic-card" role="dialog" aria-modal="true" aria-labelledby="epicTitle">
+    <div class="epic-head">
+      <div id="epicIco" class="epic-ico">✓</div>
+      <div style="flex:1">
+        <h3 id="epicTitle" class="epic-title">Título</h3>
+        <div id="epicMsg" class="epic-body"></div>
+      </div>
+    </div>
+    <div class="epic-foot">
+      <button id="epicCancel" class="btn epic ghost" style="display:none">Cancelar</button>
+      <button id="epicOk" class="btn epic primary">OK</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

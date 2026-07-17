@@ -1,0 +1,1647 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CM Colombia · Configuración</title>
+
+  <style>
+    :root{
+      /* 🟢 COLORES CORPORATIVOS */
+      --green:#2D8A3C;
+      --green-2:#7CC242;
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --text:#0B1220;
+      --muted:#5E6B7A;
+      --border:rgba(45,138,60,.18);
+      --shadow:0 18px 45px rgba(0,0,0,.08);
+      --radius:18px;
+
+      --danger:#c0392b;
+      --ok:#2D8A3C;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 0%, rgba(45,138,60,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 10%, rgba(124,194,66,.10), transparent 55%),
+        #fff;
+      min-height:100vh;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      min-height:100vh;
+    }
+    @media (max-width:960px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:sticky;top:0;z-index:5}
+    }
+
+    /* SIDEBAR */
+    .sidebar{
+      border-right:1px solid rgba(0,0,0,.06);
+      background:#fff;
+      padding:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(45,138,60,.06), rgba(124,194,66,.04));
+      box-shadow:var(--shadow);
+    }
+    .brand img{width:60px;height:48px;object-fit:contain}
+    .brand .t1{margin:0;font-size:16px;font-weight:900}
+    .brand .t2{margin:4px 0 0;font-size:12px;color:var(--muted)}
+
+    .nav{
+      margin-top:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .nav a{
+      text-decoration:none;
+      color:var(--text);
+      display:flex;
+      justify-content:space-between;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.06);
+      background:#fff;
+    }
+    .nav a.active,
+    .nav a:hover{
+      border-color:rgba(45,138,60,.35);
+      box-shadow:0 0 0 4px rgba(45,138,60,.10);
+    }
+
+    .pill{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(45,138,60,.08);
+      border:1px solid rgba(45,138,60,.18);
+      color:var(--green);
+      font-weight:800;
+    }
+
+    /* MAIN */
+    .main{padding:18px}
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:var(--radius);
+      background:#fff;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    button{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+    button:hover{
+      box-shadow:0 0 0 4px rgba(45,138,60,.10);
+      border-color:rgba(45,138,60,.25);
+    }
+    .primary{
+      border:none;
+      background:linear-gradient(180deg,var(--green-2),var(--green));
+      color:#fff;
+      box-shadow: 0 14px 35px rgba(45,138,60,.18);
+    }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    @media(max-width:1000px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      padding:16px;
+      border-radius:var(--radius);
+      background:#fff;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:var(--shadow);
+    }
+
+    .card h3{margin:0 0 8px}
+    .help{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.5}
+
+    label{font-size:12px;color:var(--muted); font-weight:800}
+    input,select{
+      width:100%;
+      padding:10px;
+      margin-top:4px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+    }
+    input:focus,select:focus{
+      outline:none;
+      border-color:var(--green);
+      box-shadow:0 0 0 4px rgba(45,138,60,.12);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(max-width:520px){
+      .row{grid-template-columns:1fr}
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+    th,td{
+      padding:10px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      text-align:left;
+      font-size:13px;
+      vertical-align:middle;
+    }
+    th{
+      background:rgba(45,138,60,.08);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tr:hover td{ background: rgba(45,138,60,.03); }
+
+    .miniBtn{
+      padding:7px 10px;
+      border-radius:12px;
+      font-size:12px;
+      font-weight:900;
+      border:1px solid rgba(45,138,60,.25);
+      background:rgba(45,138,60,.08);
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .miniBtn:active{ transform: translateY(1px); }
+
+    .iconBtn{
+      width:40px;
+      height:36px;
+      padding:0;
+      border-radius:12px;
+      display:inline-grid;
+      place-items:center;
+      font-size:16px;
+    }
+
+    .status{font-size:12px;color:var(--muted);margin-top:8px; min-height:16px}
+    .status.ok{color:var(--ok); font-weight:900}
+    .status.err{color:var(--danger); font-weight:900}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(45,138,60,.18);
+      background: rgba(45,138,60,.06);
+      font-size:12px;
+      font-weight:900;
+      color: var(--green);
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;}
+
+    /* MODAL */
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(10,15,25,.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index: 9999;
+    }
+    .modal{
+      width:min(720px, 100%);
+      background:#fff;
+      border-radius: 22px;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      background: linear-gradient(180deg, rgba(45,138,60,.06), rgba(124,194,66,.03));
+    }
+    .modalHeader h4{
+      margin:0;
+      font-size:14px;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+    .modalBody{ padding:16px; }
+    .modalFooter{
+      padding:14px 16px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      border-top:1px solid rgba(0,0,0,.08);
+      background:#fff;
+    }
+    .ghost{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      font-weight:900;
+    }
+
+    .pwdWrap{
+      position:relative;
+    }
+    .pwdWrap input{
+      padding-right:46px;
+    }
+    .toggleEye{
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform: translateY(-50%);
+      width:34px;
+      height:30px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.10);
+      background:#fff;
+      cursor:pointer;
+      font-weight:1000;
+      display:grid;
+      place-items:center;
+    }
+    .toggleEye:hover{
+      box-shadow:0 0 0 4px rgba(45,138,60,.10);
+      border-color:rgba(45,138,60,.25);
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      border-left:6px solid var(--green);
+      padding:12px 14px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: 420px;
+      z-index: 10000;
+    }
+    .toast b{display:block; margin-bottom:4px;}
+    .toast small{color:var(--muted)}
+  
+    /* Danger actions */
+    .danger{
+      border:none;
+      background: linear-gradient(180deg, rgba(192,57,43,.95), rgba(140,35,25,.98));
+      color:#fff;
+      box-shadow: 0 14px 35px rgba(192,57,43,.16);
+    }
+    .danger:hover{
+      box-shadow: 0 0 0 4px rgba(192,57,43,.12);
+    }
+    .dangerSoft{
+      border:1px solid rgba(192,57,43,.35);
+      background: rgba(192,57,43,.06);
+      color: var(--danger);
+      font-weight:1000;
+    }
+    .dangerSoft:hover{
+      box-shadow: 0 0 0 4px rgba(192,57,43,.10);
+      border-color: rgba(192,57,43,.45);
+    }
+    .warnBox{
+      border:1px solid rgba(192,57,43,.25);
+      background: rgba(192,57,43,.06);
+      border-radius:16px;
+      padding:12px;
+      color: var(--text);
+    }
+    .warnBox b{ color: var(--danger); }
+    .kbd{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      font-size:12px;
+      font-weight:1000;
+    }
+
+  
+/* =========================
+   EPIC THEME OVERRIDES (2026)
+   Mantiene funcionalidades: solo estilos
+   ========================= */
+:root{
+  --g-900:#0b2b18;
+  --g-800:#0f3a21;
+  --g-700:#155a2d;
+  --g-600:#1b7a39;
+  --g-500:#2aa84f;
+  --g-400:#47c96a;
+  --g-200:#c8f3d4;
+  --w:#ffffff;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --card:#ffffffd9;
+  --glass:#ffffffb3;
+  --ring:#94d6a7;
+  --shadow: 0 18px 50px rgba(2, 32, 14, .18);
+  --shadow-soft: 0 10px 30px rgba(2, 32, 14, .12);
+  --radius-xl: 22px;
+  --radius-lg: 16px;
+}
+
+body{
+  background:
+    radial-gradient(1200px 500px at 70% -10%, rgba(42,168,79,.28), transparent 60%),
+    radial-gradient(900px 400px at -10% 20%, rgba(71,201,106,.22), transparent 60%),
+    linear-gradient(180deg, #f6fbf7 0%, #eef8f1 50%, #f6fbf7 100%);
+}
+
+/* Layout general */
+.layout{
+  gap: 18px !important;
+  padding: 16px !important;
+}
+
+/* Sidebar */
+.sidebar{
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78)) !important;
+  border: 1px solid rgba(13, 74, 29, .12) !important;
+  box-shadow: var(--shadow-soft) !important;
+  border-radius: var(--radius-xl) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.sidebar .brand{
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, rgba(42,168,79,.10), rgba(255,255,255,.95)) !important;
+  border: 1px solid rgba(42,168,79,.18) !important;
+  box-shadow: 0 8px 24px rgba(2, 32, 14, .08) !important;
+}
+.sidebar .navItem{
+  border-radius: 16px !important;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.sidebar .navItem:hover{
+  transform: translateY(-1px);
+  background: rgba(42,168,79,.08) !important;
+  box-shadow: 0 10px 20px rgba(2, 32, 14, .10);
+}
+.sidebar .navItem.active{
+  background: linear-gradient(135deg, rgba(42,168,79,.18), rgba(255,255,255,.92)) !important;
+  border: 1px solid rgba(42,168,79,.28) !important;
+}
+
+/* Top bar */
+.topbar{
+  border-radius: var(--radius-xl) !important;
+  background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.80)) !important;
+  border: 1px solid rgba(13, 74, 29, .12) !important;
+  box-shadow: var(--shadow-soft) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.topbar h1, .topbar .title{
+  letter-spacing: -0.02em;
+}
+.btnLogout{
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, var(--g-500), var(--g-700)) !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  box-shadow: 0 14px 26px rgba(27,122,57,.25) !important;
+  transition: transform .15s ease, filter .15s ease;
+}
+.btnLogout:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.btnLogout:active{ transform: translateY(0px); }
+
+/* Cards (formularios / tablas) */
+.card, .panel, .cardBox, .box, .contentCard{
+  border-radius: var(--radius-xl) !important;
+}
+.card, .panel, .cardBox{
+  background: var(--card) !important;
+  border: 1px solid rgba(13, 74, 29, .12) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.sectionTitle{
+  letter-spacing: -0.02em;
+}
+
+/* Inputs */
+input, select, textarea{
+  border-radius: 14px !important;
+  border: 1px solid rgba(15, 90, 44, .18) !important;
+  background: rgba(255,255,255,.92) !important;
+  transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease;
+}
+input:focus, select:focus, textarea:focus{
+  outline: none !important;
+  border-color: rgba(42,168,79,.55) !important;
+  box-shadow: 0 0 0 4px rgba(42,168,79,.18) !important;
+}
+
+/* Botones */
+button, .btn, .btnPrimary, .btnSuccess{
+  border-radius: 999px !important;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+button:hover, .btn:hover, .btnPrimary:hover, .btnSuccess:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(2, 32, 14, .14);
+}
+button:active, .btn:active, .btnPrimary:active, .btnSuccess:active{ transform: translateY(0px); }
+
+/* Tabla usuarios */
+.tableWrap, .tableContainer{
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid rgba(13, 74, 29, .12) !important;
+  overflow: hidden !important;
+  box-shadow: 0 12px 30px rgba(2, 32, 14, .10) !important;
+}
+table{
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+thead th{
+  background: linear-gradient(135deg, rgba(42,168,79,.14), rgba(255,255,255,.92)) !important;
+  border-bottom: 1px solid rgba(15, 90, 44, .14) !important;
+}
+tbody tr{
+  transition: background .12s ease;
+}
+tbody tr:hover{
+  background: rgba(42,168,79,.06) !important;
+}
+
+/* Chips / badges */
+.badge, .pill, .chip{
+  border-radius: 999px !important;
+  border: 1px solid rgba(42,168,79,.22) !important;
+  background: rgba(42,168,79,.10) !important;
+  color: var(--g-800) !important;
+}
+
+/* Modal */
+.modalOverlay{
+  background: rgba(8, 12, 16, .42) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.modal{
+  border-radius: 26px !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+  box-shadow: 0 28px 80px rgba(0,0,0,.30) !important;
+  overflow: hidden;
+}
+.modalHeader{
+  background: linear-gradient(135deg, rgba(42,168,79,.14), rgba(255,255,255,.92)) !important;
+  border-bottom: 1px solid rgba(15, 90, 44, .14) !important;
+}
+.modal .dangerBox{
+  background: rgba(255, 59, 59, .06) !important;
+  border: 1px solid rgba(255, 59, 59, .18) !important;
+  border-radius: 18px !important;
+}
+
+/* Pequeños detalles */
+hr{ border-color: rgba(15, 90, 44, .12) !important; }
+small, .muted{ color: var(--muted) !important; }
+
+
+
+/* =========================
+   RESPONSIVE ADDITIONS (no removals)
+   Sidebar becomes an off-canvas drawer on mobile + table horizontal scroll
+   ========================= */
+
+/* Better fluid typography */
+.topbar h2{font-size:clamp(18px, 2.2vw, 22px); line-height:1.15;}
+.card h3{font-size:clamp(15px, 2vw, 18px);}
+
+/* Topbar wraps nicely */
+.topbar{flex-wrap:wrap;}
+.topbar > div{min-width:min(520px, 100%);}
+
+/* Buttons behave better on small screens */
+@media (max-width:520px){
+  .topbar{align-items:flex-start;}
+  .topbar button{width:100%;}
+  .modalFooter{flex-wrap:wrap;}
+  .modalFooter button{width:100%;}
+}
+
+/* Table: ensure horizontal scroll on narrow screens */
+.tableScroll{
+  max-height:420px;
+  overflow:auto;
+  margin-top:10px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.06);
+}
+@media (max-width:720px){
+  .tableScroll{overflow:auto;}
+  table{min-width:760px;} /* keeps columns readable; scroll instead of squishing */
+  th,td{white-space:nowrap;}
+}
+
+/* Mobile drawer (<=960px) */
+.drawerToggle{
+  display:none;
+  border-radius:999px !important;
+  font-weight:1000;
+}
+.drawerOverlay{
+  display:none;
+}
+
+@media (max-width:960px){
+  .layout{
+    grid-template-columns:1fr !important;
+    padding: 12px !important;
+  }
+
+  .drawerToggle{display:inline-flex; align-items:center; gap:8px;}
+  .sidebar{
+    position:fixed !important;
+    top:12px !important;
+    bottom:12px !important;
+    left:12px !important;
+    width:min(340px, calc(100% - 24px)) !important;
+    z-index:9998 !important;
+    transform: translateX(-110%);
+    transition: transform .18s ease;
+    overflow:auto;
+  }
+  body.navOpen .sidebar{ transform: translateX(0); }
+
+  .drawerOverlay{
+    position:fixed;
+    inset:0;
+    background: rgba(8, 12, 16, .42);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index:9997;
+  }
+  body.navOpen .drawerOverlay{display:block;}
+
+  /* Give main full width */
+  .main{padding:0 !important;}
+}
+
+/* Prevent content from being hidden behind overlays */
+@media (max-width:960px){
+  .modalOverlay{z-index: 10000;}
+  .toast{z-index: 10001;}
+}
+
+
+
+/* =========================
+   RESPONSIVE PATCH v2 (stronger phone rules)
+   ========================= */
+
+/* Avoid accidental horizontal scrolling on phones (table still scrolls inside .tableScroll) */
+html, body{max-width:100%; overflow-x:hidden;}
+
+/* Make all 2-col grids stack on phones */
+@media (max-width:720px){
+  .grid{grid-template-columns:1fr !important;}
+  .row{grid-template-columns:1fr !important;}
+  .main{padding:12px !important;}
+  .card{padding:14px !important;}
+  .topbar{gap:10px !important;}
+  .topbar > div{min-width:0 !important;}
+}
+
+/* Safer table width so it doesn't force page overflow */
+@media (max-width:720px){
+  table{min-width:640px !important;}
+}
+
+/* Drawer: respect mobile safe areas */
+@media (max-width:960px){
+  .sidebar{
+    padding-top: max(18px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+
+
+/* Users list: mobile card view (keeps table for desktop) */
+.userCards{
+  display:none;
+  margin-top:10px;
+  gap:10px;
+}
+.userCard{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  padding:12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+  background:#fff;
+}
+.userCardTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+.userMeta{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  margin-top:10px;
+  font-size:13px;
+  color:var(--text);
+}
+.userMeta .k{color:var(--muted); font-size:12px;}
+.userActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.userActions .miniBtn{width:auto;}
+
+@media (max-width:720px){
+  .tableScroll{display:none !important;}
+  .userCards{display:grid !important;}
+}
+
+</style>
+  <link rel="icon" type="image/x-icon" href="/favicon cm 2.png">
+</head>
+
+<body>
+<div class="layout">
+
+  <div class="drawerOverlay" id="drawerOverlay" aria-hidden="true"></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/LOGO_CM.png" />
+      <div>
+        <p class="t1">CM Colombia</p>
+        <p class="t2">Configuración</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="/pages/dashboard.html">Dashboard <span class="pill">home</span></a>
+      <a href="/pages/audits.html">Auditorías</a>
+      <a href="/pages/hallazgos.html">Hallazgos</a>
+      <a href="/pages/acciones.html">Acciones</a>
+      <a href="/pages/evidencias.html">Evidencias</a>
+      <a href="/pages/firma.html">Firmas</a>
+      <a href="/pages/config.html" class="active">Config <span class="pill">admin</span></a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0">Administración de Usuarios</h2>
+        <div style="color:var(--muted); font-size:12.5px; margin-top:4px;">
+          Admin puede crear usuarios, editar rol/área/activo y actualizar contraseñas.
+        </div>
+      </div>
+      <button class="ghost drawerToggle" id="btnMenu" type="button" aria-label="Abrir menú">☰ Menú</button>
+      <button class="primary" id="btnLogout">Cerrar sesión</button>
+    </div>
+
+    <div class="grid">
+
+      <!-- CREAR USUARIO -->
+      <section class="card">
+        <h3>Crear usuario</h3>
+        <p class="help">Crea el usuario en Auth + su perfil (rol/área). La contraseña no se guarda en la base, solo en Auth.</p>
+
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input id="email" placeholder="correo@empresa.com">
+          </div>
+          <div>
+            <label>Contraseña</label>
+            <input id="password" type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+          <div>
+            <label>Nombre</label>
+            <input id="name" placeholder="Nombre completo">
+          </div>
+          <div>
+            <label>Área</label>
+            <input id="area" placeholder="Área / proceso">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+          <div>
+            <label>Rol</label>
+            <select id="role">
+              <option>user</option>
+              <option>auditor</option>
+              <option>admin</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="primary" id="btnCreate">Crear usuario</button>
+          </div>
+        </div>
+
+        <div class="status" id="createStatus"></div>
+      </section>
+
+      <!-- LISTA -->
+      <section class="card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:10px;">
+          <div>
+            <h3 style="margin:0">Usuarios</h3>
+            <p class="help" style="margin-top:6px;"></p>
+          </div>
+          <div class="badge"><span>🔒</span><span>Solo Admin</span></div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <label>Buscar</label>
+          <input id="q" placeholder="Busca por nombre, rol, área o UID...">
+        </div>
+
+        <div class="tableScroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Área</th>
+                <th>Activo</th>
+                <th>Contraseña</th>
+                <th>UID</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="userCards" id="userCards" aria-live="polite"></div>
+
+        <div class="status" id="listStatus"></div>
+      </section>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Editar usuario -->
+<div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modalHeader">
+      <div>
+        <h4 id="modalTitle">Editar usuario</h4>
+        <div style="font-size:12px; color:var(--muted); margin-top:2px;">
+          Actualiza perfil y/o contraseña de manera segura.
+        </div>
+      </div>
+      <button class="ghost" id="btnCloseModal" style="width:auto">✕</button>
+    </div>
+
+    <div class="modalBody">
+      <div class="badge" style="margin-bottom:10px;">
+        <span>👤</span><span id="mName">—</span>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Rol</label>
+          <select id="mRole">
+            <option value="user">user</option>
+            <option value="auditor">auditor</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
+        <div>
+          <label>Activo</label>
+          <select id="mActive">
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>Área</label>
+        <input id="mArea" placeholder="Área / proceso">
+      </div>
+
+      <div style="margin-top:14px; padding:12px; border:1px solid rgba(45,138,60,.18); background: rgba(45,138,60,.05); border-radius: 16px;">
+        <div style="font-weight:1000; color:var(--green); margin-bottom:6px;">🔐 Actualizar contraseña (opcional)</div>
+        <div style="font-size:12.5px; color:var(--muted); margin-bottom:10px;">
+          La contraseña actual nunca se muestra. Si dejas en blanco, no cambia.
+        </div>
+
+        <div class="row">
+          <div class="pwdWrap">
+            <label>Nueva contraseña</label>
+            <input id="mPass1" type="password" placeholder="••••••••">
+            <button class="toggleEye" id="eye1" type="button">👁</button>
+          </div>
+          <div class="pwdWrap">
+            <label>Confirmar</label>
+            <input id="mPass2" type="password" placeholder="••••••••">
+            <button class="toggleEye" id="eye2" type="button">👁</button>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; font-size:12px; color:var(--muted);">
+          Reglas: mínimo 8 caracteres.
+        </div>
+      </div>
+
+      <div class="status" id="modalStatus"></div>
+    </div>
+
+    <div class="modalFooter">
+      <button class="ghost" id="btnCancel" style="width:auto;">Cancelar</button>
+      <button class="primary" id="btnSaveUser" style="width:auto;">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL: Confirmar (desactivar/reactivar) -->
+<div class="modalOverlay" id="confirmOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modalHeader" style="background: linear-gradient(180deg, rgba(192,57,43,.10), rgba(124,194,66,.03));">
+      <div>
+        <h4 id="confirmTitle">Eliminar usuario</h4>
+        <div style="font-size:12px; color:var(--muted); margin-top:2px;">
+          Esta acción es <b>irreversible</b>: se elimina de Auth y del perfil. Luego podrás crearlo de nuevo.
+        </div>
+      </div>
+      <button class="ghost" id="btnCloseConfirm" style="width:auto" type="button">✕</button>
+    </div>
+
+    <div class="modalBody">
+      <div class="warnBox">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <div style="font-size:18px; line-height:1;">⚠️</div>
+          <div>
+            <div style="font-weight:1000;">
+              Vas a <b id="confirmVerb">eliminar</b> al usuario del <b>sistema</b>:
+            </div>
+            <div class="badge" style="margin-top:10px;">
+              <span>👤</span><span id="confirmUser">—</span>
+            </div>
+
+            <div style="margin-top:10px; font-size:12.5px; color:var(--muted); line-height:1.55;">
+              <span class="kbd">Eliminar</span> borra el usuario de <b>Auth</b> (correo/contraseña) y también su perfil. Para que vuelva a existir, tendrás que <span class="kbd">Crearlo</span> de nuevo.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>Escribe <span class="kbd">CONFIRMAR</span> para continuar</label>
+        <input id="confirmText" placeholder="CONFIRMAR" />
+      </div>
+
+      <div class="status" id="confirmStatus"></div>
+    </div>
+
+    <div class="modalFooter">
+      <button class="ghost" id="btnCancelConfirm" style="width:auto;" type="button">Cancelar</button>
+      <button class="danger" id="btnDoConfirm" style="width:auto;" type="button">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <b id="toastTitle">Listo</b>
+  <small id="toastMsg"></small>
+</div>
+
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<script>
+
+  // =========================
+  // CONFIG (Frontend)
+  // =========================
+  const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+
+  // Edge Functions
+  const CREATE_URL = SUPABASE_URL + "/functions/v1/create-user";
+  const PASS_URL   = SUPABASE_URL + "/functions/v1/set-user-password";
+  const DELETE_URL = SUPABASE_URL + "/functions/v1/delete-user";
+
+  // Cliente Supabase (browser)
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Exponer para debug en consola
+  window.sb = sb;
+
+  // =========================
+  // Helpers UI
+  // =========================
+  const $ = (id) => document.getElementById(id);
+
+  function toast(title, msg) {
+    $("toastTitle").textContent = title;
+    $("toastMsg").textContent = msg || "";
+    const t = $("toast");
+    t.style.display = "block";
+    clearTimeout(window.__toastT);
+    window.__toastT = setTimeout(() => (t.style.display = "none"), 3200);
+  }
+
+  function setStatus(el, msg, kind) {
+    if (!el) return;
+    el.className = "status" + (kind ? " " + kind : "");
+    el.textContent = msg || "";
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[m]));
+  }
+
+  // =========================
+  // Auth / Permisos
+  // =========================
+  async function session() {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+    if (!data.session) {
+      location.href = "/index.html";
+      throw new Error("No hay sesión activa");
+    }
+    return data.session;
+  }
+
+  async function requireAdmin() {
+    const s = await session();
+
+    const { data: profile, error } = await sb
+      .from("profiles")
+      .select("role, is_active")
+      .eq("id", s.user.id)
+      .single();
+
+    if (error || !profile) {
+      location.href = "/pages/dashboard.html";
+      return false;
+    }
+
+    if (profile.role !== "admin" || profile.is_active !== true) {
+      location.href = "/pages/dashboard.html";
+      return false;
+    }
+
+    return true;
+  }
+
+  // =========================
+  // Listado
+  // =========================
+  let cachedUsers = [];
+  let editingUserId = null;
+
+  function renderUsers(list) {
+    const q = $("q").value.trim().toLowerCase();
+    const rows = (q
+      ? list.filter((u) =>
+          (u.full_name || "").toLowerCase().includes(q) ||
+          (u.role || "").toLowerCase().includes(q) ||
+          (u.area || "").toLowerCase().includes(q) ||
+          (u.id || "").toLowerCase().includes(q)
+        )
+      : list);
+
+    $("tbody").innerHTML = rows
+      .map(
+        (u) => `
+      <tr data-id="${u.id}">
+        <td><b>${escapeHtml(u.full_name || "-")}</b></td>
+        <td><span class="badge">${escapeHtml(u.role || "user")}</span></td>
+        <td>${escapeHtml(u.area || "-")}</td>
+        <td>${u.is_active ? "Sí" : "No"}</td>
+        <td class="mono">••••••••</td>
+        <td class="mono" title="${u.id}">${u.id.slice(0, 8)}…${u.id.slice(-6)}</td>
+        <td>
+          <button class="miniBtn iconBtn" data-action="edit" title="Editar (rol/área/activo/contraseña)">🔑</button>
+
+          <button class="miniBtn iconBtn dangerSoft" data-action="delete" title="Eliminar del sistema (irreversible)">🗑</button>
+        </td>
+      </tr>`
+      )
+      .join("");
+
+    // Mobile card view (same actions, same data-id)
+    const cardsEl = $("userCards");
+    if (cardsEl) {
+      cardsEl.innerHTML = rows
+        .map(
+          (u) => `
+          <div class="userCard" data-id="${u.id}">
+            <div class="userCardTop">
+              <div>
+                <div style="font-weight:1100; font-size:15px;">${escapeHtml(u.full_name || "-")}</div>
+                <div style="margin-top:6px;">
+                  <span class="badge">${escapeHtml(u.role || "user")}</span>
+                  <span style="color:var(--muted); font-size:12px; margin-left:8px;">${u.is_active ? "Activo" : "Inactivo"}</span>
+                </div>
+              </div>
+              <div class="userActions">
+                <button class="miniBtn iconBtn" data-action="edit" title="Editar (rol/área/activo/contraseña)">🔑</button>
+                <button class="miniBtn iconBtn dangerSoft" data-action="delete" title="Eliminar del sistema (irreversible)">🗑</button>
+              </div>
+            </div>
+
+            <div class="userMeta">
+              <div><div class="k">Área</div><div>${escapeHtml(u.area || "-")}</div></div>
+              <div><div class="k">UID</div><div class="mono" style="word-break:break-all;">${escapeHtml(u.id || "-")}</div></div>
+              <div><div class="k">Contraseña</div><div class="mono">••••••••</div></div>
+            </div>
+          </div>`
+        )
+        .join("");
+    }
+}
+
+  async function loadUsers() {
+    setStatus($("listStatus"), "Cargando usuarios...");
+
+    // Traemos también email e is_deleted para poder ocultar "eliminados del panel"
+    // (si tu DB aún no tiene la columna is_deleted, hacemos fallback sin romper)
+    let data = null, error = null;
+
+    // Intento 1: con is_deleted
+    ({ data, error } = await sb
+      .from("profiles")
+      .select("id, email, full_name, role, area, is_active, is_deleted, created_at")
+      .eq("is_deleted", false)
+      .order("created_at", { ascending: false }));
+
+    // Fallback: si no existe la columna is_deleted, no frenamos el panel
+    if (error && /is_deleted/i.test(error.message || "")) {
+      ({ data, error } = await sb
+        .from("profiles")
+        .select("id, email, full_name, role, area, is_active, created_at")
+        .order("created_at", { ascending: false }));
+    }
+
+    if (error) {
+      setStatus($("listStatus"), "Error: " + error.message, "err");
+      return;
+    }
+
+    // Si viene is_deleted, filtramos por seguridad
+    cachedUsers = (data || []).filter(u => !u?.is_deleted);
+    renderUsers(cachedUsers);
+    setStatus($("listStatus"), `OK: ${cachedUsers.length} usuarios`, "ok");
+  }
+  // =========================
+  // Crear usuario (Edge Function)
+  // =========================
+  async function createUser() {
+    const btn = $("btnCreate");
+    const statusEl = $("createStatus");
+
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    const full_name = $("name").value.trim();
+    const area = $("area").value.trim();
+    const role = $("role").value;
+
+    if (!email || !password) {
+      setStatus(statusEl, "❌ Email y contraseña son obligatorios.", "err");
+      return;
+    }
+    if (password.length < 8) {
+      setStatus(statusEl, "❌ La contraseña debe tener mínimo 8 caracteres.", "err");
+      return;
+    }
+
+    // Si el usuario existe pero está "eliminado del panel", lo recuperamos en vez de crear duplicados
+    try{
+      const q = await sb
+        .from("profiles")
+        .select("id, is_deleted")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (q?.data && q.data.is_deleted) {
+        setStatus(statusEl, "Recuperando usuario eliminado...");
+
+        // Reactivar/recuperar perfil
+        await updateProfile(q.data.id, {
+          full_name,
+          area,
+          role,
+          is_active: true,
+          is_deleted: false
+        });
+
+        // Reasignar contraseña en Auth (la contraseña no vive en profiles)
+        await setUserPassword(q.data.id, password);
+
+        setStatus(statusEl, "✅ Usuario recuperado y actualizado.", "ok");
+        toast("✅ Listo", "Usuario recuperado (ya vuelve a aparecer)");
+
+        // limpiar
+        $("email").value = "";
+        $("password").value = "";
+        $("name").value = "";
+        $("area").value = "";
+        $("role").value = "user";
+
+        await loadUsers();
+        return;
+      }
+
+      // Si ya existe y NO está eliminado, evitamos duplicar
+      if (q?.data && !q.data.is_deleted) {
+        setStatus(statusEl, "❌ Ese usuario ya existe. Si quieres, usa 'Eliminar' y luego vuelve a agregar.", "err");
+        return;
+      }
+    }catch(e){
+      // Si tu tabla aún no tiene email o is_deleted, no frenamos el flujo normal
+      console.warn("precheck restore skip:", e?.message || e);
+    }
+
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+
+    try {
+      btn.disabled = true;
+      setStatus(statusEl, "Creando usuario...");
+
+      const s = await session();
+
+      const res = await fetch(CREATE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + s.access_token,
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          full_name,
+          role,
+          area,
+          is_active: true,
+        }),
+        signal: controller.signal,
+      });
+
+      const raw = await res.text();
+      let payload = {};
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        payload = { error: raw };
+      }
+
+      if (!res.ok) {
+        throw new Error(payload.error || payload.message || `Error HTTP ${res.status}`);
+      }
+
+      setStatus(statusEl, "✅ Usuario creado.", "ok");
+      toast("✅ Listo", "Usuario creado correctamente");
+
+      // limpiar
+      $("email").value = "";
+      $("password").value = "";
+      $("name").value = "";
+      $("area").value = "";
+      $("role").value = "user";
+
+      await loadUsers();
+    } catch (err) {
+      const msg = err?.name === "AbortError"
+        ? "Tiempo de espera agotado. Revisa que la Edge Function esté desplegada y responda."
+        : (err?.message || String(err));
+      setStatus(statusEl, "❌ " + msg, "err");
+      console.error("create-user error:", err);
+    } finally {
+      clearTimeout(timeout);
+      btn.disabled = false;
+    }
+  }
+
+  // =========================
+  // Editar perfil + contraseña
+  // =========================
+  async function updateProfile(userId, patch) {
+    const { error } = await sb.from("profiles").update(patch).eq("id", userId);
+    if (error) throw new Error(error.message);
+  }
+
+  async function setUserPassword(userId, newPass) {
+    const s = await session();
+
+    const res = await fetch(PASS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + s.access_token,
+      },
+      // mandamos varias llaves por compatibilidad
+      body: JSON.stringify({ user_id: userId, new_password: newPass, password: newPass }),
+    });
+
+    const raw = await res.text();
+    let payload = {};
+    try { payload = JSON.parse(raw); } catch { payload = { error: raw }; }
+
+    if (!res.ok) throw new Error(payload.error || payload.message || "Error cambiando contraseña");
+  }
+
+
+  async function deleteUserSystem(userId) {
+    // ✅ Borrado completo (Auth + perfil) usando Edge Function "delete-user"
+    // Nota: Si ves 401/Invalid JWT, casi siempre es porque:
+    //  - la sesión está expirada / token viejo, o
+    //  - la Edge Function tiene verify_jwt=true y no está recibiendo el Bearer,
+    //  - o la propia función está devolviendo 401 (por validación de admin).
+    //
+    // Este método:
+    //  1) valida y refresca sesión
+    //  2) intenta invoke()
+    //  3) si falla con 401, reintenta con fetch() enviando apikey + Authorization explícitos
+
+    // 1) sesión
+    const { data: sData, error: sErr } = await sb.auth.getSession();
+    if (sErr) throw new Error(sErr.message || "No se pudo leer la sesión");
+    if (!sData?.session?.access_token) throw new Error("Sesión inválida. Cierra sesión y vuelve a entrar.");
+
+    // refrescar si faltan <60s para expirar
+    const expMs = (sData.session.expires_at || 0) * 1000;
+    if (expMs && expMs < (Date.now() + 60_000)) {
+      const { data: rData, error: rErr } = await sb.auth.refreshSession();
+      if (rErr) throw new Error(rErr.message || "No se pudo refrescar la sesión");
+      if (!rData?.session?.access_token) throw new Error("Sesión inválida. Cierra sesión y vuelve a entrar.");
+    }
+
+    // vuelve a leer (por si refrescó)
+    const { data: s2 } = await sb.auth.getSession();
+    const jwt = s2?.session?.access_token;
+    if (!jwt) throw new Error("No hay token de sesión. Cierra sesión y vuelve a entrar.");
+
+    // 2) intento principal: invoke (maneja URL + headers)
+    try {
+      const { data, error } = await sb.functions.invoke("delete-user", {
+        body: { user_id: userId },
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      // 3) fallback: fetch directo con apikey + Authorization
+      const msg = (e && (e.message || e.error_description || String(e))) || "";
+      const looks401 = /401|unauthorized|invalid jwt|jwt/i.test(msg);
+
+      if (!looks401) {
+        throw new Error(msg || "No se pudo eliminar el usuario");
+      }
+
+      const res = await fetch(DELETE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${jwt}`
+        },
+        body: JSON.stringify({ user_id: userId })
+      });
+
+      const raw = await res.text();
+      let payload = {};
+      try { payload = JSON.parse(raw); } catch { payload = { error: raw }; }
+
+      if (!res.ok) {
+        // Mensaje más claro para debugging
+        const hint =
+          res.status === 401
+            ? " (401) Tu Edge Function no está aceptando el JWT. Revisa verify_jwt y/o la validación de admin en la función."
+            : "";
+        throw new Error((payload.error || payload.message || `Error HTTP ${res.status}`) + hint);
+      }
+      return payload;
+    }
+  }
+
+
+  function openModal(user) {
+    editingUserId = user.id;
+    $("mName").textContent = user.full_name || user.id;
+    $("mRole").value = user.role || "user";
+    $("mArea").value = user.area || "";
+    $("mActive").value = String(!!user.is_active);
+
+    $("mPass1").value = "";
+    $("mPass2").value = "";
+    setStatus($("modalStatus"), "");
+
+    $("modalOverlay").style.display = "flex";
+    $("modalOverlay").setAttribute("aria-hidden", "false");
+  }
+
+  function closeModal() {
+    $("modalOverlay").style.display = "none";
+    $("modalOverlay").setAttribute("aria-hidden", "true");
+    editingUserId = null;
+  }
+
+  function togglePass(inputId) {
+    const inp = $(inputId);
+    inp.type = inp.type === "password" ? "text" : "password";
+  }
+
+  // =========================
+  // Mobile drawer (sidebar)
+  // =========================
+  function setNav(open){
+    document.body.classList.toggle("navOpen", !!open);
+    const ov = $("drawerOverlay");
+    if (ov) ov.setAttribute("aria-hidden", open ? "false" : "true");
+  }
+
+  const btnMenu = $("btnMenu");
+  const drawerOverlay = $("drawerOverlay");
+
+  if (btnMenu) {
+    btnMenu.addEventListener("click", () => setNav(!document.body.classList.contains("navOpen")));
+  }
+  if (drawerOverlay) {
+    drawerOverlay.addEventListener("click", () => setNav(false));
+  }
+
+  // Close drawer when navigating (mobile)
+  document.querySelectorAll(".sidebar .nav a").forEach(a=>{
+    a.addEventListener("click", ()=> setNav(false));
+  });
+
+  // ESC closes drawer
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("navOpen")) setNav(false);
+  });
+
+
+  // =========================
+  // BINDINGS
+  // =========================
+  $("btnCreate").addEventListener("click", (e) => {
+    e.preventDefault();
+    createUser();
+  });
+
+  $("btnLogout").addEventListener("click", async () => {
+    try { await sb.auth.signOut(); } catch {}
+    location.href = "/index.html";
+  });
+
+  $("q").addEventListener("input", () => renderUsers(cachedUsers));
+
+  $("tbody").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const tr = e.target.closest("tr");
+    const id = tr?.dataset?.id;
+    if (!id) return;
+
+    const user = cachedUsers.find((u) => u.id === id);
+    if (!user) return;
+
+    if (btn.dataset.action === "edit") openModal(user);
+
+    if (btn.dataset.action === "delete") openConfirm(user);
+});
+
+  // Mobile cards actions
+  const cards = $("userCards");
+  if (cards) {
+    cards.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+
+      const card = e.target.closest(".userCard");
+      const id = card?.dataset?.id;
+      if (!id) return;
+
+      const user = cachedUsers.find((u) => u.id === id);
+      if (!user) return;
+
+      if (btn.dataset.action === "edit") openModal(user);
+      if (btn.dataset.action === "delete") openConfirm(user);
+    });
+  }
+
+  // Modal
+  $("btnCloseModal").addEventListener("click", closeModal);
+  $("btnCancel").addEventListener("click", closeModal);
+  $("modalOverlay").addEventListener("click", (e) => {
+    if (e.target === $("modalOverlay")) closeModal();
+  });
+
+  $("eye1").addEventListener("click", () => togglePass("mPass1"));
+  $("eye2").addEventListener("click", () => togglePass("mPass2"));
+
+  $("btnSaveUser").addEventListener("click", async () => {
+    if (!editingUserId) return;
+
+    const role = $("mRole").value;
+    const area = $("mArea").value.trim();
+    const is_active = $("mActive").value === "true";
+
+    const p1 = $("mPass1").value;
+    const p2 = $("mPass2").value;
+
+    try {
+      $("btnSaveUser").disabled = true;
+      setStatus($("modalStatus"), "Guardando cambios...");
+
+      await updateProfile(editingUserId, { role, area, is_active });
+
+      if (p1 || p2) {
+        if (p1.length < 8) throw new Error("La contraseña debe tener mínimo 8 caracteres.");
+        if (p1 !== p2) throw new Error("Las contraseñas no coinciden.");
+        await setUserPassword(editingUserId, p1);
+      }
+
+      toast("✅ Actualizado", "Cambios guardados" + ((p1 || p2) ? " + contraseña" : ""));
+      closeModal();
+      await loadUsers();
+    } catch (err) {
+      setStatus($("modalStatus"), "❌ " + (err?.message || String(err)), "err");
+    } finally {
+      $("btnSaveUser").disabled = false;
+    }
+  });
+
+  // =========================
+  // Eliminar del panel (reversible)
+  // =========================
+  let pendingDelete = null; // { id, label }
+
+  function openConfirm(user){
+    pendingDelete = { id: user.id, label: user.full_name || user.email || user.id };
+
+    $("confirmVerb").textContent = "eliminar";
+    $("confirmTitle").textContent = "Eliminar usuario";
+    $("confirmUser").textContent = pendingDelete.label;
+
+    $("confirmText").value = "";
+    setStatus($("confirmStatus"), "");
+    $("btnDoConfirm").textContent = "Confirmar eliminación";
+
+    $("confirmOverlay").style.display = "flex";
+    $("confirmOverlay").setAttribute("aria-hidden", "false");
+    $("confirmText").focus();
+  }
+
+  function closeConfirm(){
+    $("confirmOverlay").style.display = "none";
+    $("confirmOverlay").setAttribute("aria-hidden", "true");
+    pendingDelete = null;
+  }
+
+  async function doToggle(){
+    if(!pendingDelete) return;
+
+    const typed = ($("confirmText").value || "").trim().toUpperCase();
+    if(typed !== "CONFIRMAR"){
+      setStatus($("confirmStatus"), '❌ Escribe "CONFIRMAR" para continuar.', "err");
+      return;
+    }
+
+    try{
+      $("btnDoConfirm").disabled = true;
+      setStatus($("confirmStatus"), "Procesando...");
+
+      // Eliminación real: Auth + profiles (Edge Function)
+      await deleteUserSystem(pendingDelete.id);
+
+      toast("✅ Listo", "Usuario eliminado del sistema. Para volver, créalo de nuevo.");
+      closeConfirm();
+      await loadUsers();
+    }catch(err){
+      setStatus($("confirmStatus"), "❌ " + (err?.message || String(err)), "err");
+    }finally{
+      $("btnDoConfirm").disabled = false;
+    }
+  }
+
+  // =========================
+  // Bindings UI (Confirm modal)
+  // =========================
+  function bindConfirmModal(){
+    const overlay = $("confirmOverlay");
+    const btnX = $("btnCloseConfirm");
+    const btnCancel = $("btnCancelConfirm");
+    const btnDo = $("btnDoConfirm");
+    const input = $("confirmText");
+
+    if(!overlay || !btnX || !btnCancel || !btnDo || !input){
+      console.warn("[confirmModal] faltan elementos en DOM");
+      return;
+    }
+
+    btnX.addEventListener("click", closeConfirm);
+    btnCancel.addEventListener("click", closeConfirm);
+    btnDo.addEventListener("click", doToggle);
+
+    // click fuera
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeConfirm();
+    });
+
+    // Enter confirma
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doToggle();
+      if (e.key === "Escape") closeConfirm();
+    });
+
+    // ESC global
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.style.display === "flex") closeConfirm();
+    });
+  }
+
+  // Llamar una sola vez cuando ya existe el DOM
+  bindConfirmModal();
+
+
+  // Boot
+  (async () => {
+    const ok = await requireAdmin();
+    if (ok) await loadUsers();
+  })();
+
+</script>
+</body>
+</html>

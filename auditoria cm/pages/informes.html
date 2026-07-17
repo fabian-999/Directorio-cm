@@ -1,0 +1,5179 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CM Colombia · Informes (PDF)</title>
+
+  <style>
+    :root{
+      --green:#2D8A3C;
+      --green-2:#7CC242;
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --text:#0B1220;
+      --muted:#5E6B7A;
+      --border:rgba(45,138,60,.18);
+      --shadow:0 18px 45px rgba(0,0,0,.08);
+      --radius:18px;
+      --danger:#c0392b;
+      --ok:#2D8A3C;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 0%, rgba(45,138,60,.10), transparent 55%),
+        radial-gradient(900px 500px at 90% 10%, rgba(124,194,66,.10), transparent 55%),
+        #fff;
+      min-height:100vh;
+    }
+    .layout{ display:grid; grid-template-columns:280px 1fr; min-height:100vh; }
+    
+
+    .sidebar{
+      border-right:1px solid rgba(0,0,0,.06);
+      background:#fff;
+      padding:18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding:12px; border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(45,138,60,.06), rgba(124,194,66,.04));
+      box-shadow:var(--shadow);
+    }
+    .brand img{width:60px;height:48px;object-fit:contain}
+    .brand .t1{margin:0;font-size:16px;font-weight:900}
+    .brand .t2{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .nav{ margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+    .nav a{
+      text-decoration:none; color:var(--text);
+      display:flex; justify-content:space-between; gap:10px;
+      padding:12px; border-radius:14px;
+      border:1px solid rgba(0,0,0,.06); background:#fff;
+    }
+    .nav a.active, .nav a:hover{
+      border-color:rgba(45,138,60,.35);
+      box-shadow:0 0 0 4px rgba(45,138,60,.10);
+    }
+    .pill{
+      font-size:11px; padding:4px 8px; border-radius:999px;
+      background:rgba(45,138,60,.08);
+      border:1px solid rgba(45,138,60,.18);
+      color:var(--green); font-weight:800;
+      white-space:nowrap;
+    }
+
+    .main{ padding:18px; }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:12px; padding:14px 16px;
+      border-radius:var(--radius);
+      background:#fff;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      flex-wrap:wrap;
+    }
+    .who{ display:flex; flex-direction:column; gap:6px; min-width:260px; }
+    .who h2{ margin:0; font-size:18px; letter-spacing:.2px; color:var(--green); }
+    .meta{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .tag{
+      font-size:12px; padding:5px 10px; border-radius:999px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#fff; color:var(--text);
+    }
+    .tag.ok{
+      border-color: rgba(45,138,60,.22);
+      background: rgba(124,194,66,.10);
+      color: var(--green);
+      font-weight:900;
+    }
+    button{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+    button:hover{
+      box-shadow:0 0 0 4px rgba(45,138,60,.10);
+      border-color:rgba(45,138,60,.25);
+    }
+    .primary{
+      border:none;
+      background:linear-gradient(180deg,var(--green-2),var(--green));
+      color:#fff;
+      box-shadow:0 14px 35px rgba(45,138,60,.18);
+    }
+
+    .grid{ margin-top:16px; display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    @media(max-width:1100px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      padding:16px;
+      border-radius:var(--radius);
+      background:#fff;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:var(--shadow);
+    }
+    .card h3{ margin:0 0 8px; }
+    .help{ margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.5; }
+
+    label{ font-size:12px; color:var(--muted); font-weight:900; display:block; margin:10px 0 6px; }
+    input, select, textarea{
+      width:100%; padding:10px; border-radius:14px;
+      border:1px solid rgba(0,0,0,.12); background:#fff;
+    }
+    input:focus,select:focus,textarea:focus{
+      outline:none; border-color:var(--green);
+      box-shadow:0 0 0 4px rgba(45,138,60,.12);
+    }
+    textarea{ min-height:88px; resize:vertical; }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media(max-width:520px){ .row{ grid-template-columns:1fr; } }
+
+    .status{ font-size:12px; color:var(--muted); margin-top:10px; min-height:16px; white-space:pre-wrap; }
+    .status.ok{ color:var(--ok); font-weight:900; }
+    .status.err{ color:var(--danger); font-weight:900; }
+
+    table{ width:100%; border-collapse:collapse; margin-top:10px; }
+    th,td{ padding:10px; border-bottom:1px solid rgba(0,0,0,.08); text-align:left; font-size:13px; vertical-align:top; }
+    th{ background:rgba(45,138,60,.08); position:sticky; top:0; z-index:1; }
+    tr:hover td{ background:rgba(45,138,60,.03); }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .miniBtn{
+      padding:7px 10px; border-radius:12px; font-size:12px; font-weight:900;
+      border:1px solid rgba(45,138,60,.25);
+      background:rgba(45,138,60,.08);
+      cursor:pointer; white-space:nowrap;
+    }
+    .miniBtn:active{ transform: translateY(1px); }
+
+    .divider{ height:1px; background:rgba(0,0,0,.08); margin:14px 0; }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid rgba(45,138,60,.18);
+      background:rgba(45,138,60,.06);
+      font-size:12px; font-weight:900; color:var(--green);
+    }
+  
+/* === CM Corporate Light Theme Override (white + green) === */
+:root{
+  --cm-green:#18a957;
+  --cm-green-2:#0f8f45;
+  --cm-bg:#f6fbf8;
+  --cm-surface:#ffffff;
+  --cm-surface-2:#f0faf5;
+  --cm-border:rgba(15,143,69,.18);
+  --cm-text:#0b1f14;
+  --cm-muted:#4f6b5c;
+  --cm-shadow:0 10px 30px rgba(2, 25, 14, .08);
+}
+html,body{background:var(--cm-bg)!important;color:var(--cm-text)!important;}
+/* containers */
+.shell,.wrap,.app,.card,.panel,.box,.main,.content{
+  background:transparent!important;
+}
+.card, .panel, .box, .surface{
+  background:var(--cm-surface)!important;
+  border:1px solid var(--cm-border)!important;
+  box-shadow:var(--cm-shadow)!important;
+  color:var(--cm-text)!important;
+}
+.header,.topbar,.app-header{
+  background:linear-gradient(90deg, #ffffff 0%, var(--cm-surface-2) 55%, #ffffff 100%)!important;
+  border-bottom:1px solid var(--cm-border)!important;
+}
+.header h1,.topbar h1,.app-header h1{color:var(--cm-text)!important;}
+/* buttons */
+button, .btn{
+  border-radius:12px!important;
+  border:1px solid var(--cm-border)!important;
+}
+.btn-primary, button.primary, button#btnGenerate, button#btnPreview, .action.primary{
+  background:linear-gradient(180deg,var(--cm-green) 0%, var(--cm-green-2) 100%)!important;
+  color:#fff!important;
+  border:0!important;
+  box-shadow:0 10px 22px rgba(24,169,87,.22)!important;
+}
+.btn-primary:hover, button.primary:hover, .action.primary:hover{filter:brightness(.98);}
+.btn-secondary, button.secondary, .action.secondary{
+  background:var(--cm-surface)!important;
+  color:var(--cm-text)!important;
+}
+/* inputs */
+input, select, textarea{
+  background:var(--cm-surface)!important;
+  color:var(--cm-text)!important;
+  border:1px solid var(--cm-border)!important;
+  border-radius:12px!important;
+}
+input::placeholder, textarea::placeholder{color:rgba(79,107,92,.7)!important;}
+/* tags / pills */
+.pill,.chip,.badge{
+  background:rgba(24,169,87,.10)!important;
+  border:1px solid rgba(24,169,87,.25)!important;
+  color:var(--cm-green-2)!important;
+}
+/* tables */
+table{background:var(--cm-surface)!important;color:var(--cm-text)!important;}
+th{background:var(--cm-surface-2)!important;color:var(--cm-text)!important;}
+td,th{border-color:rgba(15,143,69,.18)!important;}
+/* status colors (keep your earlier logic, but ensure contrast) */
+.status-ok{background:rgba(24,169,87,.12)!important;color:var(--cm-green-2)!important;border-color:rgba(24,169,87,.25)!important;}
+.status-warn{background:rgba(255,193,7,.18)!important;color:#7a5600!important;border-color:rgba(255,193,7,.35)!important;}
+.status-bad{background:rgba(220,53,69,.16)!important;color:#8a1020!important;border-color:rgba(220,53,69,.35)!important;}
+/* make sure preview/pdf area is white */
+#preview, .preview, .pdf-preview, iframe{background:#fff!important;}
+
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+<style>
+/* ===== Encabezados modernos (no coloridos) ===== */
+.section-title {
+  background-color: #f3f6f8;
+  color: #1f2933;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  background-color: #6b7280;
+  border-radius: 4px;
+}
+
+/* Checklist cards */
+.check-item {
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+/* Estados suaves */
+.check-item.si { background-color: #eaf7ef; }
+.check-item.no { background-color: #fdeeee; }
+.check-item.abierta { background-color: #f5f6f7; }
+
+/* Badge alineado */
+.badge {
+  min-width: 72px;
+  text-align: center;
+  padding: 6px 0;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+
+<style>
+/* ===== Separador moderno por degradado (sutil) ===== */
+.section-title {
+  position: relative;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 10px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(31, 41, 51, 0.18),
+    transparent
+  );
+}
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+
+<style>
+/* ===== Ajuste final: quitar verde y dejar sombreado neutro ===== */
+.section-title {
+  background-color: #f3f6f8 !important; /* neutro moderno */
+  color: #1f2933 !important;
+}
+
+/* Mantener el separador degradado */
+.section-title::after {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(31, 41, 51, 0.18),
+    transparent
+  ) !important;
+}
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+
+<style>
+/* ===== Ajuste fino: separar texto del encabezado del separador ===== */
+.section-title {
+  padding-bottom: 16px !important; /* más aire abajo */
+}
+
+.section-title::after {
+  margin-top: 14px !important; /* separa la palabra de la línea */
+}
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+
+<style>
+/* ===== BRUTAL MODERNO: encabezados tipo "card header" ===== */
+.section-title {
+  background: #f8fafc !important;
+  color: #111827 !important;
+  padding: 14px 18px 18px 22px !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2px !important;
+  box-shadow: 0 1px 0 rgba(17,24,39,0.06), 0 8px 20px rgba(17,24,39,0.06) !important;
+  border: 1px solid rgba(17,24,39,0.06) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Acento moderno a la izquierda (NO colorido, solo gris/azul suave) */
+.section-title::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 10px !important;
+  bottom: 10px !important;
+  width: 6px !important;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.35), rgba(31, 41, 55, 0.25)) !important;
+  border-radius: 10px !important;
+}
+
+/* Separador por degradado MUY sutil (más separado del texto) */
+.section-title::after {
+  content: "" !important;
+  display: block !important;
+  height: 1px !important;
+  margin-top: 16px !important;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(17, 24, 39, 0.12),
+    transparent
+  ) !important;
+}
+
+/* Checklist cards más premium */
+.check-item {
+  border-radius: 12px !important;
+  padding: 16px 18px !important;
+  margin-bottom: 14px !important;
+  border: 1px solid rgba(17,24,39,0.05) !important;
+}
+
+/* Estados suaves (sin saturación) */
+.check-item.si { background-color: #edf7f0 !important; }
+.check-item.no { background-color: #fff1f2 !important; }
+.check-item.abierta { background-color: #f6f7f9 !important; }
+
+/* Badge más pro y consistente */
+.badge {
+  min-width: 86px !important;
+  text-align: center !important;
+  padding: 7px 0 !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+/* Ajuste de tipografía general (sobrio) */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+    /* ===== Loading overlay ===== */
+    .loading-overlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(2px);
+      z-index:9999;
+    }
+    .loading-overlay.hidden{ display:none; }
+    .loading-card{
+      width:min(520px, calc(100% - 32px));
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .spinner{
+      width:34px; height:34px;
+      border-radius:999px;
+      border:4px solid rgba(45,138,60,.18);
+      border-top-color: var(--green);
+      animation: spin 0.85s linear infinite;
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .loading-text{ line-height:1.25; }
+    .loading-title{ font-weight:800; color:var(--text); margin:0; }
+    .loading-sub{ color:var(--muted); margin:4px 0 0 0; font-size:14px; }
+
+  </style>
+
+
+<script>
+// Helper local: detector de negaciones (para preguntas abiertas).
+// NO pisa nada si ya existe window.isNegativeOpenText.
+(function(){
+  const NEG_RE = /(no|nunca|jam[aá]s|tampoco|nadie|ningun(?:o|a)?s?|ninguna?s?|ningún|sin)/i;
+  const detect = (s) => {
+    const t = String(s || "").toLowerCase();
+    if (!t.trim()) return false;
+    // evita falsos positivos con "número"/"normal": usamos word boundaries ()
+    return NEG_RE.test(t);
+  };
+  if (typeof window.isNegativeOpenText !== "function") {
+    window.isNegativeOpenText = detect;
+  }
+  window.__detectNegation = detect; // uso interno
+})();
+
+// =============================
+// NUEVA LÓGICA DE CALIFICACIÓN (mejorada)
+// =============================
+function evaluarPregunta(q){
+  let isCorrect = false;
+
+  switch(q.type){
+
+    case "boolean": // SI / NO
+      if(q.inverse){
+        isCorrect = q.answer === false;
+      }else{
+        isCorrect = q.answer === true;
+      }
+      break;
+
+    case "scale": // ESCALA
+      isCorrect = Number(q.answer) >= 3;
+      break;
+
+    case "open": // ABIERTA
+      const negatives = ["no","nunca","mal","deficiente","problema","incorrecto","falta","sin"];
+      const text = (q.answer || "").toLowerCase();
+      const hasNegative = negatives.some(w => text.includes(w));
+      isCorrect = !hasNegative && text.trim().length > 0;
+      break;
+
+    case "evidence": // EVIDENCIA
+      isCorrect = !!q.evidenceUploaded;
+      break;
+
+    case "multiple": // MÚLTIPLE / CHECKLIST
+      if(Array.isArray(q.selected) && Array.isArray(q.correctAnswers)){
+        const sel = [...q.selected].sort().join(",");
+        const cor = [...q.correctAnswers].sort().join(",");
+        isCorrect = sel === cor;
+      }
+      break;
+
+    default:
+      isCorrect = false;
+  }
+
+  return isCorrect;
+}
+
+function calcularScore(questions){
+  let total = 0;
+  let correct = 0;
+
+  questions.forEach(q => {
+    total++;
+    if(evaluarPregunta(q)) correct++;
+  });
+
+  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  return {
+    total,
+    correct,
+    score
+  };
+}
+
+</script>
+<script>
+/* ===== Bootstrap commentFindings (evita errores en PDF) ===== */
+window.commentFindings = window.commentFindings || [];
+(function(){
+  try{
+    const params = new URLSearchParams(window.location.search);
+    // Regla: si venimos desde Hallazgos con use_selected_findings=1, NO cargar hallazgos por comentario.
+    if(params.get("use_selected_findings") === "1"){
+      window.commentFindings = [];
+      return;
+    }
+
+    const exported = JSON.parse(localStorage.getItem("exportedFindings") || "{}");
+    if (Array.isArray(exported.commentFindings)) window.commentFindings = exported.commentFindings;
+    else window.commentFindings = JSON.parse(localStorage.getItem("commentFindings") || "[]");
+  }catch(e){
+    window.commentFindings = window.commentFindings || [];
+  }
+})();
+</script>
+
+
+
+<script>
+// Alias local (por si el código usa commentFindings sin window.)
+var commentFindings = window.commentFindings || [];
+</script>
+
+
+<style>
+/* ===== CHECKLIST UI PRO ===== */
+.checklist-box {
+  margin-top: 16px;
+  margin-left: 18px;
+  max-width: 520px;
+}
+.checklist-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  column-gap: 12px;
+  align-items: center; /* centra checkbox con el texto */
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+/* Checkbox consistente (evita que el "chulito" quede montado en PDF) */
+
+.checklist-item input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:#000;
+}
+
+
+.checklist-item span {
+
+  word-break: break-word;
+}
+.checklist-comment {
+  margin-top: 14px;
+}
+.checklist-comment textarea {
+  width: 100%;
+  min-height: 60px;
+  border-radius: 8px;
+  border: 1px solid #cfd8dc;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+</style>
+
+
+<style>
+/* ===== Responsive Drawer Sidebar (mobile) ===== */
+#btnMenu{ display:none; align-items:center; gap:8px; }
+#drawerOverlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.35);
+  backdrop-filter: blur(1px);
+  z-index:55;
+  display:none;
+}
+#drawerOverlay.show{ display:block; }
+
+@media (max-width:960px){
+  /* use drawer instead of sticky sidebar */
+  .layout{ grid-template-columns: 1fr !important; }
+  .sidebar{
+    position:fixed !important;
+    top:0; bottom:0; left:0;
+    width:280px;
+    max-width:86vw;
+    padding:18px;
+    transform: translateX(-110%);
+    transition: transform .25s ease;
+    z-index:60;
+    overflow:auto;
+    box-shadow: 0 18px 45px rgba(0,0,0,.18);
+    border-right:1px solid rgba(0,0,0,.06);
+  }
+  .sidebar.open{ transform: translateX(0); }
+  body.drawer-open{ overflow:hidden; }
+  #btnMenu{ display:inline-flex; }
+  .main{ padding:14px !important; }
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:40;
+  }
+}
+
+@media (max-width:960px){
+  /* el layout pasa a 1 columna; el menú será drawer */
+  .layout{ grid-template-columns: 1fr; }
+
+  /* botón menú visible */
+  #btnMenu{ display:inline-flex !important; }
+
+  /* sidebar como drawer */
+  .sidebar{
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(86vw, 360px);
+    z-index: 90;
+    overflow: auto;
+    transform: translateX(-105%);
+    transition: transform .22s ease;
+    border-right: 1px solid rgba(0,0,0,.08);
+    border-radius: 0 20px 20px 0;
+    box-shadow: 18px 0 45px rgba(0,0,0,.18);
+    padding-bottom: 22px;
+    background: #fff;
+  }
+  .sidebar.open{ transform: translateX(0); }
+
+  /* overlay */
+  #drawerOverlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.38);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  #drawerOverlay.show{
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* el contenido ocupa todo */
+  .main{ padding: 14px; }
+
+  /* evita scroll horizontal */
+  body{ overflow-x:hidden; }
+}
+
+</style></head>
+
+<body>
+
+  
+  <!-- Mobile drawer overlay -->
+  <div id="drawerOverlay" aria-hidden="true"></div>
+<!-- Loading overlay -->
+  <div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite" aria-busy="true">
+    <div class="loading-card" role="status" aria-label="Cargando">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="loading-text">
+        <p id="loadingTitle" class="loading-title">Cargando…</p>
+        <p id="loadingSub" class="loading-sub">Por favor espera.</p>
+      </div>
+    </div>
+  </div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/LOGO_CM.png" alt="CM Colombia" onerror="this.style.display='none'">
+      <div>
+        <p class="t1">CM Colombia</p>
+        <p class="t2">Informes PDF</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="/pages/dashboard.html">Dashboard <span class="pill">home</span></a>
+      <a href="/pages/audits.html">Auditorías</a>
+      <a href="/pages/hallazgos.html">Hallazgos</a>
+      <a href="/pages/acciones.html">Acciones</a>
+      <a href="/pages/evidencias.html">Evidencias</a>
+      <a href="/pages/firma.html">Firmas</a>
+      <a href="/pages/reports.html" class="active">Informes <span class="pill">PDF</span></a>
+      <a href="/pages/config.html" id="navConfig">Config <span class="pill">admin</span></a>
+    </nav>
+
+    <div class="divider"></div>
+    <div class="help" style="margin:0">
+      Genera el PDF con el logo y lo guarda en <span class="badge">Storage / reports</span>
+      + registra en <span class="badge">report_versions</span>.
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div class="who">
+        <h2>Generador de Informes (PDF)</h2>
+        <div class="meta">
+          <span class="tag" id="tagUser">Usuario: -</span>
+          <span class="tag ok" id="tagRole">Rol: -</span>
+          <span class="tag" id="tagArea">Área: -</span>
+          <span class="tag" id="tagUid">UID: -</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="btnMenu" aria-label="Abrir menú">☰ Menú</button>
+        <button id="btnReload">Actualizar</button>
+        <button class="primary" id="btnLogout">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- Selección + Generación -->
+      <section class="card">
+        <h3>1) Selecciona la auditoría</h3>
+        <p class="help">
+          Puedes abrir esta página con <span class="mono">?audit_id=UUID</span>.
+          Luego genera el PDF (con firmas si existen) y guarda una versión.
+        </p>
+
+        <label>Auditoría</label>
+        <select id="auditSelect"></select>
+
+        <div class="row" style="margin-top:8px;">
+          <div>
+            <label>Versión</label>
+            <input id="version" type="number" min="1" value="1" />
+          </div>
+          <div>
+            <label>Final</label>
+            <select id="isFinal">
+              <option value="false">No</option>
+              <option value="true">Sí</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Notas / Observaciones (opcional)</label>
+        <textarea id="notes" placeholder="Resumen ejecutivo, observaciones del auditor, etc."></textarea>
+
+        <div class="divider"></div>
+
+        <h3 style="margin:0 0 6px;">1.1) Firma (obligatoria para generar)</h3>
+        <p class="help" style="margin-top:0">
+          Firma aquí mismo y luego genera el PDF. <b>No se guarda en base de datos</b>: se incrusta directamente en el PDF.
+        </p>
+
+        <div class="row">
+          <div>
+            <label>Rol de firma</label>
+            <select id="sigRole">
+              <option value="auditor">auditor</option>
+              <option value="auditado">auditado</option>
+              <option value="responsable">responsable</option>
+              <option value="aprobador">aprobador</option>
+            </select>
+          </div>
+          <div>
+            <label>Nombre visible (opcional)</label>
+            <input id="sigName" placeholder="Ej: Fabián Camilo • Auditor" />
+          </div>
+        </div>
+
+        <label style="margin-top:10px;">Firma</label>
+        <div style="border:1px solid rgba(0,0,0,.10); border-radius:14px; padding:12px; background:#fff;">
+          <canvas id="sigCanvas" style="width:100%; height:180px; border:1px solid rgba(0,0,0,.08); border-radius:12px; background:#fff; touch-action:none;"></canvas>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <button id="sigClear">Limpiar</button>
+            <button class="primary" id="sigSave">Guardar firma</button>
+          </div>
+
+          <div class="status" id="sigStatus" style="margin-top:10px;"></div>
+
+          <div style="margin-top:10px; border:1px solid rgba(0,0,0,.06); border-radius:12px; padding:10px; background:#fff;">
+            <div class="help" style="margin:0 0 8px;">Vista previa (lo que irá al PDF):</div>
+            <img id="sigPreview" alt="preview firma" style="width:100%; max-height:180px; object-fit:contain; display:none;" />
+            <div id="sigPreviewEmpty" style="color:var(--muted); font-size:12px;">Dibuja una firma para ver la vista previa.</div>
+          </div>
+        </div>
+
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+          <button class="primary" id="btnGenerate">Generar PDF + Guardar versión</button>
+          <button id="btnPreview">Previsualizar (sin guardar)</button>
+        </div>
+
+        <div class="status" id="statusGen"></div>
+
+        <div class="divider"></div>
+
+        <h3 style="margin:0 0 8px;">Vista rápida</h3>
+        <div class="help" id="quickInfo" style="margin:0">Selecciona una auditoría...</div>
+      </section>
+
+      <!-- Historial -->
+      <section class="card">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px;">
+          <div>
+            <h3 style="margin:0">2) Versiones del informe</h3>
+            <p class="help" style="margin-top:6px;">Se carga desde <span class="mono">report_versions</span>.</p>
+          </div>
+          <span class="badge">📄 report_versions</span>
+        </div>
+
+        <div style="max-height:420px; overflow:auto; margin-top:10px; border-radius:14px; border:1px solid rgba(0,0,0,.06);">
+          <table>
+            <thead>
+              <tr>
+                <th>Versión</th>
+                <th>Final</th>
+                <th>Fecha</th>
+                <th>Hash</th>
+                <th>PDF</th>
+              </tr>
+            </thead>
+            <tbody id="verTbody">
+              <tr><td colspan="5" style="color:var(--muted)">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="status" id="statusList"></div>
+      </section>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ===== Helpers globales (evita errores en PDF) ===== */
+window.normalizeText = window.normalizeText || function(s){
+  return String(s||"")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+window.isNegativeOpenText = window.isNegativeOpenText || function(text){
+  const t = window.normalizeText(text);
+  if(!t) return false;
+
+  const neutral = ["n/a","na","no aplica","sin informacion","sin información","sin dato","sin datos"];
+  for(const n of neutral){ if(t === n || t.startsWith(n+" ")) return false; }
+
+  const positive = ["ok","okay","bien","todo bien","sin novedad","cumple","correcto","excelente","perfecto","conforme","satisfactorio"];
+  for(const p of positive){ if(t === p || t.includes(p)) return false; }
+
+  const rx = [
+    /\bno\s+(hay|tiene|cuenta|funciona|sirve|existe|cumple)\b/,
+    /\bsin\s+(evidencia|documento|internet|equipo|senal|señal|control)\b/,
+    /\bfalta(n)?\b/,
+    /\bincumpl\w*\b/,
+    /\bproblema\b|\bfalla\b|\berror\b/,
+    /\bmal\b|\bdeficiente\b|\binsuficiente\b/
+  ];
+  return rx.some(r=>r.test(t));
+};
+</script>
+<script>
+/* ===== LÓGICA DE NEGACIÓN (sincronizada con Hallazgos) ===== */
+(function(){
+  function normalizeText(s){
+      return String(s||"")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+  if(typeof window.normalizeText !== "function") window.normalizeText = normalizeText;
+
+  const OPEN_NEUTRAL = [
+      "n/a","na","no aplica","no aplica.","no aplica:","sin informacion","sin información",
+      "sin dato","sin datos","sin evidencia reportada"
+    ];
+    const OPEN_POSITIVE = [
+      "todo bien","sin novedad","ok","okay","bien","excelente","cumple","perfecto","correcto",
+      "sin problema","sin problemas","conforme","satisfactorio","satisfactoria"
+    ];
+  
+    const OPEN_NEG_WORDS = [
+      "nada","ninguno","ninguna","ningun","ningún","ninguna evidencia","sin nada","no hay nada",
+      "mal","malo","mala","pesimo","pésimo","horrible","regular","deficiente","inadecuado","inadecuada",
+      "insuficiente","incompleto","incompleta","deteriorado","deteriorada","danado","danada","dañado","dañada",
+      "roto","rota","averiado","averiada","inoperativo","inoperativa","vencido","vencida","caducado","caducada",
+      "falta","faltan","faltante","ausente","pendiente","incumple","incumplimiento","no cumple",
+      "no hay","no tiene","no funciona","no sirve","sin evidencia","sin documento","sin internet",
+      "riesgo","peligro","grave","urgente","critico","crítico",
+      "queja","quejas","reclamo","reclamos","mala atencion","mala atención","demora","lento","lenta","retraso",
+      "sucio","sucia","desorden","desordenado","desordenada"
+    ];
+  
+    const OPEN_NEG_RX = [
+      /\bno\s+(hay|tiene|cuenta|funciona|sirve|existe|aplica|cumple|se\s+evidencia|se\s+observa|se\s+encuentra)\b/,
+      /\bsin\s+(evidencia|documento|internet|equipo|computador|pc|señal|senal|senalizacion|señalizacion|presupuesto|mantenimiento|control)\b/,
+      /\bfalta(n)?\b/,
+      /\bincumpl\w*\b/,
+      /\briesgo\b|\bpeligro\b|\bgrave\b|\burgente\b/,
+      /\bdañad[oa]\b|\bdanad[oa]\b|\broto\b|\baveriad[oa]\b|\binoperativ[oa]\b/,
+      /\bfalla\b|\bfallo\b|\berror\b|\bproblema\b/
+    ];
+  
+    
+  function isNegativeOpenText(text){
+      const t = normalizeText(text);
+      if(!t) return false;
+  
+      const emptyNeg = new Set(["nada","ninguno","ninguna","ningun","ningún","no hay","no hay nada","sin nada"]);
+      if(emptyNeg.has(t)) return true;
+  
+      for(const n of OPEN_NEUTRAL){
+        if(t === n || t.startsWith(n+" ")) return false;
+      }
+      for(const p of OPEN_POSITIVE){
+        if(t === p || t.includes(p)) return false;
+      }
+  
+      for(const rx of OPEN_NEG_RX){
+        if(rx.test(t)) return true;
+      }
+  
+      for(const w of OPEN_NEG_WORDS){
+        if(w.includes(" ")){
+          if(t.includes(w)) return true;
+        }else{
+          const rx = new RegExp(`\\b${w.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+          if(rx.test(t)) return true;
+        }
+      }
+  
+      if(/\bno\b/.test(t) || /\bsin\b/.test(t)) return true;
+      if(t.length <= 4) return true;
+  
+      return false;
+    }
+  window.isNegativeOpenText = isNegativeOpenText;
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script>
+
+  // =========================
+  // LOADING OVERLAY
+  // =========================
+  function beginLoading(title, sub){
+    const ov = document.getElementById("loadingOverlay");
+    if(!ov) return;
+    const t = document.getElementById("loadingTitle");
+    const s = document.getElementById("loadingSub");
+    if(t) t.textContent = title || "Cargando…";
+    if(s) s.textContent = sub || "Por favor espera.";
+    ov.classList.remove("hidden");
+  }
+  function endLoading(){
+    const ov = document.getElementById("loadingOverlay");
+    if(!ov) return;
+    ov.classList.add("hidden");
+  }
+  async function withLoading(fn, title, sub){
+    beginLoading(title, sub);
+    try{ return await fn(); }
+    finally{ endLoading(); }
+  }
+
+
+
+  // =========================
+  // CONFIG
+  // =========================
+  const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+  const REPORTS_BUCKET = "reports";
+  const SIGNATURES_BUCKET = "signatures"; // usado en firma.html
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+  });
+
+  const $ = (id) => document.getElementById(id);
+
+  const getUserDisplayName = (profile, sessionUser) => {
+    const md = sessionUser?.user_metadata || {};
+    return (
+      (profile?.full_name && String(profile.full_name).trim()) ||
+      (md.full_name && String(md.full_name).trim()) ||
+      (md.name && String(md.name).trim()) ||
+      (md.username && String(md.username).trim()) ||
+      (sessionUser?.email && String(sessionUser.email).trim()) ||
+      (sessionUser?.phone && String(sessionUser.phone).trim()) ||
+      "Usuario"
+    );
+  };
+
+
+
+  // Refuerzo de UI: mostrar usuario aunque después falle algo (audit/hallazgos/etc.)
+  async function bootUserTag(){
+    try{
+      const el = $("tagUser");
+      if(el) el.textContent = "Usuario: Cargando...";
+      // getUser suele traer más completo que getSession.user
+      let u = null;
+      try{
+        const gu = await sb.auth.getUser();
+        u = gu?.data?.user || null;
+      }catch(_e){ u = null; }
+      if(!u){
+        try{
+          const gs = await sb.auth.getSession();
+          u = gs?.data?.session?.user || null;
+        }catch(_e){ u = null; }
+      }
+      if(el) el.textContent = "Usuario: " + getUserDisplayName(null, u || {});
+    }catch(_e){}
+  }
+
+  const isUUID = (v) => {
+    if (v === null || v === undefined) return false;
+    const s = String(v).trim();
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+  };
+
+
+  // Normaliza la respuesta de inspection_answers sin depender de nombres de columna específicos
+  const pickAnswerFromRow = (row) => {
+    if (!row) return null;
+
+    // Prioridad de columnas comunes (si existen)
+    const directKeys = [
+      "answer","respuesta","response","result","resultado","value","valor","val",
+      "score","puntuacion","rating","likert","numeric_value","number_value","num_value",
+      "bool_value","boolean_value","checked","is_checked","selected","option","opcion","choice"
+    ];
+    for (const k of directKeys) {
+      if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") return row[k];
+    }
+
+    // Fallback: buscar cualquier campo primitivo útil
+    const skip = new Set([
+      "id","inspection_id","audit_id","template_id","question_id","section_id",
+      "created_at","updated_at","deleted_at","user_id",
+      "comment","comentario","notes","nota","observaciones","observation","observacion"
+    ]);
+
+    for (const [k,v] of Object.entries(row)) {
+      if (skip.has(k)) continue;
+      if (v === undefined || v === null) continue;
+      if (typeof v === "boolean") return v;
+      if (typeof v === "number") return v;
+      if (typeof v === "string" && v.trim() !== "") return v;
+    }
+    return null;
+  };
+
+  // Normaliza el ID de pregunta en inspection_answers (puede venir con nombres distintos según tabla/versión)
+  const pickQuestionIdFromRow = (row) => {
+    if (!row) return null;
+    const keys = [
+      "question_id",
+      "checklist_question_id",
+      "checklist_questions_id",
+      "checklist_question",
+      "question",
+      "qid",
+      "q_id",
+      "question_uuid",
+      "questionUid",
+      "questionId",
+    ];
+    for (const k of keys) {
+      const v = row[k];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return String(v).trim();
+    }
+    return null;
+  };
+
+  const pickCommentFromRow = (row) => {
+    if (!row) return "";
+    const keys = ["comment","comentario","comments","notes","nota","observaciones","observation","observacion"];
+    for (const k of keys) {
+      const v = row[k];
+      if (v !== undefined && v !== null && String(v).trim() !== "") return String(v);
+    }
+    return "";
+  };
+
+
+  let sessionUser = null;
+let hasEvidenceByAnswerId = {};
+
+  let profile = null;
+
+  function setStatus(id, msg, kind){
+    const el = $(id);
+    el.className = "status" + (kind ? (" " + kind) : "");
+    el.textContent = msg || "";
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  function qp(name){
+    return new URL(window.location.href).searchParams.get(name);
+  }
+
+  // Lee las plantillas seleccionadas para esta auditoría (desde URL o localStorage).
+  // Esto permite generar el PDF solo con lo "actual" (sin acumulados históricos).
+  function getSelectedTemplateIdsForAudit(auditId){
+    const out = new Set();
+
+    // 1) URL params
+    // - ?template_ids=uuid,uuid
+    // - ?template_id=uuid
+    // - ?tpl=uuid&tpl=uuid
+    try{
+      const url = new URL(window.location.href);
+      const tplParams = url.searchParams.getAll("tpl");
+      tplParams.forEach(v => { if(isUUID(v)) out.add(v); });
+
+      const one = url.searchParams.get("template_id");
+      if(one && isUUID(one)) out.add(one);
+
+      const list = url.searchParams.get("template_ids");
+      if(list){
+        String(list).split(",").map(s=>s.trim()).forEach(v => { if(isUUID(v)) out.add(v); });
+      }
+    }catch(_e){}
+
+    // 2) localStorage (probamos varias llaves comunes)
+    const keys = [
+      `cm_tpl_queue_${auditId}`,
+      `cm_selected_templates_${auditId}`,
+      `selected_templates_${auditId}`,
+      `selectedTemplates_${auditId}`,
+      `tpl_queue_${auditId}`,
+      `templates_${auditId}`
+    ];
+
+    for(const k of keys){
+      try{
+        const raw = localStorage.getItem(k);
+        if(!raw) continue;
+        const parsed = JSON.parse(raw);
+
+        // Puede venir como array de UUIDs o array de objetos {id, template_id}
+        const arr = Array.isArray(parsed) ? parsed : (parsed?.templates || parsed?.selected || []);
+        if(Array.isArray(arr)){
+          for(const item of arr){
+            const v = (typeof item === "string") ? item : (item?.template_id || item?.id);
+            if(isUUID(v)) out.add(v);
+          }
+        }
+      }catch(_e){}
+    }
+
+    return Array.from(out);
+  }
+
+  function getTemplateIdsFromSelectedFindings(auditId){
+    const keys = [
+      `selected_findings:${auditId || 'NA'}`,
+      `selected_findings_${auditId || 'NA'}`,
+      'selected_findings'
+    ];
+    const out = [];
+    const seen = new Set();
+
+    const pushTpl = (v) => {
+      const id = String(v || '').trim();
+      if(isUUID(id) && !seen.has(id)){
+        seen.add(id);
+        out.push(id);
+      }
+    };
+
+    for(const storage of [sessionStorage, localStorage]){
+      for(const k of keys){
+        try{
+          const raw = storage.getItem(k);
+          if(!raw) continue;
+          const arr = JSON.parse(raw);
+          if(!Array.isArray(arr)) continue;
+          for(const item of arr){
+            if(item && typeof item === 'object'){
+              pushTpl(item.template_id || item.templateId || item.tpl_id || item.tplId);
+            }
+          }
+          if(out.length) return out;
+        }catch(_e){}
+      }
+    }
+    return out;
+  }
+
+  function getSelectedInspectionIdsForAudit(auditId){
+    const out = [];
+    const seen = new Set();
+    const pushId = (v) => {
+      const id = String(v || '').trim();
+      if(isUUID(id) && !seen.has(id)){
+        seen.add(id);
+        out.push(id);
+      }
+    };
+
+    const extract = (value, sourceKey = '', depth = 0) => {
+      if(depth > 6 || value == null) return;
+      if(typeof value === 'string'){
+        const s = value.trim();
+        if(!s) return;
+        if(isUUID(s)) { pushId(s); return; }
+        s.split(/[;,\s]+/g).map(x=>x.trim()).filter(Boolean).forEach(pushId);
+        return;
+      }
+      if(Array.isArray(value)){
+        value.forEach(v => extract(v, sourceKey, depth + 1));
+        return;
+      }
+      if(typeof value !== 'object') return;
+
+      const ownAudit = value.audit_id || value.auditId || value.audit || value.audit_uuid;
+      if(ownAudit && String(ownAudit) !== String(auditId)) return;
+
+      [
+        value.inspection_id, value.inspectionId, value.inspection_uuid, value.inspectionUuid,
+        value.selected_inspection_id, value.selectedInspectionId
+      ].forEach(pushId);
+
+      [
+        value.inspection_ids, value.inspectionIds, value.selectedInspectionIds,
+        value.selected_inspection_ids, value.ids, value.selected, value.items,
+        value.rows, value.data, value.payload, value.values, value.inspections
+      ].forEach(v => extract(v, sourceKey, depth + 1));
+
+      if(value.id && !value.template_id && !value.templateId && !value.tpl_id && !value.tplId){
+        if(value.audit_id || value.auditId || value.created_at || value.createdAt || /inspection|inspecc/i.test(String(sourceKey||''))){
+          pushId(value.id);
+        }
+      }
+
+      Object.entries(value).forEach(([k,v]) => {
+        const ks = String(k || '');
+        if(/inspection|inspeccion|inspección|insp/i.test(ks)) extract(v, ks, depth + 1);
+      });
+    };
+
+    try{
+      const url = new URL(window.location.href);
+      ['inspection_id','inspection_ids','selected_inspections','selectedInspectionIds','inspectionIds'].forEach(name => {
+        url.searchParams.getAll(name).forEach(v => extract(v, name));
+      });
+      if(out.length) return out;
+    }catch(_e){}
+
+    const keys = [
+      `cm_selected_inspections_${auditId}`,
+      `selected_inspections_${auditId}`,
+      `inspection_ids_${auditId}`,
+      `selected_inspection_ids_${auditId}`,
+      `report_selected_inspections_${auditId}`,
+      `pdf_selected_inspections_${auditId}`,
+      `selected_inspections`,
+      `inspection_ids`,
+      `selectedInspectionIds`
+    ];
+
+    for(const storage of [sessionStorage, localStorage]){
+      for(const k of keys){
+        try{
+          const raw = storage.getItem(k);
+          if(!raw) continue;
+          let parsed = raw;
+          try{ parsed = JSON.parse(raw); }catch(_e){}
+          extract(parsed, k);
+          if(out.length >= 2) return out;
+        }catch(_e){}
+      }
+    }
+    return out;
+  }
+
+
+
+  async function requireSession(){
+    const { data, error } = await sb.auth.getSession();
+    if(error) throw error;
+    if(!data.session){
+      location.href="/index.html";
+      return null;
+    }
+    return data.session;
+  }
+
+  async function loadMyProfile(){
+    // Puede no existir fila en profiles o el esquema puede variar: no rompas.
+    const { data, error } = await sb
+      .from("profiles")
+      .select("*")
+      .eq("id", sessionUser.id)
+      .maybeSingle();
+
+    // Si hay error (tabla no existe/RLS), devolvemos null y seguimos.
+    if(error) return null;
+    return data || null;
+  }
+
+  function hideConfigIfNotAdmin(){
+    const link = $("navConfig");
+    if(!link) return;
+    if((profile?.role || "user") !== "admin") link.style.display = "none";
+  }
+
+  // =========================
+  // DATA LOAD
+  // =========================
+  async function loadAudits(){
+    setStatus("statusGen","");
+    $("auditSelect").innerHTML = `<option value="">Cargando...</option>`;
+
+    const { data, error } = await sb
+      .from("audits")
+      .select("id,title,punto,process,status,start_date,end_date,objective,criteria,created_at")
+      .order("created_at", { ascending:false });
+
+    if(error){
+      $("auditSelect").innerHTML = `<option value="">(Error cargando)</option>`;
+      setStatus("statusGen","No pude listar auditorías: " + error.message, "err");
+      return;
+    }
+
+    if(!data?.length){
+      $("auditSelect").innerHTML = `<option value="">No hay auditorías visibles</option>`;
+      return;
+    }
+
+    $("auditSelect").innerHTML =
+      `<option value="">Selecciona...</option>` +
+      data.map(a => `<option value="${a.id}">${escapeHtml(a.title || "(sin título)")} - ${a.id.slice(0,8)}...</option>`).join("");
+
+    const urlAudit = qp("audit_id");
+    if(urlAudit){
+      $("auditSelect").value = urlAudit;
+    }
+  }
+
+async function loadAuditBundle(auditId){
+  if(!isUUID(auditId)) throw new Error("Audit ID inválido (debe ser UUID).");
+
+  const { data: audits, error: auditErr } = await sb.from('audits')
+    .select('id, title, punto, process, start_date, end_date, objective, criteria, created_at')
+    .eq('id', auditId)
+    .limit(1);
+  if (auditErr) throw auditErr;
+  const audit = audits?.[0] || null;
+  if (!audit) throw new Error('No existe la auditoría: ' + auditId);
+
+  const center = null;
+  let selectedTemplateIds = getSelectedTemplateIdsForAudit(auditId);
+  const selectedInspectionIds = getSelectedInspectionIdsForAudit(auditId);
+
+  const { data: inspections, error: inspErr } = await sb.from('inspections')
+    .select('id, audit_id, template_id, created_at')
+    .eq('audit_id', auditId)
+    .order('created_at', { ascending: false });
+  if (inspErr) throw inspErr;
+
+  let allInspections = Array.isArray(inspections) ? inspections.slice() : [];
+  if (selectedInspectionIds.length) {
+    const missingIds = selectedInspectionIds.filter(id => !allInspections.some(x => x && String(x.id) === String(id)));
+    if (missingIds.length) {
+      try {
+        const { data: extraInspections, error: extraErr } = await sb.from('inspections')
+          .select('id, audit_id, template_id, created_at')
+          .in('id', missingIds);
+        if (!extraErr && Array.isArray(extraInspections)) {
+          for (const insp of extraInspections) {
+            if (!insp || String(insp.audit_id || '') !== String(auditId)) continue;
+            if (!allInspections.some(x => x && String(x.id) === String(insp.id))) allInspections.push(insp);
+          }
+          allInspections.sort((a,b) => {
+            const ta = a?.created_at ? Date.parse(a.created_at) : 0;
+            const tb = b?.created_at ? Date.parse(b.created_at) : 0;
+            return tb - ta;
+          });
+        }
+      } catch(_e){}
+    }
+  }
+
+  try {
+    const missingTemplateInspectionsAll = (allInspections || []).filter(i => i && i.id && !i.template_id);
+    if (missingTemplateInspectionsAll.length) {
+      const missIds = missingTemplateInspectionsAll.map(i => i.id);
+      const CHUNK_FIX = 400;
+      let aRowsAll = [];
+      for (let i = 0; i < missIds.length; i += CHUNK_FIX) {
+        const chunk = missIds.slice(i, i + CHUNK_FIX);
+        const { data: aRows, error: aErr } = await sb.from('inspection_answers').select('*').in('inspection_id', chunk);
+        if (!aErr && Array.isArray(aRows)) aRowsAll = aRowsAll.concat(aRows);
+      }
+      const qIds = [...new Set((aRowsAll || []).map(r => pickQuestionIdFromRow(r) || r?.question_id).filter(Boolean))];
+      let qsMap = new Map();
+      if (qIds.length) {
+        for (let i = 0; i < qIds.length; i += CHUNK_FIX) {
+          const chunk = qIds.slice(i, i + CHUNK_FIX);
+          const { data: qRows, error: qErr } = await sb.from('checklist_questions').select('id, template_id').in('id', chunk);
+          if (!qErr && Array.isArray(qRows)) {
+            qRows.forEach(q => { if (q?.id) qsMap.set(String(q.id), q); });
+          }
+        }
+      }
+      allInspections = allInspections.map(i => {
+        if (!i || i.template_id || !i.id) return i;
+        const a = (aRowsAll || []).find(r => String(r.inspection_id || '') === String(i.id) && qsMap.get(String(pickQuestionIdFromRow(r) || r?.question_id || ''))?.template_id);
+        if (!a) return i;
+        const q = qsMap.get(String(pickQuestionIdFromRow(a) || a?.question_id || ''));
+        return q?.template_id ? { ...i, template_id: q.template_id } : i;
+      });
+    }
+  } catch(_e){}
+
+  const urlParamsForTpl = new URLSearchParams(window.location.search);
+  const useSelectedFindingsMode = urlParamsForTpl.get('use_selected_findings') === '1';
+  const selectedFindingTemplateIds = getTemplateIdsFromSelectedFindings(auditId);
+  if(useSelectedFindingsMode && selectedFindingTemplateIds.length){
+    selectedTemplateIds = selectedFindingTemplateIds.slice();
+  }
+
+  try {
+    const missingTplInspectionsAll = (allInspections || []).filter(i => i && i.id && !i.template_id);
+    if (missingTplInspectionsAll.length) {
+      const missIds = missingTplInspectionsAll.map(i => i.id);
+      const aRows = [];
+      const CHUNK_FIX = 400;
+      for (let i = 0; i < missIds.length; i += CHUNK_FIX) {
+        const chunk = missIds.slice(i, i + CHUNK_FIX);
+        const { data: partRows, error: partErr } = await sb.from('inspection_answers').select('*').in('inspection_id', chunk);
+        if (partErr) throw partErr;
+        if (Array.isArray(partRows)) aRows.push(...partRows);
+      }
+
+      const qIds = [...new Set((aRows || []).map(r => pickQuestionIdFromRow(r) || r?.question_id).filter(Boolean))];
+      let qsMap = new Map();
+      if (qIds.length) {
+        const qRowsAll = [];
+        for (let i = 0; i < qIds.length; i += CHUNK_FIX) {
+          const chunk = qIds.slice(i, i + CHUNK_FIX);
+          const { data: qRows, error: qErr } = await sb.from('checklist_questions').select('id, template_id').in('id', chunk);
+          if (qErr) throw qErr;
+          if (Array.isArray(qRows)) qRowsAll.push(...qRows);
+        }
+        qsMap = new Map((qRowsAll || []).map(q => [String(q.id), q]));
+      }
+
+      const tplByInspection = new Map();
+      for (const row of (aRows || [])) {
+        const inspId = String(row?.inspection_id || '').trim();
+        if (!inspId || tplByInspection.has(inspId)) continue;
+        const qid = String(pickQuestionIdFromRow(row) || row?.question_id || '').trim();
+        const tplId = qid ? qsMap.get(qid)?.template_id : null;
+        if (tplId) tplByInspection.set(inspId, tplId);
+      }
+
+      allInspections = (allInspections || []).map(i => {
+        if (!i || i.template_id || !i.id) return i;
+        const tplId = tplByInspection.get(String(i.id));
+        return tplId ? { ...i, template_id: tplId } : i;
+      });
+    }
+  } catch(_e) {}
+
+  const inspIdsAll = allInspections.map(i => i?.id).filter(Boolean);
+  const inspHasAnswers = new Set();
+  if (inspIdsAll.length) {
+    const CHUNK = 400;
+    for (let i = 0; i < inspIdsAll.length; i += CHUNK) {
+      const chunk = inspIdsAll.slice(i, i + CHUNK);
+      const { data: aRows, error: aErr } = await sb.from('inspection_answers')
+        .select('inspection_id')
+        .in('inspection_id', chunk);
+      if (aErr) throw aErr;
+      (aRows || []).forEach(r => { if (r?.inspection_id) inspHasAnswers.add(String(r.inspection_id)); });
+    }
+  }
+
+  let currentInspections = [];
+  if (selectedInspectionIds.length) {
+    for (const inspectionId of selectedInspectionIds) {
+      const insp = allInspections.find(x => x && x.id && String(x.id) === String(inspectionId));
+      if (insp) currentInspections.push(insp);
+    }
+  } else {
+    const candidates = (allInspections || []).slice().sort((a, b) => {
+      const ta = a?.created_at ? Date.parse(a.created_at) : 0;
+      const tb = b?.created_at ? Date.parse(b.created_at) : 0;
+      return tb - ta;
+    });
+
+    if (selectedTemplateIds.length) {
+      const wanted = [];
+      const seenWanted = new Set();
+      (selectedTemplateIds || []).forEach(v => {
+        const key = String(v || '').trim();
+        if (!key || seenWanted.has(key)) return;
+        seenWanted.add(key);
+        wanted.push(key);
+      });
+
+      currentInspections = wanted.map((wantedId) => {
+        const exactInspection = candidates.find(i => i?.id && String(i.id) === wantedId);
+        if (exactInspection) return exactInspection;
+
+        const sameTemplate = candidates.filter(i => i?.template_id && String(i.template_id) === wantedId);
+        if (!sameTemplate.length) {
+          return { id: null, audit_id: auditId, template_id: wantedId, created_at: null };
+        }
+
+        const withAnswersForTemplate = sameTemplate.filter(i => i?.id && inspHasAnswers.has(String(i.id)));
+        return withAnswersForTemplate[0] || sameTemplate[0];
+      }).filter(Boolean);
+    } else {
+      const withAnswers = candidates.filter(i => i?.id && inspHasAnswers.has(String(i.id)));
+      const withoutAnswers = candidates.filter(i => !i?.id || !inspHasAnswers.has(String(i.id)));
+
+      currentInspections = withAnswers.slice(0, 2);
+      if (currentInspections.length < 2) {
+        currentInspections = currentInspections.concat(withoutAnswers.slice(0, 2 - currentInspections.length));
+      }
+      if (!currentInspections.length) {
+        currentInspections = candidates.slice(0, 2);
+      }
+    }
+  }
+
+  if ((currentInspections || []).some(i => i && i.id)) {
+    currentInspections = (currentInspections || []).filter(i => i && (i.id || !selectedInspectionIds.length));
+  }
+  {
+    const seen = new Set();
+    currentInspections = (currentInspections || []).filter(i => {
+      if(!i) return false;
+      const key = i.id ? `id:${String(i.id)}` : `tpl:${String(i.template_id || '')}:${String(i.created_at || '')}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+
+  {
+    const countsByTpl = new Map();
+    (currentInspections || []).forEach((insp) => {
+      const tplKey = String(insp?.template_id || '__sin_template__');
+      countsByTpl.set(tplKey, (countsByTpl.get(tplKey) || 0) + 1);
+    });
+
+    const seqByTpl = new Map();
+    currentInspections = (currentInspections || []).map((insp) => {
+      if (!insp) return insp;
+      const tplKey = String(insp?.template_id || '__sin_template__');
+      const nextSeq = (seqByTpl.get(tplKey) || 0) + 1;
+      seqByTpl.set(tplKey, nextSeq);
+      return {
+        ...insp,
+        __sameTemplateCount: countsByTpl.get(tplKey) || 1,
+        __inspectionNumber: nextSeq
+      };
+    });
+  }
+
+  try {
+    const missingTemplateInspections = (currentInspections || []).filter(i => i && i.id && !i.template_id);
+    if (missingTemplateInspections.length) {
+      const missIds = missingTemplateInspections.map(i => i.id);
+      const { data: aRows } = await sb.from('inspection_answers').select('*').in('inspection_id', missIds);
+      const qIds = [...new Set((aRows || []).map(r => pickQuestionIdFromRow(r) || r?.question_id).filter(Boolean))];
+      let qsMap = new Map();
+      if (qIds.length) {
+        const { data: qRows } = await sb.from('checklist_questions').select('id, template_id').in('id', qIds);
+        qsMap = new Map((qRows || []).map(q => [String(q.id), q]));
+      }
+      currentInspections = currentInspections.map(i => {
+        if (!i || i.template_id || !i.id) return i;
+        const a = (aRows || []).find(r => String(r.inspection_id || '') === String(i.id) && qsMap.get(String(pickQuestionIdFromRow(r) || r?.question_id || ''))?.template_id);
+        if (!a) return i;
+        const q = qsMap.get(String(pickQuestionIdFromRow(a) || a?.question_id || ''));
+        return q?.template_id ? { ...i, template_id: q.template_id } : i;
+      });
+    }
+  } catch(_e){}
+
+  if (selectedTemplateIds.length) {
+    const candidatesSorted = (allInspections || []).slice().sort((a, b) => {
+      const ta = a?.created_at ? Date.parse(a.created_at) : 0;
+      const tb = b?.created_at ? Date.parse(b.created_at) : 0;
+      return tb - ta;
+    });
+    currentInspections = (currentInspections || []).map((insp) => {
+      if (!insp || insp.id || !insp.template_id) return insp;
+      const tplKey = String(insp.template_id);
+      const sameTemplate = candidatesSorted.filter(x => x && x.id && String(x.template_id || '') === tplKey);
+      if (!sameTemplate.length) return insp;
+      const withAnswers = sameTemplate.filter(x => inspHasAnswers.has(String(x.id)));
+      return withAnswers[0] || sameTemplate[0] || insp;
+    });
+  }
+
+  const inspectionIds = currentInspections.filter(i => i && i.id).map(i => i.id);
+  const templateIdsInUse = Array.from(new Set(currentInspections.map(i => i.template_id).filter(Boolean)));
+
+  let inspectionAnswers = [];
+  if (inspectionIds.length){
+    const { data: answers, error: ansErr } = await sb.from('inspection_answers')
+      .select('*')
+      .in('inspection_id', inspectionIds)
+      .order('created_at', { ascending: true });
+    if (ansErr) throw ansErr;
+    inspectionAnswers = (answers || []).map(a => ({
+      ...a,
+      question_id: pickQuestionIdFromRow(a),
+      comment: ((a?.comment && String(a.comment).trim() !== '') ? a.comment : pickCommentFromRow(a)),
+      answer: ((a?.answer !== undefined && a?.answer !== null && String(a.answer).trim() !== '') ? a.answer : pickAnswerFromRow(a))
+    }));
+
+    hasEvidenceByAnswerId = {};
+    try{
+      const ansIds = (inspectionAnswers || []).map(a => a?.id).filter(Boolean);
+      if(ansIds.length){
+        const CH = 400;
+        const evIds = new Set();
+        const evByAns = new Map();
+        for(let i=0;i<ansIds.length;i+=CH){
+          const chunk = ansIds.slice(i, i+CH);
+          const { data: links, error: lErr } = await sb.from('inspection_answer_evidence').select('*').in('answer_id', chunk);
+          if(lErr) throw lErr;
+          (links||[]).forEach(r=>{
+            const aid = r?.answer_id ?? r?.inspection_answer_id ?? r?.inspection_answers_id ?? r?.inspection_answerid ?? r?.answerId ?? r?.inspectionAnswerId;
+            const eid = r?.evidence_id ?? r?.evidenceId ?? r?.media_id ?? r?.mediaId ?? r?.file_id ?? r?.fileId;
+            if(aid && eid){
+              evIds.add(eid);
+              if(!evByAns.has(String(aid))) evByAns.set(String(aid), []);
+              evByAns.get(String(aid)).push(eid);
+            }
+          });
+        }
+        let evInfo = new Map();
+        const evIdArr = Array.from(evIds);
+        for(let i=0;i<evIdArr.length;i+=CH){
+          const chunk = evIdArr.slice(i, i+CH);
+          const { data: evRows, error: eErr } = await sb.from('evidence').select('*').in('id', chunk);
+          if(eErr) throw eErr;
+          (evRows||[]).forEach(ev=>{
+            const ok = (ev?.file_url && String(ev.file_url).trim()) || (ev?.url && String(ev.url).trim()) || (ev?.file_path && String(ev.file_path).trim()) || (ev?.path && String(ev.path).trim()) || (ev?.storage_path && String(ev.storage_path).trim());
+            evInfo.set(ev.id, !!ok);
+          });
+        }
+        for(const [aid, eids] of evByAns.entries()){
+          const ok = (eids||[]).some(eid => evInfo.get(eid) === true);
+          hasEvidenceByAnswerId[aid] = ok;
+          hasEvidenceByAnswerId[String(aid)] = ok;
+        }
+      }
+    }catch(_e){}
+  }
+
+  const CHUNK = 200;
+  const allQs = [];
+  if (templateIdsInUse.length){
+    for (let i = 0; i < templateIdsInUse.length; i += CHUNK){
+      const chunkTpl = templateIdsInUse.slice(i, i + CHUNK);
+      const { data: qs, error: qErr } = await sb.from('checklist_questions').select('*').in('template_id', chunkTpl);
+      if (!qErr && qs) allQs.push(...qs);
+    }
+  }
+  const questionIds = [...new Set(inspectionAnswers.map(a=>a.question_id).filter(Boolean))];
+  if (questionIds.length){
+    for (let i = 0; i < questionIds.length; i += CHUNK){
+      const chunkIds = questionIds.slice(i, i + CHUNK);
+      const { data: qs, error: qErr } = await sb.from('checklist_questions').select('*').in('id', chunkIds);
+      if (!qErr && qs) allQs.push(...qs);
+    }
+  }
+
+  const uniqQs = [];
+  const seenQ = new Set();
+  for (const q of allQs){
+    if (!q?.id) continue;
+    const k = String(q.id);
+    if (seenQ.has(k)) continue;
+    seenQ.add(k);
+    uniqQs.push(q);
+  }
+
+  let questionsById = {};
+  let sectionsById = {};
+  if (uniqQs.length){
+    questionsById = Object.fromEntries(uniqQs.map(q=>[q.id, q]));
+    const sectionIds = [...new Set(uniqQs.map(q=>q.section_id).filter(Boolean))];
+    if (sectionIds.length){
+      const allSecs = [];
+      for (let i = 0; i < sectionIds.length; i += CHUNK){
+        const chunkSecIds = sectionIds.slice(i, i + CHUNK);
+        const { data: secs, error: sErr } = await sb.from('checklist_sections').select('id, title, name, order_index').in('id', chunkSecIds);
+        if (!sErr && secs) allSecs.push(...secs);
+      }
+      sectionsById = Object.fromEntries(allSecs.map(s=>[s.id, s]));
+    }
+  }
+
+  let templatesById = {};
+  if (templateIdsInUse.length){
+    const { data: tpls, error: tErr } = await sb.from('checklist_templates').select('id, name, area, is_active').in('id', templateIdsInUse);
+    if (!tErr && tpls) templatesById = Object.fromEntries(tpls.map(t=>[t.id, t]));
+  }
+
+  let findings = [];
+  try{
+    const params = new URLSearchParams(window.location.search);
+    const keySel = `selected_findings:${auditId || 'NA'}`;
+    const useSelected = (params.get('use_selected_findings') === '1') || !!(function(){let v=null; try{v=sessionStorage.getItem(keySel);}catch(_e){} if(v==null){try{v=localStorage.getItem(keySel);}catch(_e){}} return v;})();
+    if(useSelected){
+      const key = keySel;
+      let raw=null;
+      try{ raw = sessionStorage.getItem(key);}catch(_e){}
+      if(raw==null){ try{ raw = localStorage.getItem(key);}catch(_e){} }
+      const arr = raw ? JSON.parse(raw) : [];
+      if(Array.isArray(arr) && arr.length){
+        findings = arr.map((x)=>({
+          audit_id: auditId,
+          template_id: x.template_id || null,
+          section: x.section || null,
+          condition: x.condition || '',
+          cause: x.cause || '',
+          effect: x.effect || '',
+          recommendation: x.recommendation || '',
+          created_at: x.created_at || new Date().toISOString(),
+          severity: x.severity || null,
+          status: x.status || null
+        }));
+      }
+    }
+    if(useSelected && (!findings || !findings.length)) setStatus('statusGen', 'No hay hallazgos seleccionados para el PDF. Vuelve a Hallazgos y usa "Anexar hallazgo al PDF" o "Guardar y ver PDF".', 'warn');
+    if(!findings.length && !useSelected){
+      let q = sb.from('findings').select('*').eq('audit_id', auditId).order('created_at', { ascending: false });
+      if(selectedTemplateIds.length) q = q.in('template_id', selectedTemplateIds);
+      const { data: fRows, error: fErr } = await q;
+      if(fErr) findings = [];
+      else if(fRows) findings = fRows;
+    }
+  }catch(_e){ findings = []; }
+
+  let signatures = [];
+  try{
+    const test = await sb.from('report_signatures').select('id').limit(1);
+    if(!test.error){
+      const { data: sRows, error: sErr } = await sb.from('report_signatures').select('id, audit_id, finding_id, signed_by, signed_at, signature_path, signature_role, meta').eq('audit_id', auditId).order('signed_at', { ascending:false });
+      if(!sErr && sRows) signatures = sRows.map(r=>({ signature_role: r.signature_role || '-', signed_at: r.signed_at, signed_by: r.signed_by, signature_path: r.signature_path, meta: r.meta }));
+    } else {
+      const { data: sRows, error: sErr } = await sb.from('signatures').select('id, audit_id, finding_id, action_id, signed_by, signed_at, signature_url, signature_type, display_name').eq('audit_id', auditId).order('signed_at', { ascending:false });
+      if(!sErr && sRows) signatures = sRows.map(r=>({ signature_role: r.signature_type || '-', signed_at: r.signed_at, signed_by: r.display_name || r.signed_by, signature_url: r.signature_url }));
+    }
+  }catch(_e){ signatures = []; }
+
+  try{
+    const raw = sessionStorage.getItem('cm_temp_signature');
+    if(raw){
+      const t = JSON.parse(raw);
+      const isForThisAudit = (t?.audit_id && String(t.audit_id) === String(auditId)) || ((t?.target?.kind === 'audit_id') && String(t?.target?.id) === String(auditId));
+      if(isForThisAudit && t?.data_url){
+        signatures = [{ signature_role: t?.role || '-', signed_at: t?.created_at || null, signed_by: t?.display_name || t?.signed_by || '-', signature_url: t.data_url, _temp: true }];
+      }
+    }
+  }catch(_e){}
+
+  return { audit, center, currentInspections, inspectionAnswers, questionsById, sectionsById, templatesById, hasEvidenceByAnswerId, findings, signatures };
+}
+
+// =========================
+// SAFETY SCORE (por plantilla y general)
+// =========================
+
+
+  // =========================
+  // Helpers compartidos (Sí/No inversa)
+  // =========================
+  // Nota: se usan tanto en computeSafetyScores() como en el builder del PDF.
+  const _isYesNoQuestion = (q) => {
+    if(!q) return false;
+    const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? q?.qtype ?? "").toLowerCase();
+
+    let cfg = q?.config;
+    if (typeof cfg === "string") { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+    const opts = (cfg?.options || cfg?.opciones || cfg?.items || cfg?.choices || cfg?.valores || []);
+    const yesNoTokens = new Set(["si","sí","no","n/a","na","no aplica","noaplica","yes"]);
+
+    if (/(boolean|si_no|yesno)/i.test(qType)) return true;
+
+    if (Array.isArray(opts) && opts.length) {
+      const labels = opts.map(o => (typeof o === "string" ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "")))
+        .map(x => String(x).trim().toLowerCase()).filter(Boolean);
+      if (labels.length && labels.length <= 4 && labels.every(t => yesNoTokens.has(t))) return true;
+    }
+    return qType === "yes_no" || qType === "yesno";
+  };
+
+  const _getInverseFlag = (q) => {
+    let cfg = q?.config;
+    if (typeof cfg === "string") { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+    return cfg?.inverse === true;
+  };
+
+
+// Global getAnswerRow wrapper (evita ReferenceError)
+let __getAnswerRow = null;
+function getAnswerRow(q){
+  try{ return __getAnswerRow ? __getAnswerRow(q) : null; }catch(_e){ return null; }
+}
+
+// ===== Helper: identificar IDs "raros" en campos de texto =====
+function looksLikeId(s){
+  const t = String(s||"").trim();
+  if(!t) return false;
+  // UUID, hashes largos, o solo dígitos
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t)) return true;
+  if(/^[0-9a-f]{16,}$/i.test(t)) return true;
+  if(/^\d{6,}$/.test(t)) return true;
+  return false;
+}
+
+// ===== Helper: mejor texto para pregunta =====
+function bestQuestionText(q){
+  if(!q) return "";
+  const candidates = [
+    q.text, q.question, q.q_text, q.label, q.title, q.prompt, q.name,
+    q.question_text, q.pregunta, q.enunciado, q.descripcion, q.description
+  ];
+  for(const c of candidates){
+    const t = String(c ?? "").trim();
+    if(t && !looksLikeId(t)) return t;
+  }
+  return "";
+}
+
+// ===== Helper: la pregunta requiere evidencia? =====
+function questionRequiresEvidence(q){
+  if(!q) return false;
+  const direct = (q.requires_evidence ?? q.require_evidence ?? q.requireEvidence ?? q.requiresEvidence);
+  if(direct === true) return true;
+
+  let cfg = q.config ?? q.cfg ?? q.settings ?? null;
+  if(typeof cfg === "string"){ try{ cfg = JSON.parse(cfg); }catch{ cfg = null; } }
+  if(cfg){
+    const v = (cfg.requires_evidence ?? cfg.require_evidence ?? cfg.requireEvidence ?? cfg.requiresEvidence);
+    if(v === true) return true;
+    const ev = (cfg.evidence ?? cfg.photo ?? cfg.foto ?? cfg.archivo ?? cfg.adjunto);
+    if(ev === true) return true;
+  }
+
+  const t = String(q.type ?? q.question_type ?? q.kind ?? q.question_kind ?? q.questionType ?? q.qtype ?? "").toLowerCase();
+  if(/(evidence|evidencia|foto|photo|archivo|file|adjunt|upload)/i.test(t)) return true;
+
+  // último fallback: si el texto menciona evidencia/foto
+  const qt = bestQuestionText(q);
+  if(qt && /(evidencia|foto|adjunta|adjunto|sube\s+foto|suba\s+foto|cargar\s+foto)/i.test(qt)) return true;
+
+  return false;
+}
+
+
+// ===== Global helper: getAnswerRow =====
+function getAnswerRowFactory(answersByQ, answersByText){
+  return function(q){
+    if(!q) return null;
+    const idKey = String(q.id ?? q.question_id ?? q.uuid ?? "");
+    if(idKey && answersByQ && answersByQ.has(idKey)) return answersByQ.get(idKey);
+    try{
+      const k = (typeof window.normalizeText === "function")
+        ? window.normalizeText(q?.text ?? q?.question ?? q?.q_text ?? q?.label ?? "")
+        : String(q?.text ?? q?.question ?? q?.q_text ?? q?.label ?? "").toLowerCase().trim();
+      if(k && answersByText && answersByText.has(k)) return answersByText.get(k);
+    }catch(_e){}
+    return null;
+  };
+}
+
+
+function getOpenTextFromRowRobust(row){
+  if(!row) return '';
+  const prefer = ['openText','open_text','comment','comentario','comments','notes','nota','observaciones','observation','observacion','answer_text','response_text','text','body','description','descripcion','detail','detalle'];
+  const skip = new Set(['id','inspection_id','audit_id','template_id','question_id','section_id','created_at','updated_at','deleted_at','user_id','answer_id']);
+  const fromValue = (v, depth = 0) => {
+    if(depth > 3 || v == null) return '';
+    if(typeof v === 'string'){
+      const s = v.trim();
+      if(!s) return '';
+      if((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))){ try{ return fromValue(JSON.parse(s), depth + 1); }catch(_e){} }
+      return looksLikeId(s) ? '' : s;
+    }
+    if(typeof v === 'number' || typeof v === 'boolean') return String(v);
+    if(Array.isArray(v)) return v.map(x => fromValue(x, depth + 1)).filter(Boolean).join(', ');
+    if(typeof v === 'object'){
+      for(const k of prefer){
+        if(v[k] !== undefined && v[k] !== null){
+          const got = fromValue(v[k], depth + 1);
+          if(got) return got;
+        }
+      }
+      for(const [k,val] of Object.entries(v)){
+        if(skip.has(String(k))) continue;
+        const got = fromValue(val, depth + 1);
+        if(got) return got;
+      }
+    }
+    return '';
+  };
+  return fromValue(row);
+}
+
+function isOpenQuestionRobust(q){
+  if(!q) return false;
+  const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? q?.qtype ?? '').toLowerCase();
+  let cfg = q?.config;
+  if (typeof cfg === 'string') { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+  const opts = (cfg?.options || cfg?.opciones || cfg?.items || cfg?.choices || cfg?.valores || []);
+  if(Array.isArray(opts) && opts.length) return false;
+  if(/(^|_)(open|text|abierta|textarea|comment|comentario|long_text|paragraph)(_|$)/i.test(qType)) return true;
+  const qt = bestQuestionText(q);
+  return /^(describa|describe|detalle|detalla|explique|explica|observaciones|observacion|comentarios|comentario|justifique|indique|especifique|cual es|cuáles son|cuales son|resuma|hallazgos)/i.test(String(qt || '').trim());
+}
+
+function buildAnswersByInspectionAndQ(answersAll){
+  const map = new Map();
+  for (const a of (answersAll || [])) {
+    const qid = pickQuestionIdFromRow(a) || a?.question_id;
+    const iid = a?.inspection_id;
+    if (!qid || !iid) continue;
+    const key = `${String(iid)}::${String(qid)}`;
+    const norm = {
+      ...a,
+      question_id: String(qid),
+      answer: ((a?.answer !== undefined && a?.answer !== null && String(a.answer).trim() !== '') ? a.answer : pickAnswerFromRow(a)),
+      comment: ((a?.comment && String(a.comment).trim() !== '') ? a.comment : pickCommentFromRow(a)),
+      open_text: getOpenTextFromRowRobust(a)
+    };
+    const prev = map.get(key);
+    if (!prev) { map.set(key, norm); continue; }
+    const tPrev = prev?.updated_at ? Date.parse(prev.updated_at) : (prev?.created_at ? Date.parse(prev.created_at) : 0);
+    const tNow  = norm?.updated_at ? Date.parse(norm.updated_at) : (norm?.created_at ? Date.parse(norm.created_at) : 0);
+    if (tNow >= tPrev) map.set(key, norm);
+  }
+  return map;
+}
+
+function classifyQuestionResponse(q, answerRow, hasEvidenceByAnswerId){
+  const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? q?.qtype ?? '').toLowerCase();
+  let cfg = q?.config;
+  if (typeof cfg === 'string') { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+  const opts = (cfg?.options || cfg?.opciones || cfg?.items || cfg?.choices || cfg?.valores || []);
+  const optLabels = (Array.isArray(opts) ? opts.map(o => (typeof o === 'string' ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? ''))) : []).map(x => String(x).trim()).filter(Boolean);
+  const isYesNo = _isYesNoQuestion(q);
+  const isLikert = /(likert|scale|escala|rating)/i.test(qType);
+  const isOpen = isOpenQuestionRobust(q);
+  const requiresEv = (q?.requires_evidence === true || q?.require_evidence === true || cfg?.requires_evidence === true || cfg?.require_evidence === true);
+  const looksEvidenceType = /(photo|foto|evidencia|evidence|file|archivo|adjunt|upload)/i.test(qType);
+  const isEvidenceQ = !isYesNo && !isLikert && (requiresEv || looksEvidenceType);
+  const isChecklist = !isYesNo && !isLikert && !isEvidenceQ && (/(checklist|check\s*list|lista|multi|multiple|seleccion)/i.test(qType) || (Array.isArray(optLabels) && optLabels.length > 0));
+
+  const raw = answerRow ? ((answerRow?.answer !== undefined && answerRow?.answer !== null) ? answerRow.answer : pickAnswerFromRow(answerRow)) : null;
+  const openText = getOpenTextFromRowRobust(answerRow || raw);
+  const isNA = (v) => v !== null && v !== undefined && ['na','n/a','n.a','no aplica','noaplica'].includes(String(v).trim().toLowerCase());
+  const isNumeric = (v) => v !== null && v !== undefined && String(v).trim() !== '' && !Number.isNaN(Number(v));
+
+  if(!answerRow && !openText){
+    if(isOpen || isEvidenceQ || isChecklist || isYesNo || isLikert) return 'bad';
+    return 'neutral';
+  }
+  if(isOpen){
+    const txt = openText || String(raw ?? '').trim();
+    if(!txt) return 'bad';
+    if(isNA(txt)) return 'neutral';
+    if(typeof window.isNegativeOpenText === 'function' && window.isNegativeOpenText(txt)) return 'bad';
+    return 'ok';
+  }
+  if(isEvidenceQ){
+    const aid = answerRow?.id || answerRow?.answer_id;
+    const hasEv = !!(aid && hasEvidenceByAnswerId && (hasEvidenceByAnswerId[aid] === true || hasEvidenceByAnswerId[String(aid)] === true));
+    return hasEv ? 'ok' : 'bad';
+  }
+  if(raw === null || raw === undefined || (typeof raw === 'string' && raw.trim() === '')) return 'bad';
+  if(isNA(raw)) return 'neutral';
+
+  if(isChecklist){
+    const parseSelected = (v) => {
+      const set = new Set();
+      try{
+        if(Array.isArray(v)){ v.forEach(x=>{ if(x!==null&&x!==undefined) set.add(String(x).trim()); }); return set; }
+        if(v && typeof v === 'object'){ for(const [k,val] of Object.entries(v)){ if(val) set.add(String(k).trim()); } return set; }
+        if(typeof v === 'string'){
+          const t = v.trim();
+          if(!t) return set;
+          try{ return parseSelected(JSON.parse(t)); }catch(_e){}
+          t.split(/[;,\n]/g).map(s=>s.trim()).filter(Boolean).forEach(x=>set.add(x));
+          return set;
+        }
+        if(v!==null && v!==undefined) set.add(String(v).trim());
+      }catch(_e){}
+      return set;
+    };
+    const selected = parseSelected(raw);
+    if (!selected.size) return 'bad';
+    const correctCfg = (cfg?.correct_answers || cfg?.correctAnswers || cfg?.correct_options || cfg?.correctOptions || cfg?.correct || cfg?.corrects || null);
+    const req = (cfg?.required_items || cfg?.requiredItems || cfg?.required_options || cfg?.requiredOptions || cfg?.required || cfg?.requeridos || cfg?.requeridas || null);
+    const toList = (v) => {
+      try{
+        if(Array.isArray(v)) return v.map(x=>String(x).trim()).filter(Boolean);
+        if(typeof v === 'string') return v.split(/[;,\n]/g).map(s=>s.trim()).filter(Boolean);
+      }catch(_e){}
+      return [];
+    };
+    const correctList = toList(correctCfg);
+    const requiredList = correctList.length ? correctList : (toList(req).length ? toList(req) : []);
+    if(!requiredList.length) return selected.size ? 'ok' : 'bad';
+    const norm = (s) => (typeof window.normalizeText === 'function' ? window.normalizeText(s) : String(s||'').toLowerCase().trim());
+    const selNorm = new Set(Array.from(selected).map(norm));
+    return requiredList.every(r => selNorm.has(norm(r))) ? 'ok' : 'bad';
+  }
+
+  if(typeof raw === 'boolean'){
+    if(isYesNo){
+      const inverse = _getInverseFlag(q);
+      return raw ? (inverse ? 'bad' : 'ok') : (inverse ? 'ok' : 'bad');
+    }
+    return raw ? 'ok' : 'bad';
+  }
+  if(isNumeric(raw)) return Number(raw) >= 4 ? 'ok' : 'bad';
+  const s = String(raw ?? '').trim().toLowerCase();
+  if(s === 'si' || s === 'sí' || s === 'yes') return 'ok';
+  if(s === 'no') return 'bad';
+  if(s) return 'ok';
+  return 'bad';
+}
+
+function computeSafetyScores(bundle){
+  const rows = computeSafetyScoresByInspection(bundle);
+  const totalOk = rows.reduce((s,r)=>s + (r.ok||0), 0);
+  const totalBad = rows.reduce((s,r)=>s + (r.bad||0), 0);
+  const totalNeutral = rows.reduce((s,r)=>s + (r.neutral||0), 0);
+  const total = totalOk + totalBad;
+  const overallPercent = total ? Math.round((totalOk / total) * 100) : null;
+
+  const byTplMap = new Map();
+  for(const row of rows){
+    const key = String(row.template_id || row.name || '');
+    if(!byTplMap.has(key)) byTplMap.set(key, { template_id: row.template_id || null, name: row.name || 'Plantilla', ok:0, bad:0, neutral:0, total:0, percent:null });
+    const agg = byTplMap.get(key);
+    agg.ok += row.ok || 0;
+    agg.bad += row.bad || 0;
+    agg.neutral += row.neutral || 0;
+  }
+  const byTemplate = Array.from(byTplMap.values()).map(r => {
+    r.total = (r.ok || 0) + (r.bad || 0);
+    r.percent = r.total ? Math.round((r.ok / r.total) * 100) : null;
+    return r;
+  });
+
+  return { overallPercent, byTemplate, totalOk, totalBad, totalNeutral, total };
+}
+
+function computeSafetyScoresByInspection(bundle){
+  const inspections = bundle?.currentInspections || [];
+  const answersAll = bundle?.inspectionAnswers || [];
+  const questionsById = bundle?.questionsById || {};
+  const tplsById = bundle?.templatesById || {};
+  const hasEvidenceByAnswerId = bundle?.hasEvidenceByAnswerId || {};
+  const answersByInspectionAndQ = buildAnswersByInspectionAndQ(answersAll);
+  const rows = [];
+
+  for (const insp of inspections) {
+    const inspectionId = insp?.id ? String(insp.id) : '';
+    const templateId = insp?.template_id ? String(insp.template_id) : '';
+    const tplQuestions = Object.values(questionsById || {}).filter(q => {
+      const qTpl = String(q?.template_id || q?.checklist_template_id || q?.checklist_templates_id || q?.template || '');
+      return templateId && qTpl === templateId;
+    });
+
+    let ok = 0, bad = 0, neutral = 0;
+    for (const q of tplQuestions) {
+      const qid = String(q?.id || '');
+      const answerRow = (inspectionId && qid) ? (answersByInspectionAndQ.get(`${inspectionId}::${qid}`) || null) : null;
+      const kind = classifyQuestionResponse(q, answerRow, hasEvidenceByAnswerId);
+      if (kind === 'ok') ok++;
+      else if (kind === 'bad') bad++;
+      else neutral++;
+    }
+
+    const total = ok + bad;
+    const percent = total ? Math.round((ok / total) * 100) : null;
+    rows.push({
+      inspection_id: inspectionId,
+      template_id: templateId,
+      name: tplsById?.[templateId]?.name || (templateId ? `Plantilla ${templateId.slice(0,8)}…` : 'Plantilla'),
+      ok,
+      bad,
+      neutral,
+      total,
+      percent
+    });
+  }
+  return rows;
+}
+
+
+// =========================
+// PORCENTAJE POR PREGUNTA
+// =========================
+function getQuestionWeightMap(bundle){
+  const questionsById = bundle?.questionsById || {};
+  const byTemplate = new Map();
+
+  for(const q of Object.values(questionsById)){
+    const tplId = String(q?.template_id || q?.checklist_template_id || q?.checklist_templates_id || q?.template || "");
+    if(!tplId) continue;
+    if(!byTemplate.has(tplId)) byTemplate.set(tplId, []);
+    byTemplate.get(tplId).push(q);
+  }
+
+  const out = {};
+  for(const [tplId, qs] of byTemplate.entries()){
+    const evaluables = (qs || []).filter(q => {
+      const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? q?.qtype ?? "").toLowerCase();
+      return !/(photo|foto|evidencia|evidence|file|archivo|adjunt|upload)/i.test(qType);
+    });
+    const list = evaluables.length ? evaluables : qs;
+    const each = list.length ? (100 / list.length) : 0;
+    out[tplId] = {
+      total: list.length,
+      each,
+      byQuestionId: Object.fromEntries(list.map(q => [String(q.id), each]))
+    };
+  }
+  return out;
+}
+
+// =========================
+// PDF BUILDER
+// =========================
+const buildPdfBytes = async (bundle, notes, opts = {}) => {
+  const { PDFDocument, StandardFonts, rgb, degrees } = PDFLib;
+
+  // --- Paleta (igual al look corporativo) ---
+  const C = {
+    green: rgb(0.07, 0.45, 0.22),
+    green2: rgb(0.09, 0.66, 0.34),
+    text: rgb(0.06, 0.12, 0.08),
+    muted: rgb(0.33, 0.43, 0.37),
+    line: rgb(1, 1, 1), // line separators hidden (white)
+    soft: rgb(0.95, 0.98, 0.96),
+    white: rgb(1, 1, 1),
+    red: rgb(0.70, 0.16, 0.24),
+    redSoft: rgb(0.98, 0.94, 0.95),
+    greenSoft: rgb(0.93, 0.98, 0.95),
+    graySoft: rgb(0.97, 0.98, 0.985),
+    pillGray: rgb(0.55, 0.60, 0.64)
+  };
+
+  const pdfDoc = await PDFDocument.create();
+  bundle.__questionWeights = getQuestionWeightMap(bundle);
+  
+  
+  // =========================
+  // Evidencias: abrir DIRECTO la foto/archivo si existe
+  // =========================
+  const EVIDENCE_BUCKET = "evidence";
+
+  const getEvidenceDirectUrl = async ({ inspectionId, questionId }) => {
+    try{
+      if (!inspectionId || !questionId) return null;
+
+      // 1) answer_id
+      const { data: ans, error: ansErr } = await sb
+        .from("inspection_answers")
+        .select("id")
+        .eq("inspection_id", inspectionId)
+        .eq("question_id", questionId)
+        .maybeSingle();
+      if (ansErr || !ans?.id) return null;
+
+      // 2) evidence links (latest)
+      const { data: links, error: lErr } = await sb
+        .from("inspection_answer_evidence")
+        .select("evidence_id, created_at")
+        .eq("answer_id", ans.id)
+        .order("created_at", { ascending: false });
+      if (lErr) return null;
+
+      const evId = (links || []).map(x => x.evidence_id).filter(Boolean)[0];
+      if (!evId) return null;
+
+      // 3) evidence record
+      const { data: ev, error: evErr } = await sb
+        .from("evidence")
+        .select("file_url, file_path")
+        .eq("id", evId)
+        .maybeSingle();
+      if (evErr || !ev) return null;
+
+      // Prefer direct URL
+      if (ev.file_url && String(ev.file_url).trim()) return String(ev.file_url).trim();
+
+      // Or build public URL from storage path
+      if (ev.file_path && String(ev.file_path).trim()) {
+        try{
+          const pub = sb.storage.from(EVIDENCE_BUCKET).getPublicUrl(String(ev.file_path).trim());
+          const u = pub?.data?.publicUrl;
+          if (u) return u;
+        }catch(_e){}
+      }
+      return null;
+    }catch(_e){
+      return null;
+    }
+  };
+
+  // Alias: compatibilidad con render del PDF
+  const fetchEvidenceUrl = getEvidenceDirectUrl;
+
+// =========================
+  // Helper: link clickeable REAL en PDF (anotación URI)
+  // =========================
+  const addPdfLink = (page, x, y, w, h, url) => {
+    try{
+      const { PDFName, PDFString, PDFArray } = PDFLib;
+
+      const annotDict = pdfDoc.context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: [x, y, x + w, y + h],
+        Border: [0, 0, 0],
+        A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) }
+      });
+
+      const annotRef = pdfDoc.context.register(annotDict);
+
+      let annots = page.node.lookup(PDFName.of('Annots'));
+      if (!annots || !(annots instanceof PDFArray)) {
+        annots = pdfDoc.context.obj([]);
+      }
+      annots.push(annotRef);
+      page.node.set(PDFName.of('Annots'), annots);
+    }catch(_e){}
+  };
+
+  // ===== Fuentes Unicode (mejor soporte de caracteres en comentarios) =====
+  // Nota: pdf-lib con StandardFonts no soporta bien muchos caracteres (acentos raros/símbolos).
+  // Cargamos Noto Sans (subset) vía CDN para soportar mejor Unicode.
+  let font = null;
+  let fontBold = null;
+
+  // Fuentes locales del PDF: usar Helvetica fija para evitar errores 403 del CDN
+  font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+
+  const pageSize = { width: 595.28, height: 841.89 }; // A4
+  const marginX = 44;
+  const marginTop = 52;
+  const marginBottom = 44;
+
+  
+  const wrap = (text, maxWidth, size, fnt) => {
+    const t = String(text ?? "");
+    if (!t.trim()) return [""];
+    const out = [];
+    const words = t.split(/\s+/);
+
+    const pushLine = (line) => { if (line !== null && line !== undefined) out.push(line); };
+
+    const breakLongToken = (token) => {
+      // rompe un token (sin espacios) en varias líneas para que no se salga del ancho
+      const chars = Array.from(String(token));
+      let piece = "";
+      for (const ch of chars) {
+        const test = piece + ch;
+        if (fnt.widthOfTextAtSize(test, size) <= maxWidth) {
+          piece = test;
+        } else {
+          if (piece) pushLine(piece);
+          piece = ch;
+        }
+      }
+      if (piece) pushLine(piece);
+    };
+
+    let line = "";
+    for (const w of words) {
+      const token = String(w);
+
+      // Si el token solo ya excede el ancho, lo rompemos
+      if (fnt.widthOfTextAtSize(token, size) > maxWidth) {
+        if (line) { pushLine(line); line = ""; }
+        breakLongToken(token);
+        continue;
+      }
+
+      const test = line ? (line + " " + token) : token;
+      if (fnt.widthOfTextAtSize(test, size) <= maxWidth) {
+        line = test;
+      } else {
+        if (line) pushLine(line);
+        line = token;
+      }
+    }
+    if (line) pushLine(line);
+    return out.length ? out : [""];
+  };
+
+
+  // Justificado "fake": reparte espacios extra (PDF-Lib no trae justify nativo)
+  const justifyLine = (line, maxWidth, size, fnt) => {
+    const parts = String(line ?? "").split(" ");
+    if (parts.length <= 1) return line;
+    const textWidth = fnt.widthOfTextAtSize(line, size);
+    const extra = maxWidth - textWidth;
+    if (extra <= 1) return line;
+
+    const gaps = parts.length - 1;
+    const extraPerGap = extra / gaps;
+    // Convertimos "pixeles" aproximados a espacios adicionales
+    const spaceWidth = fnt.widthOfTextAtSize(" ", size) || 1;
+    const addSpaces = Math.max(0, Math.floor(extraPerGap / spaceWidth));
+
+    if (addSpaces <= 0) return line;
+    const spacer = " ".repeat(1 + addSpaces);
+    return parts.join(spacer);
+  };
+
+  const addPage = () => pdfDoc.addPage([pageSize.width, pageSize.height]);
+  const ctx = { page: addPage(), y: pageSize.height - marginTop };
+
+
+  // ========= WATERMARK (logo suave centrado) =========
+  let __wmLogo = null;
+  const getWmLogo = async () => {
+    if (__wmLogo) return __wmLogo;
+    try{
+      const res = await fetch("/LOGO_CM.png", { cache: "no-store" });
+      if(!res.ok) return null;
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      __wmLogo = await pdfDoc.embedPng(bytes);
+      return __wmLogo;
+    }catch(_e){
+      return null;
+    }
+  };
+
+  
+  const drawWatermark = async () => {
+    try{
+      const wm = await getWmLogo();
+      if(!wm) return;
+
+      // ====== Token único por PDF (aporta trazabilidad y dificulta manipulación) ======
+      // (no revela datos sensibles; es un "id" derivado de datos ya visibles en el informe)
+      const auditId = bundle?.audit?.id || "";
+      const user = (opts?.userName || "Usuario");
+      const genIso = (opts?.generatedAt || new Date().toISOString());
+      const baseToken = `${auditId}|${user}|${genIso}`;
+      // hash simple para no mostrar el string completo:
+      let token = 0;
+      for (let i=0; i<baseToken.length; i++) token = (token*31 + baseToken.charCodeAt(i)) >>> 0;
+      const tokenText = `CM-${token.toString(16).toUpperCase().padStart(8,"0")}`;
+
+      const W = pageSize.width;
+      const H = pageSize.height;
+
+      // ====== 1) Rejilla de LOGO (marca de agua principal) ======
+      const baseW = W * 0.16;                 // tamaño del logo
+      const baseH = (wm.height / wm.width) * baseW;
+      const stepX = baseW * 1.55;             // separación horizontal
+      const stepY = baseH * 1.75;             // separación vertical
+      const opacityLogo = 0.055;              // opacidad logo
+      const opacityShadow = 0.030;            // opacidad sombra
+      const rotA = degrees(-18);
+      const rotB = degrees(18);
+
+      // Desfase (evita patrón perfecto)
+      const pageSeed = (token + Math.floor(Math.random()*1e6)) >>> 0;
+      const jitter = (n) => {
+        // pseudo random determinista por página
+        const x = Math.sin((pageSeed + n) * 12.9898) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      const offsetX = (jitter(1) - 0.5) * stepX * 0.7;
+      const offsetY = (jitter(2) - 0.5) * stepY * 0.7;
+
+      let n = 0;
+      for(let x = -stepX; x < W + stepX; x += stepX){
+        for(let y = -stepY; y < H + stepY; y += stepY){
+          const r = (n % 2 === 0) ? rotA : rotB;
+          const jx = (jitter(10+n) - 0.5) * 10;
+          const jy = (jitter(20+n) - 0.5) * 10;
+
+          // Sombra (profundidad)
+          ctx.page.drawImage(wm, {
+            x: x + offsetX + jx + 2,
+            y: y + offsetY + jy - 2,
+            width: baseW,
+            height: baseH,
+            opacity: opacityShadow,
+            rotate: r
+          });
+
+          // Logo
+          ctx.page.drawImage(wm, {
+            x: x + offsetX + jx,
+            y: y + offsetY + jy,
+            width: baseW,
+            height: baseH,
+            opacity: opacityLogo,
+            rotate: r
+          });
+
+          n++;
+        }
+      }
+
+      // ====== 2) Marca central adicional (refuerzo) ======
+      const bigW = W * 0.40;
+      const bigH = (wm.height / wm.width) * bigW;
+      ctx.page.drawImage(wm, {
+        x: (W - bigW) / 2,
+        y: (H - bigH) / 2,
+        width: bigW,
+        height: bigH,
+        opacity: 0.040,
+        rotate: degrees(-30)
+      });
+
+      // ====== 3) Microtexto diagonal repetido (anti-copia/edición) ======
+      const microOpacity = 0.060;
+      const microSize = 9;
+      const microStepX = 240;
+      const microStepY = 180;
+
+      // Texto de micro-marca: empresa + token + fecha (corto)
+      const micro = `CM COLOMBIA • ${tokenText} • ${String(genIso).slice(0,10)}`;
+
+      for(let x = -W; x < W * 2; x += microStepX){
+        for(let y = -H; y < H * 2; y += microStepY){
+          ctx.page.drawText(micro, {
+            x,
+            y,
+            size: microSize,
+            font: fontBold,
+            color: rgb(0,0,0),
+            opacity: microOpacity,
+            rotate: degrees(-30)
+          });
+        }
+      }
+
+      // ====== 4) Sello "CONFIDENCIAL" discreto en esquinas ======
+      const stamp = "USO INTERNO • CONFIDENCIAL";
+      const stampSize = 10;
+      const stampOpacity = 0.08;
+
+      const corners = [
+        { x: 22, y: H - 30, rot: degrees(0) },
+        { x: W - 210, y: H - 30, rot: degrees(0) },
+        { x: 22, y: 30, rot: degrees(0) },
+        { x: W - 210, y: 30, rot: degrees(0) },
+      ];
+
+      for(const c of corners){
+        ctx.page.drawText(stamp, {
+          x: c.x,
+          y: c.y,
+          size: stampSize,
+          font: fontBold,
+          color: rgb(0,0,0),
+          opacity: stampOpacity,
+          rotate: c.rot
+        });
+      }
+
+    }catch(_e){}
+  };
+
+
+
+  const drawHeader = async () => {
+    await drawWatermark();
+
+    // fondo blanco
+    ctx.page.drawRectangle({ x: 0, y: pageSize.height - 70, width: pageSize.width, height: 70, color: C.white });
+    // línea verde
+    ctx.page.drawRectangle({ x: 0, y: pageSize.height - 72, width: pageSize.width, height: 2, color: C.green });
+
+    // logo (si existe)
+    try {
+      const res = await fetch("/LOGO_CM.png", { cache: "no-store" });
+      if (res.ok) {
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const img = await pdfDoc.embedPng(bytes);
+        const h = 44;
+        const w = (img.width / img.height) * h;
+        ctx.page.drawImage(img, { x: marginX, y: pageSize.height - 60, width: w, height: h });
+      }
+    } catch (_e) {}
+
+    const title = "CM Colombia - Informe de Auditoría";
+    ctx.page.drawText(title, { x: marginX + 64, y: pageSize.height - 36, size: 14, font: fontBold, color: C.text });
+
+    const gen = opts?.generatedAt ? new Date(opts.generatedAt) : new Date();
+    const genStr = gen.toLocaleString("es-CO");
+    const userStr = opts?.userName ? String(opts.userName) : "-";
+    const sub = `Generado: ${genStr} · Usuario: ${userStr}`;
+    ctx.page.drawText(sub, { x: marginX + 64, y: pageSize.height - 52, size: 9, font, color: C.muted });
+
+    ctx.y = pageSize.height - 84;
+  };
+
+  const ensureSpace = async (h) => {
+    if (ctx.y - h < marginBottom) {
+      ctx.page = addPage();
+      ctx.y = pageSize.height - marginTop;
+      await drawHeader();
+    }
+  };
+
+  const drawH2 = async (t) => {
+    await ensureSpace(28);
+
+    // Para "Objetivo" el título debe quedar DEBAJO de la raya (como en el diseño que mostraste)
+    if (String(t) === "Objetivo") {
+      ctx.page.drawLine({
+        start: { x: marginX, y: ctx.y },
+        end: { x: pageSize.width - marginX, y: ctx.y },
+        thickness: 1,
+        color: C.line
+      });
+      ctx.y -= 12;
+      ctx.page.drawText(t, { x: marginX, y: ctx.y, size: 12, font: fontBold, color: C.green });
+      ctx.y -= 16;
+      return;
+    }
+
+    // Default: título arriba, raya abajo
+    ctx.page.drawText(t, { x: marginX, y: ctx.y, size: 12, font: fontBold, color: C.green });
+    ctx.y -= 10;
+    ctx.page.drawLine({
+      start: { x: marginX, y: ctx.y },
+      end: { x: pageSize.width - marginX, y: ctx.y },
+      thickness: 1,
+      color: C.line
+    });
+    ctx.y -= 16;
+  };
+
+// Subtítulo bonito (pill + separación)
+
+
+// Pills en línea (ej: prueba 1 · prueba 2)
+const drawInlinePills = async (items) => {
+  const size = 9.5;
+  const padX = 8;
+  const padY = 5;
+  const gap = 8;
+
+  let x = marginX;
+  await ensureSpace(22);
+
+  for (const it of items) {
+    const text = String(it || "");
+    const w = fontBold.widthOfTextAtSize(text, size) + padX * 2;
+    const h = size + padY * 2;
+
+    // salto de línea si no cabe
+    if (x + w > pageSize.width - marginX) {
+      ctx.y -= (h + 8);
+      x = marginX;
+      await ensureSpace(h + 8);
+    }
+
+    ctx.page.drawRectangle({
+      x,
+      y: ctx.y - h + 2,
+      width: w,
+      height: h,
+      color: C.greenSoft,
+      borderWidth: 0
+    });
+
+    ctx.page.drawText(text, {
+      x: x + padX,
+      y: ctx.y - h + 8,
+      size,
+      font: fontBold,
+      color: C.green
+    });
+
+    x += w + gap;
+  }
+
+  ctx.y -= (size + padY * 2 + 12);
+};
+
+const drawSubHeader = async (t) => {
+  await ensureSpace(22);
+  const text = String(t || "");
+  const size = 10.5;
+  const padX = 10;
+  const padY = 6;
+  const w = Math.min(pageSize.width - marginX * 2, fontBold.widthOfTextAtSize(text, size) + padX * 2);
+  const h = size + padY * 2;
+
+  ctx.page.drawRectangle({
+    x: marginX,
+    y: ctx.y - h + 2,
+    width: w,
+    height: h,
+    color: C.greenSoft,
+    borderWidth: 0
+  });
+
+  ctx.page.drawText(text, { x: marginX + padX, y: ctx.y - h + 8, size, font: fontBold, color: C.green });
+  ctx.y -= (h + 10);
+};
+
+const drawBullet = async (text, size = 9.5, indent = 14) => {
+  const maxW = pageSize.width - marginX * 2 - indent;
+  const lines = wrap(String(text || ""), maxW, size, font);
+  const blockH = 11 * Math.max(1, lines.length) + 4;
+  await ensureSpace(blockH);
+
+  // bullet
+  ctx.page.drawText("•", { x: marginX, y: ctx.y, size: size + 2, font: fontBold, color: C.text });
+
+  // text
+  let y = ctx.y;
+  for (let i = 0; i < lines.length; i++) {
+    ctx.page.drawText(lines[i], { x: marginX + indent, y, size, font, color: C.text });
+    y -= 11;
+  }
+  ctx.y = y - 4;
+};
+
+
+
+  const drawMetaRow = async (k, v) => {
+    await ensureSpace(14);
+    ctx.page.drawText(String(k ?? ""), { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.text });
+    ctx.page.drawText(String(v ?? "-"), { x: marginX + 110, y: ctx.y, size: 10, font, color: C.text });
+    ctx.y -= 20;
+  };
+
+
+  function parseSelectedSetForPdf(raw){
+    const set = new Set();
+    try{
+      const add = (v) => {
+        if(v === null || v === undefined) return;
+        const s = String(v).trim();
+        if(s) set.add(s);
+      };
+      if(Array.isArray(raw)){
+        raw.forEach(add);
+        return set;
+      }
+      if(raw && typeof raw === "object"){
+        if("value" in raw) add(raw.value);
+        if("label" in raw) add(raw.label);
+        Object.entries(raw).forEach(([k,v]) => { if(v === true) add(k); });
+        return set;
+      }
+      const s = String(raw ?? "").trim();
+      if(!s) return set;
+      try{
+        const parsed = JSON.parse(s);
+        if(Array.isArray(parsed)){
+          parsed.forEach(add);
+          return set;
+        }
+        if(parsed && typeof parsed === "object"){
+          if("value" in parsed) add(parsed.value);
+          if("label" in parsed) add(parsed.label);
+          Object.entries(parsed).forEach(([k,v]) => { if(v === true) add(k); });
+          return set;
+        }
+        add(parsed);
+        return set;
+      }catch(_e){}
+      s.split(/[;,\n]/g).map(x => x.trim()).filter(Boolean).forEach(add);
+      return set;
+    }catch(_e){
+      return set;
+    }
+  }
+
+  const _isNumeric = (v) => {
+    if (v === null || v === undefined) return false;
+    const s = String(v).trim();
+    if (!s) return false;
+    return !Number.isNaN(Number(s));
+  };
+
+  // Helper: detectar preguntas Sí/No (por tipo o por opciones)
+  const _isYesNoQuestion = (q) => {
+    if(!q) return false;
+    const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? "").toLowerCase();
+    let cfg = q?.config;
+    if (typeof cfg === "string") { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+    const opts = (cfg?.options || cfg?.opciones || cfg?.items || cfg?.choices || cfg?.valores || []);
+    const yesNoTokens = new Set(["si","sí","no","n/a","na","no aplica","noaplica","yes"]);
+    if (/(boolean|si_no|yesno)/i.test(qType)) return true;
+    if (Array.isArray(opts) && opts.length) {
+      const labels = opts.map(o => (typeof o === "string" ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "")))
+        .map(x => String(x).trim().toLowerCase()).filter(Boolean);
+      if (labels.length && labels.length <= 4 && labels.every(t => yesNoTokens.has(t))) return true;
+    }
+    return false;
+  };
+
+  const _getInverseFlag = (q) => {
+    let cfg = q?.config;
+    if (typeof cfg === "string") { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+    return cfg?.inverse === true;
+  };
+
+  const _answerKind = (q, raw) => {
+    const fakeRow = (raw && typeof raw === 'object' && !Array.isArray(raw)) ? raw : { answer: raw };
+    return classifyQuestionResponse(q, fakeRow, hasEvidenceByAnswerId);
+  };
+
+  const normAnswer = (q, a, commentText) => {
+    const looksOpen = isOpenQuestionRobust(q);
+    const cleanComment = String(commentText ?? '').trim();
+    const openFromAny = getOpenTextFromRowRobust({ answer: a, comment: commentText });
+
+    if (a === null || a === undefined || (typeof a === 'string' && a.trim() === '')) {
+      if (looksOpen) {
+        const txt = openFromAny || cleanComment;
+        return { label: 'Abierta', kind: txt ? ((window.isNegativeOpenText && window.isNegativeOpenText(txt)) ? 'bad' : 'ok') : 'bad', openText: txt };
+      }
+      return { label: '-', kind: 'neutral' };
+    }
+
+    if (typeof a === 'boolean') return { label: a ? 'Sí' : 'No', kind: _answerKind(q, a) };
+    if (typeof a === 'number') return { label: String(a), kind: _answerKind(q, a) };
+
+    const s = String(a);
+    const m = s.match(/(^|\b)([1-5])(\b|$)/);
+    if (m) {
+      const n = Number(m[2]);
+      return { label: String(n), kind: (n >= 4 ? 'ok' : 'bad') };
+    }
+
+    if (looksOpen) {
+      const openText = openFromAny || cleanComment || String(s || '').trim();
+      const neg = (typeof window.isNegativeOpenText === 'function') ? window.isNegativeOpenText(openText) : false;
+      return { label: 'Abierta', kind: (neg ? 'bad' : 'ok'), openText };
+    }
+
+    const st = s.trim().toLowerCase();
+    if (st === 'si' || st === 'sí' || st === 'yes') return { label: 'Sí', kind: 'ok' };
+    if (st === 'no') return { label: 'No', kind: 'bad' };
+    if (st === 'na' || st === 'n/a' || st === 'n.a' || st === 'no aplica' || st === 'noaplica') return { label: 'N/A', kind: 'neutral' };
+    if (/(checklist|check\s*list|lista|multi|multiple|seleccion|photo|foto|evidencia|evidence|file|archivo|adjunt|upload)/i.test(String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? q?.qtype ?? '').toLowerCase())) {
+      return { label: '-', kind: 'neutral' };
+    }
+    return { label: s, kind: _answerKind(q, s) };
+  };
+
+const drawCardQA = async ({ qText, ans, rawAnswer, comment, q, auditId, inspectionId }) => {
+    const maxW = pageSize.width - marginX * 2;
+    const cardX = marginX;
+    const cardW = maxW;
+
+    const qLines = wrap(qText, cardW - 18 - 92, 10, fontBold); // deja espacio para pill
+    // Comentario completo (sin truncar)
+    const commentFull = (() => {
+      const txt = (comment !== undefined && comment !== null) ? String(comment).trim() : '';
+      if (!txt) return '';
+      if (txt === '-' || /^null$/i.test(txt) || /^undefined$/i.test(txt)) return '';
+      if (/^(yes|si|sí|no|true|false)$/i.test(txt)) return '';
+      if (/^\d+(?:[.,]\d+)?$/.test(txt)) return '';
+      return txt;
+    })();
+    const cLines = commentFull ? wrap(commentFull, cardW - 18, 9, font) : [];
+
+    const requiredEv = questionRequiresEvidence(q);
+    const tplIdForWeight = String(q?.template_id || q?.checklist_template_id || q?.checklist_templates_id || q?.template || "");
+    const qWeight = Number(bundle?.__questionWeights?.[tplIdForWeight]?.byQuestionId?.[String(q?.id)] ?? bundle?.__questionWeights?.[tplIdForWeight]?.each ?? 0) || 0;
+
+    const questionId = q?.id || q?.question_id || q?.uuid || q?.question_uuid;
+    const evidenceUrl = await fetchEvidenceUrl({ inspectionId, questionId });
+    const showEv = requiredEv || !!evidenceUrl;
+
+    // Pre-calcular líneas de checklist para determinar altura correcta
+    let checklistLinesCount = 0;
+    const qType = String(q?.type ?? q?.question_type ?? q?.kind ?? q?.question_kind ?? q?.questionType ?? "").toLowerCase();
+    let cfg = q?.config;
+    if (typeof cfg === "string") { try { cfg = JSON.parse(cfg); } catch { cfg = null; } }
+    const opts = (cfg?.options || cfg?.opciones || cfg?.items || cfg?.choices || cfg?.valores || []);
+    const hasOptions = Array.isArray(opts) && opts.length > 0;
+    const optLabels = (Array.isArray(opts) ? opts.map(o => (typeof o === "string" ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? ""))) : [])
+      .map(x => String(x).trim()).filter(Boolean);
+    const optSetLow = new Set(optLabels.map(x => x.toLowerCase()));
+    const yesNoTokens = new Set(["si","sí","no","n/a","na","no aplica","noaplica","yes"]);
+    const looksYesNoByOpts = (optSetLow.size > 0 && optSetLow.size <= 3) && [...optSetLow].every(t => yesNoTokens.has(t));
+    const isYesNoType    = /(choice|boolean|si_no|yesno)/i.test(qType) || looksYesNoByOpts || (hasOptions && optLabels.length <= 3 && optLabels.every(x => yesNoTokens.has(x.toLowerCase())));
+    const isLikertType   = /(likert|scale|escala|rating)/i.test(qType);
+    const isTextType     = String(q?.qtype || qType || "").toLowerCase() === "text" || /(text|abierta|open)/i.test(qType);
+    const commentLabel   = isTextType ? "Respuestas:" : "Comentario:";
+
+    
+    // Evidencia/Foto: SOLO por tipo declarado
+    const qTextLowPrecalc = String(qText || "").toLowerCase();
+    const isEvidenceTypeDeclared = /(photo|foto|evidencia|evidence|file|archivo)/i.test(qType);
+    const isEvidenceTypeByText = /(foto|evidencia|archivo|adjunt)/i.test(qType + " " + qTextLowPrecalc);
+    const isEvidenceType = isEvidenceTypeDeclared || isEvidenceTypeByText;
+    
+    // IMPORTANTE: Si es sí/no, NUNCA es evidencia aunque tenga archivos adjuntos
+    const isEvidenceQ = !isYesNoType && isEvidenceType;
+    
+    const isChecklist = !isYesNoType && (/(checklist|check\s*list|lista|multi|multiple|seleccion)/i.test(qType) || (hasOptions && !isEvidenceType && !isLikertType));
+    
+    if (isChecklist && hasOptions) {
+      for (const o of opts) {
+        const label = (typeof o === "string") ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "");
+        if (!label) continue;
+        const wLines = wrap("[x] " + label, cardW - 18 - 92, 9, font);
+        checklistLinesCount += wLines.length;
+      }
+    }
+
+    // Para selección múltiple simple (choice que no es yes/no ni checklist)
+    let choiceSimpleLinesCount = 0;
+    if (!isYesNoType && !isChecklist && !isEvidenceQ && hasOptions && opts.length > 0) {
+      for (const o of opts) {
+        const label = (typeof o === "string") ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "");
+        if (!label) continue;
+        const wLines = wrap("[x] " + label, cardW - 18 - 92, 9, font);
+        choiceSimpleLinesCount += wLines.length;
+      }
+    }
+
+    const commentBlockH = cLines.length
+  ? (22 + cLines.length * 12) // label + líneas + padding real
+  : 0;
+
+const baseH = 18
+  + (qLines.length * 12)
+  + commentBlockH
+  + (showEv ? 18 : 0)
+  + (checklistLinesCount ? (6 + checklistLinesCount * 14) : 0)
+  + (choiceSimpleLinesCount ? (6 + choiceSimpleLinesCount * 14) : 0)
+  + 18;
+
+const h = Math.max(56, baseH);
+
+    await ensureSpace(h + 8);
+
+    // Para preguntas de opción múltiple/checklist/choice, determinar si es correcta (1 o varias)
+    let kind = ans.kind;
+
+    // Helper: parsea selectedSet desde rawAnswer (array / JSON / string / CSV)
+    const parseSelectedSet = (raw) => {
+      const set = new Set();
+      try{
+        if (Array.isArray(raw)) { raw.forEach(v => { if(v!==null && v!==undefined) set.add(String(v).trim()); }); return set; }
+        if (typeof raw === "string") {
+          const t = raw.trim();
+          if (!t) return set;
+
+          // JSON
+          try{
+            const j = JSON.parse(t);
+            if (Array.isArray(j)) { j.forEach(v => { if(v!==null && v!==undefined) set.add(String(v).trim()); }); return set; }
+            if (j && typeof j === "object") {
+              if ("value" in j) { set.add(String(j.value).trim()); return set; }
+              // mapa {opcion:true}
+              for (const [k,v] of Object.entries(j)) { if (v) set.add(String(k).trim()); }
+              return set;
+            }
+            set.add(String(j).trim());
+            return set;
+          }catch(_e){
+            // CSV / texto plano
+            if (t.includes(",")) t.split(",").map(x=>x.trim()).filter(Boolean).forEach(v=>set.add(v));
+            else set.add(t);
+            return set;
+          }
+        }
+        if (raw !== null && raw !== undefined) set.add(String(raw).trim());
+      }catch(_e){}
+      return set;
+    };
+
+    // Helper: obtiene correctSet (correct_answers[] o correct_answer legacy)
+    const getCorrectSet = (cfg) => {
+      const set = new Set();
+      const arr = Array.isArray(cfg?.correct_answers) ? cfg.correct_answers : [];
+      for (const v of arr) { if (v !== null && v !== undefined && String(v).trim()) set.add(String(v).trim()); }
+      if (!set.size && cfg?.correct_answer && String(cfg.correct_answer).trim()) set.add(String(cfg.correct_answer).trim());
+      return set;
+    };
+
+    const allowMultiple = cfg?.allow_multiple_correct === true;
+    const correctSet = getCorrectSet(cfg);
+    const hasCorrect = correctSet.size > 0;
+
+    // Solo evaluamos correctness si hay correctas definidas (y no es evidencia)
+    if (!isEvidenceQ && hasOptions && hasCorrect) {
+      const selectedSetForKind = parseSelectedSet(rawAnswer);
+      const multi = allowMultiple || correctSet.size > 1;
+
+      if (multi) {
+        // Correcto si el set seleccionado == set correcto
+        const sameSize = selectedSetForKind.size === correctSet.size;
+        const allIn = [...selectedSetForKind].every(v => correctSet.has(v));
+        kind = (sameSize && allIn) ? "ok" : "bad";
+      } else {
+        // Single correct
+        const correctOne = [...correctSet][0] || null;
+        kind = (correctOne && selectedSetForKind.has(correctOne)) ? "ok" : "bad";
+      }
+    }
+
+    const border = kind === "bad" ? C.red : (kind === "ok" ? C.green : C.line);
+    const bg = kind === "bad" ? C.redSoft : (kind === "ok" ? C.greenSoft : C.graySoft);
+
+    // card
+    ctx.page.drawRectangle({
+      x: cardX,
+      y: ctx.y - h,
+      width: cardW,
+      height: h,
+      color: bg,
+      borderWidth: 0
+    });
+
+    // pregunta
+    let y = ctx.y - 14;
+    for (const l of qLines) {
+      ctx.page.drawText(l, { x: cardX + 10, y, size: 10, font: fontBold, color: C.text });
+      y -= 12;
+    }
+
+    // Para checklist: primero mostrar opciones, después comentario
+    // Para otros tipos: primero comentario, después opciones
+    const shouldChecklistFirst = isChecklist;
+
+    
+    // link a evidencia (solo si la pregunta lo requiere)
+    if (showEv) {
+      y -= 4;
+      ctx.page.drawText("Evidencia:", { x: cardX + 10, y, size: 9, font: fontBold, color: C.muted });
+
+      const linkText = evidenceUrl ? "Ver evidencia" : "Sin evidencia";
+      const linkColor = evidenceUrl ? rgb(0.10, 0.35, 0.85) : C.muted;
+
+      const lx = cardX + 78;
+      ctx.page.drawText(linkText, { x: lx, y, size: 9, font: fontBold, color: linkColor });
+
+      if (evidenceUrl) {
+        const w = fontBold.widthOfTextAtSize(linkText, 9);
+        addPdfLink(ctx.page, lx, y - 1, w, 12, evidenceUrl);
+      }
+      y -= 12;
+    }
+
+    // checklist: render opciones con [x]/[ ] dentro de la tarjeta (en gris)
+    const qTextLow = String(qText || "").toLowerCase();
+
+    // Evidencia/Foto: SOLO por tipo declarado (photo, foto, evidencia, etc)
+    // NO incluir "requiredEv" aquí - eso solo significa que la pregunta requiere evidencia
+    // pero no significa que sea una pregunta de TIPO evidencia
+
+    if (isChecklist) {
+      const selectedSet = parseSelectedSetForPdf(rawAnswer);
+
+      const __correctSet = (() => {
+        const set = new Set();
+        const arr = Array.isArray(cfg?.correct_answers) ? cfg.correct_answers : [];
+        for (const v of arr) { if (v !== null && v !== undefined && String(v).trim()) set.add(String(v).trim()); }
+        if (!set.size && cfg?.correct_answer && String(cfg.correct_answer).trim()) set.add(String(cfg.correct_answer).trim());
+        return set;
+      })();
+
+      const lines = [];
+      if (!opts || !opts.length) {
+        for (const v of Array.from(selectedSet)) {
+          lines.push("[x] " + String(v));
+        }
+      }
+
+      for (let optIndex = 0; optIndex < opts.length; optIndex++) {
+        const o = opts[optIndex];
+        const label = (typeof o === "string") ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "");
+        if (!label) continue;
+        const __val = String((typeof o==="object" && o?.value !== undefined && o?.value !== null) ? o.value : label).trim();
+        const __idx = String(optIndex);
+        const checked = selectedSet.has(String(label).trim()) || selectedSet.has(__val) || selectedSet.has(__idx);
+        const isCorrect = __correctSet.size ? (__correctSet.has(String(label).trim()) || __correctSet.has(__val) || __correctSet.has(__idx)) : checked;
+        lines.push({ text: (checked ? "[x] " : "[ ] ") + label, checked, isCorrect, label });
+      }
+      if (lines.length) {
+        y -= 2;
+
+        // ===== Checklist PRO (checkbox + label alineado, sin [x]) =====
+        const box = 11;
+        const gap = 8;
+        const boxX = cardX + 18;
+        const textX = boxX + box + gap;
+
+        for (const lineObj of lines) {
+          const rawLabel = String(lineObj.text || "");
+          const cleanLabel = rawLabel.replace(/^\s*\[[xX\s]?\]\s*/,"").trim() || rawLabel;
+
+          const hasCorrect = (__correctSet && __correctSet.size);
+          let accent = C.green;
+          if (lineObj.checked && !lineObj.isCorrect && hasCorrect) accent = C.red;
+
+          const wLines = wrap(cleanLabel, (cardW - 18 - 92) - (box + gap), 9, font);
+
+          let first = true;
+          for (const l of wLines) {
+            if (first) {
+              ctx.page.drawRectangle({
+                x: boxX,
+                y: y - 4,
+                width: box,
+                height: box,
+                borderWidth: 1,
+                borderColor: C.pillGray,
+                color: lineObj.checked ? accent : C.white
+              });
+              if (lineObj.checked) {
+                ctx.page.drawLine({ start: { x: boxX + 2.0, y: y + 5.0 }, end: { x: boxX + 4.2, y: y + 2.6 }, thickness: 1.6, color: C.white });
+                ctx.page.drawLine({ start: { x: boxX + 4.1, y: y + 2.6 }, end: { x: boxX + 8.0, y: y + 8.3 }, thickness: 1.6, color: C.white });
+              }
+              first = false;
+            }
+
+            let textColor = C.text;
+            if (lineObj.checked && lineObj.isCorrect) textColor = C.green;
+            else if (lineObj.checked && !lineObj.isCorrect && hasCorrect) textColor = C.red;
+
+            ctx.page.drawText(l, { x: textX, y: y - 4, size: 9, font, color: textColor });
+            y -= 20;
+          }
+        }
+      }
+
+      y -= 6;
+
+      // Comentario DESPUÉS del checklist
+      if (cLines.length) {
+        y -= 4;
+        ctx.page.drawText(commentLabel, { x: cardX + 10, y, size: 9, font: fontBold, color: C.muted });
+        y -= 11;
+
+        for (let i = 0; i < cLines.length; i++) {
+          const line = cLines[i];
+          const isLast = i === cLines.length - 1;
+          const txt = isLast ? line : justifyLine(line, cardW - 18, 9, font);
+          ctx.page.drawText(txt, { x: cardX + 10, y, size: 9, font, color: C.muted });
+          y -= 11;
+        }
+      }
+    }
+
+    // Comentario para otros tipos de preguntas (no checklist)
+    if (!isChecklist && cLines.length) {
+      y -= 4;
+      ctx.page.drawText(commentLabel, { x: cardX + 10, y, size: 9, font: fontBold, color: C.muted });
+      y -= 11;
+
+      for (let i = 0; i < cLines.length; i++) {
+        const line = cLines[i];
+        const isLast = i === cLines.length - 1;
+        const txt = isLast ? line : justifyLine(line, cardW - 18, 9, font);
+        ctx.page.drawText(txt, { x: cardX + 10, y, size: 9, font, color: C.muted });
+        y -= 11;
+      }
+    }
+
+    // Renderizar opciones de Sí/No en el recuadro
+    if (isYesNoType && !isChecklist && !isEvidenceQ) {
+      y -= 2;
+      // Mostrar "Sí" y "No" con sus colores
+      const yesLabel = "✅ Sí";
+      const noLabel = "❌ No";
+      const naLabel = "N/A";
+      
+      const answerLow = String(rawAnswer || "").toLowerCase().trim();
+      const isYes = answerLow === "yes" || answerLow === "sí" || answerLow === "si";
+      const isNo = answerLow === "no";
+      const isNA = answerLow === "n/a" || answerLow === "na" || answerLow === "no aplica";
+      
+      // Dibujar opciones con colores
+      const optionW = cardW - 18 - 92;
+      const optionX = cardX + 10;
+      
+      const inverse = cfg?.inverse === true;
+
+      // Sí (verde si es correcta y seleccionada; rojo si es incorrecta y seleccionada)
+      const yesColor = isYes ? (inverse ? C.red : C.green) : C.text;
+      ctx.page.drawText(yesLabel, { x: optionX, y, size: 9, font, color: yesColor });
+      y -= 11;
+      
+      // No (verde si es correcta y seleccionada; rojo si es incorrecta y seleccionada)
+      const noColor = isNo ? (inverse ? C.green : C.red) : C.text;
+      ctx.page.drawText(noLabel, { x: optionX, y, size: 9, font, color: noColor });
+      y -= 11;
+      
+      // N/A (gris si es seleccionado)
+      const naColor = isNA ? C.muted : C.text;
+      ctx.page.drawText(naLabel, { x: optionX, y, size: 9, font, color: naColor });
+      y -= 11;
+    }
+
+    // Renderizar opciones para selección múltiple SIMPLE (choice)
+    if (!isChecklist && !isYesNoType && !isEvidenceQ && hasOptions && opts.length) {
+      const selectedAnswers = parseSelectedSetForPdf(rawAnswer);
+
+      const __correctSet2 = (() => {
+        const set = new Set();
+        const arr = Array.isArray(cfg?.correct_answers) ? cfg.correct_answers : [];
+        for (const v of arr) { if (v !== null && v !== undefined && String(v).trim()) set.add(String(v).trim()); }
+        if (!set.size && cfg?.correct_answer && String(cfg.correct_answer).trim()) set.add(String(cfg.correct_answer).trim());
+        return set;
+      })();
+
+      for (let optIndex = 0; optIndex < opts.length; optIndex++) {
+        const o = opts[optIndex];
+        const label = (typeof o === "string") ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "");
+        if (!label) continue;
+        const value = (typeof o === "object" && o?.value !== undefined && o?.value !== null) ? String(o.value).trim() : String(label).trim();
+        const idxVal = String(optIndex);
+        const checked = selectedAnswers.has(String(label).trim()) || selectedAnswers.has(value) || selectedAnswers.has(idxVal);
+        const isCorrect = __correctSet2.size ? (__correctSet2.has(String(label).trim()) || __correctSet2.has(value) || __correctSet2.has(idxVal)) : checked;
+        const text = (checked ? "[x] " : "[ ] ") + label;
+        const wLines = wrap(text, cardW - 18 - 92, 9, font);
+        for (const l of wLines) {
+          let textColor = C.text;
+          if (checked && isCorrect) textColor = C.green;
+          else if (checked && !isCorrect && __correctSet2.size) textColor = C.red;
+          ctx.page.drawText(l, { x: cardX + 10, y, size: 9, font, color: textColor });
+          y -= 20;
+        }
+      }
+
+      // Mostrar texto con la(s) respuesta(s) correcta(s)
+      if (__correctSet2.size) {
+        // Intentar mostrar labels amigables
+        const correctLabels = [];
+        for (const cVal of __correctSet2) {
+          let lbl = cVal;
+          for (const o of opts) {
+            const label = (typeof o === "string") ? o : (o?.label ?? o?.name ?? o?.text ?? o?.value ?? "");
+            const value = (typeof o === "object" && o?.value) ? String(o.value).trim() : String(label).trim();
+            if (cVal === label || cVal === value) { lbl = label; break; }
+          }
+          correctLabels.push(lbl);
+        }
+        y -= 4;
+        ctx.page.drawText("Respuesta correcta es: " + correctLabels.join(", "), { x: cardX + 10, y, size: 9, font: fontBold, color: C.green });
+        y -= 11;
+      }
+    }
+
+    // pill respuesta (derecha)
+    const pillW = 150;
+    const pillH = 20;
+    const pillX = cardX + cardW - pillW - 10;
+    const pillY = ctx.y - 20;
+
+    let pillColor = kind === "bad" ? C.red : (kind === "ok" ? C.green : C.pillGray);
+    // Preguntas abiertas/texto: pill neutra (gris)
+    if (isTextType) {
+      pillColor = C.pillGray;
+    }
+    // Solo gris si es checklist sin respuesta correcta definida, o si es evidencia
+    const __hasCorrectCfg = (cfg && ((Array.isArray(cfg.correct_answers) && cfg.correct_answers.length) || (cfg.correct_answer && String(cfg.correct_answer).trim())));
+    if ((isChecklist && !__hasCorrectCfg) || isEvidenceQ) pillColor = C.pillGray;
+    ctx.page.drawRectangle({ x: pillX, y: pillY, width: pillW, height: pillH, color: pillColor });
+
+    // texto pill centrado
+    let lbl = String(ans.label ?? "-");
+    // Para checklist o selección múltiple con respuesta correcta, mostrar Correcta/Incorrecta
+    if ((isChecklist || (!isYesNoType && !isEvidenceQ && hasOptions)) && __hasCorrectCfg) {
+      lbl = kind === "ok" ? "Correcta" : "Incorrecta";
+    } else if (isChecklist) {
+      lbl = "Checklist"; // Solo si no tiene respuesta correcta configurada
+    }
+    if (isEvidenceQ) lbl = "Evidencia";
+    // Preguntas abiertas/texto: no mostrar el comentario en el pill
+    if (isTextType) lbl = "Abierta";
+
+    // Para sí/no, mostrar "Sí" o "No" en el pill
+    if (isYesNoType && !isChecklist && !isEvidenceQ) {
+      const answerLow = String(rawAnswer || "").toLowerCase().trim();
+      if (answerLow === "yes" || answerLow === "sí" || answerLow === "si") {
+        lbl = "Sí";
+      } else if (answerLow === "no") {
+        lbl = "No";
+      } else if (answerLow === "n/a" || answerLow === "na" || answerLow === "no aplica") {
+        lbl = "N/A";
+      }
+    }
+
+    // Mostrar porcentaje individual de la pregunta
+    const earnedPct = (kind === "ok") ? qWeight : 0;
+    if (qWeight > 0) {
+      if (lbl === "Correcta" || lbl === "Incorrecta") {
+        lbl = `${lbl} ${Math.round(earnedPct)}%/${Math.round(qWeight)}%`;
+      } else if (lbl === "Sí" || lbl === "No" || lbl === "N/A" || lbl === "Abierta") {
+        lbl = `${lbl} ${Math.round(earnedPct)}%/${Math.round(qWeight)}%`;
+      }
+    }
+    const size = 8.5;
+    const txW = fontBold.widthOfTextAtSize(lbl, size);
+    ctx.page.drawText(lbl, {
+      x: pillX + (pillW - txW) / 2,
+      y: pillY + 6,
+      size,
+      font: fontBold,
+      color: C.white
+    });
+
+    ctx.y -= (h + 12);
+  };
+
+  const drawSmallParagraph = async (text, size = 10) => {
+    const maxW = pageSize.width - marginX * 2;
+    const lines = wrap(text, maxW, size, font);
+    for (let i = 0; i < lines.length; i++) {
+      const isLast = i === lines.length - 1;
+      await ensureSpace(size + 8);
+      const l = isLast ? lines[i] : justifyLine(lines[i], maxW, size, font);
+      ctx.page.drawText(l, { x: marginX, y: ctx.y, size, font, color: C.text });
+      ctx.y -= (size + 4);
+    }
+  };
+
+  // ========= INIT HEADER =========
+  await drawHeader();
+
+  // ========= PORTADA / DATOS =========
+  await drawH2("Resumen");
+  await drawMetaRow("Título:", bundle.audit?.title || "-");
+  await drawMetaRow("Punto:", bundle.audit?.punto || "-");
+const fechas = `${bundle.audit?.start_date ? String(bundle.audit.start_date).slice(0, 10) : "-"} -> ${bundle.audit?.end_date ? String(bundle.audit.end_date).slice(0, 10) : "-"}`;
+  await drawMetaRow("Fechas:", fechas);
+
+  // Score Safety (general + por inspección)
+  const __scores = computeSafetyScores(bundle);
+  const __scoresByInspection = computeSafetyScoresByInspection(bundle);
+  if(__scores?.overallPercent !== null && __scores?.overallPercent !== undefined){
+    const total = __scores.total || 0;
+    const ok = __scores.totalOk || 0;
+    const neutral = __scores.totalNeutral || 0;
+    await ensureSpace(18);
+    ctx.page.drawText("Score Safety general:", { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.text });
+
+    const pct = `${__scores.overallPercent}%`;
+    const meta = `(Ok ${ok} / ${total}${neutral ? ` · ${neutral} neutras` : ''})`;
+
+    const pctW = fontBold.widthOfTextAtSize(pct, 12);
+    const boxPadX = 8;
+    const boxH = 18;
+    const boxX = marginX + 140;
+    const boxY = ctx.y - 4;
+
+    ctx.page.drawRectangle({
+      x: boxX,
+      y: boxY,
+      width: pctW + boxPadX * 2,
+      height: boxH,
+      color: C.soft,
+      borderWidth: 0
+    });
+
+    ctx.page.drawText(pct, { x: boxX + boxPadX, y: ctx.y, size: 12, font: fontBold, color: C.text });
+
+    const metaX = boxX + boxPadX + pctW + 10;
+    ctx.page.drawText(meta, { x: metaX, y: ctx.y - 1, size: 9, font, color: C.muted });
+
+    ctx.y -= 16;
+  }
+
+  if(__scoresByInspection?.length){
+    await ensureSpace(18);
+    ctx.page.drawText("Por inspección:", { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.text });
+    ctx.y -= 16;
+
+    for(const row of __scoresByInspection){
+      const label = `${row.name}`;
+      const pct = `${row.percent === null ? '-' : row.percent + '%'}`;
+      const meta = `(Ok ${row.ok} / ${row.total}${row.neutral ? ` · ${row.neutral} neutras` : ''})`;
+
+      ctx.page.drawText(label, {
+        x: marginX,
+        y: ctx.y,
+        size: 9,
+        font: fontBold,
+        color: C.text
+      });
+
+      const pctW = fontBold.widthOfTextAtSize(pct, 11);
+      const boxPadX = 8;
+      const boxH = 17;
+      const boxX = pageSize.width - marginX - pctW - 72;
+      const boxY = ctx.y - 4;
+
+      ctx.page.drawRectangle({
+        x: boxX,
+        y: boxY,
+        width: pctW + boxPadX * 2,
+        height: boxH,
+        color: C.soft,
+        borderWidth: 0
+      });
+
+      ctx.page.drawText(pct, {
+        x: boxX + boxPadX,
+        y: ctx.y,
+        size: 11,
+        font: fontBold,
+        color: C.text
+      });
+
+      ctx.page.drawText(meta, {
+        x: marginX + 220,
+        y: ctx.y - 1,
+        size: 8.5,
+        font,
+        color: C.muted
+      });
+
+      ctx.y -= 16;
+    }
+
+    ctx.y -= 4;
+  }
+
+  if (bundle.audit?.objective) {
+    await drawH2("Objetivo");
+    await drawSmallParagraph(bundle.audit.objective, 10);
+    ctx.y -= 6;
+  }
+
+  if (notes && String(notes).trim()) {
+    await drawH2("Notas / Observaciones");
+    await drawSmallParagraph(String(notes), 10);
+    ctx.y -= 6;
+  }
+
+  // ========= CHECKLIST =========
+  await drawH2("Checklist (respuestas)");
+
+  const inspections = bundle.currentInspections || [];
+  const answersAll = bundle.inspectionAnswers || [];
+  const questionsById = bundle.questionsById || {};
+  const sectionsById = bundle.sectionsById || {};
+  const tplsById = bundle.templatesById || {};
+
+  const __scoreByInspection = new Map((__scoresByInspection || []).map(r => [String(r.inspection_id || ''), r]));
+
+  const answersByInspectionAndQ = buildAnswersByInspectionAndQ(answersAll);
+
+  if (!inspections.length) {
+    await ensureSpace(18);
+    ctx.page.drawText("No hay inspecciones registradas para esta auditoría.", { x: marginX, y: ctx.y, size: 10, font, color: C.muted });
+    ctx.y -= 20;
+  } else {
+    const findingsToRender = [];
+
+    let inspIdx = 0;
+    for (const insp of inspections) {
+      const tpl = insp.template_id ? (tplsById[insp.template_id] || null) : null;
+      const tplName = tpl?.name || (insp.template_id ? ("Plantilla " + String(insp.template_id).slice(0, 8) + "…") : "Plantilla");
+      const displayInspectionName = (insp?.__sameTemplateCount > 1)
+        ? `${tplName} - inspección ${Number(insp?.__inspectionNumber || 0) || 1}`
+        : tplName;
+
+      // Cada plantilla/inspección empieza en una nueva página para que no se pierda la segunda
+      if (inspIdx > 0) {
+        ctx.page = addPage();
+        ctx.y = pageSize.height - marginTop;
+        await drawHeader();
+        await drawH2("Checklist (respuestas)");
+      }
+
+      // Subtítulo de inspección
+      await ensureSpace(22);
+      // Separador gris arriba del nombre de la sección (prueba 1, prueba 2, etc.)
+      ctx.page.drawLine({
+        start: { x: marginX, y: ctx.y - 12 },
+        end: { x: pageSize.width - marginX, y: ctx.y - 12 },
+        thickness: 1,
+        color: rgb(0.82, 0.84, 0.86)
+      });
+
+      ctx.page.drawText(displayInspectionName, { x: marginX, y: ctx.y, size: 11, font: fontBold, color: C.text });
+
+      
+      // Separador gris debajo del nombre de la sección
+      ctx.page.drawLine({
+        start: { x: marginX, y: ctx.y - 6 },
+        end: { x: pageSize.width - marginX, y: ctx.y - 6 },
+        thickness: 1,
+        color: rgb(0.82, 0.84, 0.86)
+      });
+// Score por plantilla (Safety)
+      try{
+        const sRow = __scoreByInspection.get(String(insp.id || ''));
+        if(sRow && sRow.percent !== null && sRow.percent !== undefined){
+          const txt = `Score: ${sRow.percent}% · ${sRow.ok}/${sRow.total}${sRow.neutral ? ` · ${sRow.neutral} neutras` : ''}`;
+          const w = font.widthOfTextAtSize(txt, 9);
+          ctx.page.drawText(txt, { x: pageSize.width - marginX - w, y: ctx.y - 1, size: 9, font, color: C.muted });
+        }
+      }catch(_e){}
+      ctx.y -= 6;
+      ctx.page.drawLine({ start: { x: marginX, y: ctx.y }, end: { x: pageSize.width - marginX, y: ctx.y }, thickness: 1, color: C.line });
+      ctx.y -=  18;
+      // En modo "merge", las respuestas de TODAS las plantillas quedan guardadas en una sola inspección.
+      // Por eso, aquí NO amarramos por inspection_id; pintamos por plantilla usando el mapa global answersByQ.
+      const tplIdForQ = insp.template_id;
+
+      // Preguntas de esta plantilla
+      const qs = Object.values(questionsById || {}).filter(q => {
+        const qTpl = q?.template_id || q?.checklist_template_id || q?.checklist_templates_id || q?.template || null;
+        return tplIdForQ && String(qTpl) === String(tplIdForQ);
+      });
+
+      if (!qs.length) {
+        await ensureSpace(16);
+        ctx.page.drawText("Sin respuestas.", { x: marginX, y: ctx.y, size: 10, font, color: C.muted });
+        ctx.y -= 20;
+        continue;
+      }
+
+      // Construimos rows por pregunta. Primero buscamos la respuesta de ESTA inspección.
+      // Si esta plantilla quedó sin respuestas directas en su inspección, hacemos fallback al mapa global
+      // para no dejar la segunda plantilla en 0 cuando las respuestas quedaron mezcladas en otra inspección.
+      const rows = qs.map((q, idx) => {
+        let a = null;
+        const qid = String(q?.id || '');
+        const iid = String(insp?.id || '');
+        if (qid && iid) a = answersByInspectionAndQ.get(`${iid}::${qid}`) || null;
+        return ({
+          inspection_id: (a?.inspection_id || insp.id),
+          question_id: q.id,
+          template_id: (q.template_id || q.checklist_template_id || q.checklist_templates_id || tplIdForQ || null),
+          answer: (a ? (a.answer ?? pickAnswerFromRow(a)) : null),
+          comment: (a ? (a.comment ?? pickCommentFromRow(a)) : null),
+          created_at: (a?.created_at ?? null),
+          _answerRow: a || null,
+          order_index: q.order_index ?? q.position ?? idx
+        });
+      });
+
+      // Agrupación por sección
+
+      const rowHasRenderableContent = (row) => {
+        const answerRow = row?._answerRow || null;
+        const answerVal = row?.answer;
+        const commentVal = row?.comment;
+        const openTxt = getOpenTextFromRowRobust(answerRow || { answer: answerVal, comment: commentVal });
+        const hasAnswer = !(answerVal === null || answerVal === undefined || (typeof answerVal === 'string' && !String(answerVal).trim()));
+        const hasComment = !(commentVal === null || commentVal === undefined || !String(commentVal).trim());
+        const hasOpen = !!String(openTxt || '').trim();
+        return !!(answerRow || hasAnswer || hasComment || hasOpen);
+      };
+
+      const enriched = rows.map((a, idx) => {
+        const q = questionsById[a.question_id] || null;
+        const sec = q?.section_id ? (sectionsById[q.section_id] || null) : null;
+        const tplId = a.template_id || q?.template_id || q?.checklist_template_id || null;
+        const tpl = tplId ? (tplsById[tplId] || null) : null;
+        const tplTitle = tpl?.title || tpl?.name || tpl?.area || null;
+
+        // Si la pregunta no tiene sección, usamos el nombre de la plantilla para evitar "Sin sección"
+        const secTitle = (sec?.title || sec?.name || null);
+
+        let qText = bestQuestionText(q);
+        if (!qText) qText = (q?.code && !looksLikeId(q.code)) ? String(q.code) : "";
+        if (!qText) qText = `Pregunta ${idx + 1}`; // fallback humano
+
+        return {
+          ...a,
+          _idx: idx,
+          _q: q,
+          section_title: secTitle,
+          section_order: (sec?.order_index ?? 999999),
+          order_index: (q?.position ?? q?.order_index ?? idx),
+          q_text: qText
+        };
+      }).filter(rowHasRenderableContent).sort((a, b) =>
+        (a.section_order - b.section_order) ||
+        (String(a.section_title||'')).localeCompare(String(b.section_title||'')) ||
+        (a.order_index - b.order_index)
+      );
+
+      if (!enriched.length) {
+        await ensureSpace(16);
+        ctx.page.drawText("Sin respuestas.", { x: marginX, y: ctx.y, size: 10, font, color: C.muted });
+        ctx.y -= 20;
+        inspIdx++;
+        continue;
+      }
+
+      const _tplNameNorm = String(tplName || "").trim().toLowerCase();
+      let currentSection = null;
+      for (const r of enriched) {
+        if (r.section_title && r.section_title !== currentSection && String(r.section_title).trim().toLowerCase() !== _tplNameNorm) {
+          currentSection = r.section_title;
+
+          await ensureSpace(22);
+          // sección (sin marco, solo subrayado)
+          if (
+            currentSection &&
+            !String(currentSection).startsWith("Hallazgos -") &&
+            String(currentSection) !== "Sin categoría"
+          ) {
+            ctx.page.drawText(currentSection, { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.text });
+            ctx.y -= 6;
+          }
+
+          ctx.page.drawLine({
+            start: { x: marginX, y: ctx.y },
+            end: { x: pageSize.width - marginX, y: ctx.y },
+            thickness: 1,
+            color: C.line
+          });
+          ctx.y -= 12;
+        }
+
+        const ans = normAnswer(r._q, r.answer, r.comment);
+        await drawCardQA({
+          qText: r.q_text,
+          ans,
+          rawAnswer: r.answer,
+          comment: (() => {
+            const rowTxt = getOpenTextFromRowRobust(r._answerRow || { comment: r.comment });
+            if (rowTxt) return rowTxt;
+            if (ans && ans.openText && String(ans.openText).trim()) return String(ans.openText).trim();
+            if (r.comment && String(r.comment).trim()) return String(r.comment).trim();
+            return '';
+          })(),
+          q: r._q,
+          auditId: bundle?.audit?.id,
+          inspectionId: r.inspection_id || insp?.id || insp?.inspection_id
+        });
+      }
+      // ========= HALLAZGOS por plantilla (se renderiza al final) =========
+      // ========= HALLAZGOS por plantilla (se renderiza inmediatamente después de cada inspección) =========
+      const finds = (bundle.findings || []).filter(f => (insp.template_id && f.template_id === insp.template_id));
+      if (finds.length) {
+        // Agrupar hallazgos por categoría/tipo
+        const findingsByCategory = new Map();
+        for (const f of finds) {
+          const cat = f.category || f.type || "Sin categoría";
+          if (!findingsByCategory.has(cat)) findingsByCategory.set(cat, []);
+          findingsByCategory.get(cat).push(f);
+        }
+
+        // Renderizar hallazgos agrupados por categoría
+        const drawFinding = async (f) => {
+          const maxW = pageSize.width - marginX * 2;
+          const findingDesc = String(f.description || f.name || "").trim();
+          if (!findingDesc) return;
+
+          const lines = wrap(findingDesc, maxW, 9, font);
+          const blockH = 11 * lines.length + 8;
+          await ensureSpace(blockH);
+
+          for (let i = 0; i < lines.length; i++) {
+            ctx.page.drawText(lines[i], { x: marginX + 12, y: ctx.y, size: 9, font, color: C.text });
+            ctx.y -= 11;
+          }
+          ctx.y -= 4;
+        };
+
+        for (const [category, categoryFindings] of findingsByCategory) {
+          await ensureSpace(16);
+          if (String(category) !== "Sin categoría") {
+          ctx.page.drawText(String(category), { x: marginX, y: ctx.y, size: 9, font: fontBold, color: rgb(0.20, 0.50, 0.20) });
+          ctx.y -= 12;
+
+          }
+          for (const f of categoryFindings) {
+            await drawFinding(f);
+          }
+        }
+
+        findingsToRender.push({ template_id: insp.template_id, tplName, finds });
+      }
+
+      
+      inspIdx++;
+}
+
+      
+    // ========= HALLAZGOS (al final, después de todas las inspecciones) =========
+    // Leer hallazgos seleccionados desde localStorage (si existen)
+    let selectedSections = [];
+    let parametersBySection = {};
+    let commentFindings = [];
+    try {
+      const exported = localStorage.getItem('exportedFindings');
+      if (exported) {
+        const data = JSON.parse(exported) || {};
+        if (data.selectedSections && Array.isArray(data.selectedSections)) {
+          selectedSections = data.selectedSections;
+        }
+        if (data.parametersBySection && typeof data.parametersBySection === "object") {
+          parametersBySection = data.parametersBySection || {};
+        }
+        if (data.commentFindings && Array.isArray(data.commentFindings)) {
+          commentFindings = data.commentFindings || [];
+        }
+      }
+    } catch (_e) {}
+    // ========= MODO "EN VIVO": construir Hallazgos por comentario desde respuestas actuales (sin localStorage) =========
+    // Si NO hay commentFindings en localStorage, o si queremos reflejar el estado actual, lo generamos desde bundle.inspectionAnswers.
+    const buildLiveCommentFindings = (bundle) => {
+      try {
+        const insps = (bundle?.currentInspections || []);
+        const inspById = new Map(insps.map(i => [String(i.id), i]));
+        const qById = bundle?.questionsById || {};
+        const secById = bundle?.sectionsById || {};
+
+        const normalizeYesNo = (v) => {
+          if (v === true || v === false) return v;
+          const s = String(v ?? "").trim().toLowerCase();
+          if (!s) return null;
+          if (["si","sí","s","yes","y","true","1"].includes(s)) return true;
+          if (["no","n","false","0"].includes(s)) return false;
+          return null;
+        };
+
+        const toNumber = (v) => {
+          if (typeof v === "number" && isFinite(v)) return v;
+          const s = String(v ?? "").trim();
+          if (!s) return null;
+          const n = Number(s.replace(",", "."));
+          return isFinite(n) ? n : null;
+        };
+
+        const formatAnswer = (a) => {
+          if (a === null || a === undefined || a === "") return "";
+          if (typeof a === "object") return JSON.stringify(a);
+          return String(a);
+        };
+
+        // Regla "negativa" (para decidir si entra como hallazgo por comentario)
+        const isNegative = (ans, q) => {
+          // 1) Si es sí/no y es NO
+          const yn = normalizeYesNo(ans);
+          if (yn === false) return true;
+
+          // 2) Si es escala numérica (1..5) y es baja
+          const n = toNumber(ans);
+          if (n !== null && n <= 2) return true;
+
+          // 3) Si es texto abierto: usamos heurística existente
+          const t = String(ans ?? "");
+          if (t && typeof isNegativeOpenText === "function") {
+            try { if (isNegativeOpenText(t)) return true; } catch(_e) {}
+          }
+
+          // 4) Si la pregunta tiene "type" y sugiere no conformidad
+          const qt = String(q?.type || q?.question_type || "").toLowerCase();
+          if (qt.includes("boolean") || qt.includes("yes") || qt.includes("no")) return yn === false;
+
+          return false;
+        };
+
+        const out = [];
+        const rows = (bundle?.inspectionAnswers || []);
+        for (const row of rows) {
+          const inspId = String(row?.inspection_id || "");
+          if (!inspId || !inspById.has(inspId)) continue; // solo inspecciones del reporte
+
+          const qid = String(row?.question_id || "");
+          const q = qById[qid] || {};
+          const secId = q?.section_id ? String(q.section_id) : "";
+          const sec = secId ? (secById[secId] || {}) : {};
+
+          const comment = String(row?.comment || "").trim();
+          const ans = row?.answer;
+
+          // ✅ Entrar si hay comentario o si la respuesta es negativa
+          if (!comment && !isNegative(ans, q)) continue;
+
+          const insp = inspById.get(inspId) || {};
+          const tplId = insp?.template_id ? String(insp.template_id) : (row?.template_id ? String(row.template_id) : "");
+          const tplKey = tplId ? `tpl:${tplId}` : "__manual__";
+
+          // Lo que se imprime en el PDF bajo "Respuesta"
+          // (incluye calificación/respuesta actual + comentario)
+          const respLine = [
+            (formatAnswer(ans) ? `Calificación/Respuesta: ${formatAnswer(ans)}` : ""),
+            (comment ? `Comentario: ${comment}` : "")
+          ].filter(Boolean).join("\n");
+
+          out.push({
+            audit_id: auditId,
+            inspection_id: inspId,
+            tplKey,
+            section: sec?.title || sec?.name || "",
+            qId: qid,
+            qText: q?.text || q?.question || q?.title || q?.label || "Pregunta",
+            comment: respLine
+          });
+        }
+
+        return out;
+      } catch (_e) {
+        return [];
+      }
+    };
+
+    // Por defecto: si hay algo guardado se usa, pero si el objetivo es "estado actual", sobreescribimos con EN VIVO.
+    //  Regla requerida: en el PDF deben salir SOLO los hallazgos ANEXADOS desde Hallazgos (panel derecho).
+// Por defecto, NO regeneramos hallazgos "en vivo" desde inspectionAnswers porque eso acumula y muestra todos.
+// Si necesitas el modo "en vivo" para depurar, actívalo manualmente con ?live_comment_findings=1
+const _qs = new URLSearchParams(window.location.search);
+const _liveCommentFindings = _qs.get("live_comment_findings") === "1";
+
+if (_liveCommentFindings && (!commentFindings || commentFindings.length === 0) && bundle && Array.isArray(bundle.inspectionAnswers)) {
+  commentFindings = buildLiveCommentFindings(bundle);
+}
+// ========= FILTRO: "Hallazgos por comentario" SOLO de las inspecciones del reporte =========
+// Objetivo: que el PDF muestre únicamente hallazgos/comentarios negativos pertenecientes a la(s) inspección(es)
+// que se están imprimiendo (aunque se hayan creado antes), y NO acumulados de otras inspecciones.
+try {
+  // 1) Inspecciones que el reporte está renderizando (las ejecutadas / seleccionadas para este informe)
+  const reportInspectionIds = new Set((bundle?.currentInspections || []).map(i => String(i.id)));
+
+  try {
+  // 2) Fallback: si por alguna razón no viene bundle.currentInspections, leer de querystring (?inspection_id= o ?inspection_ids=)
+  if (!reportInspectionIds.size) {
+    const p = new URLSearchParams(location.search);
+    const one = p.get("inspection_id");
+    const many = p.getAll("inspection_ids").flatMap(v => String(v).split(",")).map(s => s.trim()).filter(Boolean);
+    const ids = []
+      .concat(one ? [one] : [])
+      .concat(many);
+    ids.forEach(id => reportInspectionIds.add(String(id)));
+  }
+
+  // 3) Aplicar filtro: mismo audit_id (si existe) y inspection_id dentro del set del reporte
+  if (reportInspectionIds.size) {
+    commentFindings = (commentFindings || []).filter(it => {
+      if (!it) return false;
+
+      // Si el hallazgo trae audit_id, debe coincidir con el del informe
+      if (it.audit_id && String(it.audit_id) !== String(auditId)) return false;
+
+      // Debe venir ligado a una inspección específica
+      if (!it.inspection_id) return false;
+
+      // ✅ Solo inspecciones del reporte
+      return reportInspectionIds.has(String(it.inspection_id));
+    });
+  }
+} catch (_e) {}
+// Fallbacks
+if (!currentSessionId) currentSessionId = localStorage.getItem(sessionKey) || localStorage.getItem("hallazgos_session_id") || "";
+
+
+  // 2) Fallback: si por alguna razón no viene bundle.currentInspections, leer de querystring (?inspection_id= o ?inspection_ids=)
+  if (!reportInspectionIds.size) {
+    const p = new URLSearchParams(location.search);
+    const one = p.get("inspection_id");
+    const many = p.getAll("inspection_ids").flatMap(v => String(v).split(",")).map(s => s.trim()).filter(Boolean);
+    const ids = []
+      .concat(one ? [one] : [])
+      .concat(many);
+    ids.forEach(id => reportInspectionIds.add(String(id)));
+  }
+
+  // 3) Aplicar filtro: mismo audit_id (si existe) y inspection_id dentro del set del reporte
+  if (reportInspectionIds.size) {
+    commentFindings = (commentFindings || []).filter(it => {
+          if (!it) return false;
+
+          // Si tenemos sesión actual, SOLO imprimir lo creado en esa sesión
+          if (currentSessionId) {
+            if (!it.session_id) return false;
+            if (String(it.session_id) !== String(currentSessionId)) return false;
+          }
+
+
+      // Si el hallazgo trae audit_id, debe coincidir con el del informe
+      if (it.audit_id && String(it.audit_id) !== String(auditId)) return false;
+
+      // Debe corresponder a la sesión actual (solo lo creado "en el momento")
+      if (!currentSessionId) return false;
+      if (!it.session_id) return false;
+      if (String(it.session_id) !== String(currentSessionId)) return false;
+
+      // Debe venir ligado a una inspección específica (hallazgos.html ya lo guarda así)
+      if (!it.inspection_id) return false;
+
+      return reportInspectionIds.has(String(it.inspection_id));
+    });
+  } else {
+    // Si no logramos determinar inspecciones, mejor NO imprimir por seguridad (evita mezclar historiales)
+    commentFindings = [];
+  }
+} catch (_e) {
+  // Si algo falla, por seguridad no mezclar comentarios
+  commentFindings = [];
+}
+
+    if (findingsToRender.length) {
+      // agrupar por plantilla para evitar duplicados
+      const byTpl = new Map();
+      for (const g of findingsToRender) {
+        const key = g.template_id || g.tplName || "tpl";
+        if (!byTpl.has(key)) byTpl.set(key, { tplName: g.tplName || "Plantilla", finds: [] });
+        byTpl.get(key).finds.push(...(g.finds || []));
+      }
+
+      // Filtrar hallazgos si el usuario seleccionó específicamente algunos
+      if (selectedSections.length > 0) {
+        for (const [key, grp] of byTpl.entries()) {
+          grp.finds = grp.finds.filter(f => selectedSections.includes(f.category || f.type || "Sin categoría"));
+        }
+      }// helper: draw key/value wrapped, evitando que se "sature" y se monte en el footer/header
+      
+
+const drawKV = async (k, v) => {
+  const key = `${k}:`;
+  const value = String(v ?? "");
+  const keySize = 9.5;
+  const valSize = 9.5;
+
+  // Más separación visual entre etiqueta y contenido
+  const valueX = marginX + 110;
+  const maxW = pageSize.width - marginX - valueX;
+
+  const lines = wrap(value, maxW, valSize, font);
+  const blockH = 16 * Math.max(1, lines.length) + 10;
+  await ensureSpace(blockH);
+
+  // key
+  ctx.page.drawText(key, {
+    x: marginX,
+    y: ctx.y,
+    size: keySize,
+    font: fontBold,
+    color: C.text
+  });
+
+  // separador suave (espacio visual)
+  ctx.page.drawLine({
+    start: { x: marginX + 70, y: ctx.y - 3 },
+    end: { x: marginX + 75, y: ctx.y - 3 },
+    thickness: 0.5,
+    color: C.line
+  });
+
+  // primera línea del valor
+  ctx.page.drawText(lines[0] || "", {
+    x: valueX,
+    y: ctx.y,
+    size: valSize,
+    font,
+    color: C.text
+  });
+  ctx.y -= 16;
+
+  // líneas siguientes
+  for (let i = 1; i < lines.length; i++) {
+    await ensureSpace(16);
+    ctx.page.drawText(lines[i], {
+      x: valueX,
+      y: ctx.y,
+      size: valSize,
+      font,
+      color: C.text
+    });
+    ctx.y -= 16;
+  }
+
+  // espacio extra entre bloques
+  ctx.y -= 8;
+};
+
+
+// ===== Helper: obtener pregunta asociada al hallazgo (si existe) =====
+const getFindingQuestionText = (f) => {
+  if(!f) return "";
+  const direct = f.question || f.question_text || f.questionText || f.qText || f.qtext || f.prompt || f.pregunta || f.question_title || f.questionTitle;
+  if(direct) return String(direct);
+
+  // Si condition viene como "pregunta?: comentario" o "pregunta: comentario"
+  const cond = String(f.condition || f.criteria || f.condicion || "");
+  const line = cond.split(/\n/)[0].trim();
+  // preferimos capturar antes de "?:"
+  if(line.includes("?:")) return line.split("?:")[0].trim();
+  // o antes de ":" si parece pregunta
+  if(line.includes(":")){
+    const left=line.split(":")[0].trim();
+    if(left.endsWith("?") || left.length>10) return left;
+  }
+  return "";
+};
+
+
+
+      for (const [, grp] of byTpl.entries()) {
+                for (const f of (grp.finds || [])) {
+          await drawBullet(String(f.title || f.name || "Hallazgo"), 9.5, 14);
+          if (f.criteria) await drawKV("Criterio", f.criteria);
+          if (f.section) await drawKV("Sección", f.section);
+          if (f.template) await drawKV("Plantilla", f.template);
+          const __q = getFindingQuestionText(f);
+          if (__q) await drawKV("Pregunta", __q);
+          if (f.cause) await drawKV("Causa", f.cause);
+          if (f.effect) await drawKV("Efecto", f.effect);
+          if (f.recommendation) await drawKV("Recomendación", f.recommendation);
+
+          ctx.y -= 6;
+          await ensureSpace(18);
+        }
+
+        ctx.y -= 6;
+      }
+    }
+
+  }
+    // ========= HALLAZGOS POR COMENTARIO (desde Hallazgos.html) =========
+    // Se guardan en localStorage.exportedFindings.commentFindings (uno por comentario negativo)
+    if (commentFindings && commentFindings.length) {
+      
+
+      
+await drawH2("Hallazgos por comentario");
+      ctx.y -= 2;
+
+      // helper: draw key/value wrapped, evitando montarse en footer/header
+      
+const drawKV2 = async (k, v) => {
+  const key = `${k}:`;
+  const value = String(v ?? "");
+  const keySize = 9.5;
+  const valSize = 9.5;
+
+  // ✅ separa el valor según el ancho real de la etiqueta (evita "Recomendaciónpegado")
+  const keyW = fontBold.widthOfTextAtSize(key, keySize);
+  const valueX = Math.max(marginX + 80, marginX + keyW + 14);
+  const maxW = pageSize.width - marginX - valueX;
+
+  const lines = wrap(value, maxW, valSize, font);
+  const blockH = 14 * Math.max(1, lines.length) + 6;
+  await ensureSpace(blockH);
+
+  // key (solo primera línea)
+  ctx.page.drawText(key, { x: marginX, y: ctx.y, size: keySize, font: fontBold, color: C.text });
+
+  // value lines
+  ctx.page.drawText(lines[0] || "", { x: valueX, y: ctx.y, size: valSize, font, color: C.text });
+  ctx.y -= 14;
+
+  for (let i = 1; i < lines.length; i++) {
+    await ensureSpace(14);
+    ctx.page.drawText(lines[i], { x: valueX, y: ctx.y, size: valSize, font, color: C.text });
+    ctx.y -= 14;
+  }
+
+  // espacio extra entre campos
+  ctx.y -= 6;
+};
+
+
+
+// ====== Resolver nombres de plantillas desde Supabase (para evitar mostrar IDs) ======
+const templateNameById = new Map();
+try {
+  const tplIds = Array.from(new Set(
+    (commentFindings || [])
+      .map(it => String(it?.tplKey || ""))
+      .filter(k => k.startsWith("tpl:"))
+      .map(k => k.slice(4))
+      .filter(Boolean)
+  ));
+
+  const tryFetch = async (table, idCol = "id", nameCol = "name") => {
+    const { data, error } = await supabase
+      .from(table)
+      .select(`${idCol},${nameCol}`)
+      .in(idCol, tplIds);
+
+    if (error) throw error;
+    (data || []).forEach(row => {
+      const id = String(row[idCol] ?? "");
+      const name = String(row[nameCol] ?? "");
+      if (id && name) templateNameById.set(id, name);
+    });
+    return true;
+  };
+
+  if (tplIds.length) {
+    // 1) Preferimos si inspection_answers tiene template_name (algunas implementaciones lo guardan)
+    try {
+      const { data, error } = await supabase
+        .from("inspection_answers")
+        .select("template_id,template_name")
+        .in("template_id", tplIds);
+
+      if (!error) {
+        (data || []).forEach(r => {
+          const id = String(r.template_id ?? "");
+          const name = String(r.template_name ?? "");
+          if (id && name) templateNameById.set(id, name);
+        });
+      }
+    } catch (_e) {}
+
+    // 2) Si aún faltan nombres, probamos tablas comunes de plantillas
+    const missing = tplIds.filter(id => !templateNameById.has(String(id)));
+    if (missing.length) {
+      // Intentos (según cómo esté modelado en tu Supabase)
+      const candidates = [
+  { table: "templates", idCols: ["id", "template_id"], nameCols: ["name", "title", "nombre", "template_name"] },
+  { table: "audit_templates", idCols: ["id", "template_id"], nameCols: ["name", "title", "nombre", "template_name"] },
+  { table: "inspection_templates", idCols: ["id", "template_id"], nameCols: ["name", "title", "nombre", "template_name"] },
+  { table: "templates_catalog", idCols: ["id", "template_id"], nameCols: ["name", "title", "nombre", "template_name"] },
+  { table: "plantillas", idCols: ["id", "template_id"], nameCols: ["name", "title", "nombre"] }
+];
+
+      for (const c of candidates) {
+  // volvemos a calcular lo que falta para no pedir de más
+  const still = tplIds.filter(id => !templateNameById.has(String(id)));
+  if (!still.length) break;
+
+  for (const idCol of (c.idCols || ["id"])) {
+    for (const nameCol of (c.nameCols || ["name"])) {
+      try {
+        const { data, error } = await supabase
+          .from(c.table)
+          .select(`${idCol},${nameCol}`)
+          .in(idCol, still);
+
+        if (error) continue;
+
+        (data || []).forEach(row => {
+          const id = String(row?.[idCol] ?? "");
+          const name = String(row?.[nameCol] ?? "");
+          if (id && name) templateNameById.set(id, name);
+        });
+
+        // si ya resolvimos todo, paramos
+        const remaining = tplIds.filter(id => !templateNameById.has(String(id)));
+        if (!remaining.length) break;
+      } catch (_e) {}
+    }
+  }
+}
+    }
+  }
+} catch (_e) {}
+
+      const keyTitle = (k) => {
+        if (!k) return "Manual";
+        const raw = String(k);
+
+        // Soportar clave compuesta: "insp:<inspection_id>|<tplKey>"
+        // Esto evita mezclar hallazgos de diferentes inspecciones cuando el reporte es multi-inspección.
+        if (raw.startsWith("insp:")) {
+          const parts = raw.split("|");
+          const inspId = (parts[0] || "").slice(5);
+          const baseKey = parts.slice(1).join("|") || "__manual__";
+
+          const baseTitle = (() => {
+            const s = String(baseKey);
+            if (s === "__manual__") return "Manual";
+            if (s.startsWith("tpl:")) {
+              const tid = s.slice(4);
+              const tpl = (bundle?.templates || []).find(t => String(t.id) === String(tid));
+              return (templateNameById.get(String(tid)) || tpl?.name || `${tid.slice(0, 8)}…`);
+            }
+            // si no tiene prefijo, intentar resolver por sección
+            const sec = (bundle?.sections || []).find(x => String(x.id) === s || String(x.key) === s || String(x.name) === s);
+            return sec?.name || sec?.title || s;
+          })();
+
+          // Etiqueta de inspección (nombre de plantilla) si existe
+          let inspLabel = "";
+          const insp = (bundle?.currentInspections || []).find(i => String(i.id) === String(inspId));
+          inspLabel = insp?.template_name || insp?.templateName || insp?.template?.name || "";
+
+          // Si no hay label, no agregamos nada extra
+          if (inspLabel && inspLabel !== baseTitle) return `${inspLabel} - ${baseTitle}`;
+          return baseTitle;
+        }
+
+        // Clave normal (compat)
+        const s = raw;
+        if (s === "__manual__") return "Manual";
+        // En hallazgos.html el tplKey suele ser "tpl:<id>" o "<sectionId>"
+        if (s.startsWith("tpl:")) {
+          const tid = s.slice(4);
+          const tpl = (bundle?.templates || []).find(t => String(t.id) === String(tid));
+          return (templateNameById.get(String(tid)) || tpl?.name || `${tid.slice(0, 8)}…`);
+        }
+        const sec = (bundle?.sections || []).find(x => String(x.id) === s || String(x.key) === s || String(x.name) === s);
+        return sec?.name || sec?.title || s;
+      };
+
+      // Agrupar por INSPECCIÓN + tplKey (evita mezclar cuando hay varias inspecciones)
+      const byKey = new Map();
+      for (const it of commentFindings) {
+        const inspId = String(it?.inspection_id || "");
+        const baseKey = it?.tplKey || it?.section || "__manual__";
+        const k = `insp:${inspId}|${baseKey}`;
+        if (!byKey.has(k)) byKey.set(k, []);
+        byKey.get(k).push(it);
+      }
+
+      // Orden estable por título
+      const entries = Array.from(byKey.entries()).sort((a, b) => keyTitle(a[0]).localeCompare(keyTitle(b[0])));
+
+// Templates (pills) para esta sección (solo si hay nombre real, no IDs)
+const tplPairs = entries
+  .map(([k]) => {
+    const tid = String(k).startsWith("tpl:") ? String(k).slice(4) : "";
+    const name = tid ? (templateNameById.get(tid) || "") : "";
+    return { tid, name };
+  })
+  .filter(x => x.name);
+
+const tplNames = tplPairs.map(x => x.name);
+if (tplNames.length) {
+  await drawInlinePills(tplNames);
+}for (const [k, items] of entries) {
+        await ensureSpace(18);
+        const tid = String(k).startsWith("tpl:") ? String(k).slice(4) : "";
+        const tname = tid ? (templateNameById.get(tid) || "") : "";
+        if (tname) {
+          ctx.page.drawText(String(tname), { x: marginX, y: ctx.y, size: 11, font: fontBold, color: C.text });
+          ctx.y -= 20;
+        }
+
+        // Orden por pregunta
+        items.sort((a, b) => String(a?.qText || "").localeCompare(String(b?.qText || "")));
+
+        for (const it of items) {
+          const qText = String(it?.qText || "Pregunta").trim();
+          const resp = String((it?.comment || it?.why || "")).trim();
+
+          const head = `• ${qText}`;
+          const headLines = wrap(head, pageSize.width - marginX * 2, 10, fontBold);
+          await ensureSpace(12 * Math.max(1, headLines.length));
+          for (const hl of headLines) {
+            ctx.page.drawText(hl, { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.text });
+            ctx.y -= 12;
+            await ensureSpace(12);
+          }
+
+          ctx.y -= 6;
+          await ensureSpace(6);
+          if (resp) await drawKV2("Respuesta", resp);
+
+          // Componentes del hallazgo por comentario
+          if (it?.cause) await drawKV2("Causa", it.cause);
+          if (it?.effect) await drawKV2("Efecto", it.effect);
+          if (it?.recommendation) await drawKV2("Recomendación", it.recommendation);
+
+          ctx.y -= 6;
+          await ensureSpace(18);
+        }
+
+        ctx.y -= 6;
+      }
+    }
+
+
+// ========= FIRMAS =========
+await drawH2("Firma del auditor");
+
+const sigs = (bundle.signatures || []);
+// Elegimos la última firma que tenga imagen (como en tu ejemplo)
+const pickSig = () => {
+  for (let i = sigs.length - 1; i >= 0; i--) {
+    const s = sigs[i];
+    if (s && (s.signature_url || s.signature_path)) return s;
+  }
+  return sigs[0] || null;
+};
+
+const s0 = pickSig();
+let rendered = false;
+
+// Intento robusto para obtener bytes de la imagen (dataURL, download autenticado, URL pública)
+const getSignatureBytes = async (s) => {
+  if (!s) return null;
+
+  // 1) Data URL
+  if (s.signature_url && typeof s.signature_url === "string" && s.signature_url.startsWith("data:image")) {
+    try {
+      return dataUrlToBytes(s.signature_url);
+    } catch (_e) { /* ignore */ }
+  }
+
+  // 2) Download autenticado desde Storage (bucket privado)
+  if (s.signature_path) {
+    try {
+      const dl = await sb.storage.from(SIGNATURES_BUCKET).download(s.signature_path);
+      if (dl?.data) {
+        const buf = await dl.data.arrayBuffer();
+        return new Uint8Array(buf);
+      }
+    } catch (_e) { /* ignore */ }
+
+    // fallback: URL pública si el bucket es público
+    try {
+      const pub = sb.storage.from(SIGNATURES_BUCKET).getPublicUrl(s.signature_path);
+      const publicUrl = pub?.data?.publicUrl;
+      if (publicUrl) {
+        const r = await fetch(publicUrl);
+        if (r.ok) return new Uint8Array(await r.arrayBuffer());
+      }
+    } catch (_e) { /* ignore */ }
+  }
+
+  // 3) URL directa
+  if (s.signature_url) {
+    try {
+      const r = await fetch(s.signature_url);
+      if (r.ok) return new Uint8Array(await r.arrayBuffer());
+    } catch (_e) { /* ignore */ }
+  }
+
+  return null;
+};
+
+// Render de la firma como imagen grande dentro de un recuadro
+if (s0) {
+  const bytes = await getSignatureBytes(s0);
+  if (bytes && bytes.length) {
+    try {
+      let img = null;
+      try { img = await pdfDoc.embedPng(bytes); } catch (_e) { img = await pdfDoc.embedJpg(bytes); }
+
+      const boxW = 260;
+      const boxH = 110;
+      await ensureSpace(boxH + 28);
+
+      // caja
+      ctx.page.drawRectangle({ x: marginX, y: ctx.y - boxH, width: boxW, height: boxH, color: C.white, borderColor: C.line, borderWidth: 1 });
+      // imagen ajustada
+      const scale = Math.min((boxW - 16) / img.width, (boxH - 16) / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      ctx.page.drawImage(img, { x: marginX + (boxW - w) / 2, y: (ctx.y - boxH) + (boxH - h) / 2, width: w, height: h });
+
+      ctx.y -= (boxH + 12);
+      rendered = true;
+    } catch (_e) {
+      rendered = false;
+    }
+  }
+}
+
+// listado
+await ensureSpace(18);
+ctx.page.drawText("Firmas registradas", { x: marginX, y: ctx.y, size: 10, font: fontBold, color: C.green });
+ctx.y -= 20;
+
+if (!sigs.length) {
+  await ensureSpace(14);
+  ctx.page.drawText("- (sin firmas)", { x: marginX, y: ctx.y, size: 10, font, color: C.muted });
+  ctx.y -= 20;
+} else {
+  for (const s of sigs) {
+    await ensureSpace(14);
+    const role = s.signature_role || s.signature_type || "auditor";
+    const when = s.signed_at ? new Date(s.signed_at).toLocaleString("es-CO") : "-";
+    const by = s.signed_by ? ` · ${s.signed_by}` : "";
+    ctx.page.drawText(`- ${role} – ${when}${by}`, { x: marginX, y: ctx.y, size: 10, font, color: C.text });
+    ctx.y -= 20;
+  }
+}
+
+// ========= FOOTERS =========
+  const pages = pdfDoc.getPages();
+  for (let i = 0; i < pages.length; i++) {
+    const p = pages[i];
+    p.drawLine({ start: { x: marginX, y: 28 }, end: { x: pageSize.width - marginX, y: 28 }, thickness: 1, color: C.green });
+    const footer = `Página ${i + 1} de ${pages.length}`;
+    p.drawText(footer, { x: marginX, y: 14, size: 9, font, color: C.text });
+    const right = "CM Colombia - Sistema de Auditorías";
+    p.drawText(right, { x: pageSize.width - marginX - font.widthOfTextAtSize(right, 9), y: 14, size: 9, font, color: C.text });
+  }
+
+  return await pdfDoc.save();
+};
+
+  // =========================
+  // HELPERS: HASH + VERSIONES
+  // =========================
+  
+  // =========================
+  // HELPERS: IMAGENES (DATA URL)
+  // =========================
+  function dataUrlToBytes(dataUrl){
+    // data:image/png;base64,....
+    const parts = String(dataUrl).split(",");
+    if (parts.length < 2) throw new Error("Invalid data URL");
+    const b64 = parts[1];
+    const binStr = atob(b64);
+    const len = binStr.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = binStr.charCodeAt(i);
+    return bytes;
+  }
+
+async function sha256Hex(bytes){
+    const buf = (bytes instanceof Uint8Array) ? bytes : new Uint8Array(bytes);
+    const hashBuf = await crypto.subtle.digest("SHA-256", buf);
+    const arr = Array.from(new Uint8Array(hashBuf));
+    return arr.map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+
+
+  // Abrir la página de Acciones (www.html) con el PDF ya listo para previsualizar
+  function openActionsWithPdf(auditId, pdfUrl){
+    if(!auditId || !pdfUrl) return;
+    try{
+      localStorage.setItem(`pdf_url_${auditId}`, pdfUrl);
+      localStorage.setItem('pdf_url', pdfUrl);
+    }catch(_e){}
+    // navega a acciones con audit_id
+    window.location.href = `www.html?audit_id=${encodeURIComponent(auditId)}`;
+  }
+
+  async function loadVersions(auditId){
+    if(!auditId){
+      $("verTbody").innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Selecciona una auditoría</td></tr>`;
+      return;
+    }
+
+    try{
+      setStatus("statusList", "Cargando versiones...");
+      $("verTbody").innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Cargando...</td></tr>`;
+
+      const { data, error } = await sb
+        .from("report_versions")
+        .select("id, audit_id, version, is_final, generated_at, document_hash, pdf_path, generated_by")
+        .eq("audit_id", auditId)
+        .order("version", { ascending:false })
+        .order("generated_at", { ascending:false });
+
+      if(error) throw error;
+
+      if(!data?.length){
+        $("verTbody").innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Sin versiones todavía</td></tr>`;
+        setStatus("statusList", "Sin versiones", "");
+        return;
+      }
+
+      const rows = data.map(r => {
+        let url = "";
+        try{
+          url = sb.storage.from(REPORTS_BUCKET).getPublicUrl(r.pdf_path).data.publicUrl || "";
+        }catch(_e){ url = ""; }
+
+        const d = r.generated_at ? new Date(r.generated_at).toLocaleString("es-CO") : "-";
+        const hash = r.document_hash ? String(r.document_hash).slice(0,10) + "…" : "-";
+        const fin = r.is_final ? "Sí" : "No";
+        const pdf = url ? `
+          <button class="miniBtn" type="button" onclick="window.open('${url}','_blank')">Abrir</button>
+          <button class="miniBtn" type="button" onclick="openActionsWithPdf('${auditId}','${url}')">Acciones</button>
+        ` : `<span style="color:var(--muted)">-</span>`;
+
+        return `<tr>
+          <td><b>${escapeHtml(r.version)}</b></td>
+          <td>${escapeHtml(fin)}</td>
+          <td>${escapeHtml(d)}</td>
+          <td class="mono">${escapeHtml(hash)}</td>
+          <td>${pdf}</td>
+        </tr>`;
+      }).join("");
+
+      $("verTbody").innerHTML = rows;
+      setStatus("statusList", `Listo · ${data.length} versión(es)`, "ok");
+    }catch(e){
+      $("verTbody").innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Error cargando</td></tr>`;
+      setStatus("statusList", "Error: " + (e?.message || e), "err");
+    }
+  }
+
+// =========================
+  // SAVE VERSION
+  // =========================
+  async function uploadPdfAndInsert(auditId, version, isFinal, pdfBytes){
+    const path = `audit/${auditId}/v${version}_${Date.now()}_informe.pdf`;
+
+    const { error: upErr } = await sb.storage
+      .from(REPORTS_BUCKET)
+      .upload(path, new Blob([pdfBytes], { type:"application/pdf" }), {
+        contentType:"application/pdf",
+        upsert:false
+      });
+
+    if(upErr) throw new Error("Error subiendo PDF a Storage: " + upErr.message);
+
+    const hash = await sha256Hex(pdfBytes);
+
+    const row = {
+      audit_id: auditId,
+      version: Number(version),
+      pdf_path: path,
+      document_hash: hash,
+      generated_at: new Date().toISOString(),
+      generated_by: sessionUser.id,
+      is_final: isFinal
+    };
+
+    const { error: insErr } = await sb.from("report_versions").insert(row);
+    if(insErr) throw new Error("Subí el PDF, pero falló el insert en report_versions: " + insErr.message);
+
+    return { path, hash };
+  }
+
+  async function previewPdf(pdfBytes){
+    const blob = new Blob([pdfBytes], { type:"application/pdf" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+
+  
+  // =========================
+  // FIRMA EN ESTA MISMA PÁGINA (NO BD): se guarda temporalmente en sessionStorage
+  // =========================
+  const Sig = {
+    canvas: null,
+    ctx: null,
+    drawing: false,
+    strokes: [],
+    current: null
+  };
+
+  function sigSetStatus(msg, kind){
+    const el = $("sigStatus");
+    if(!el) return;
+    el.className = "status" + (kind ? (" " + kind) : "");
+    el.textContent = msg || "";
+  }
+
+  function sigHasInk(){
+    return Sig.strokes.length > 0 && Sig.strokes.some(s => s.length > 2);
+  }
+
+  function sigClearCanvas(){
+    if(!Sig.canvas || !Sig.ctx) return;
+    const rect = Sig.canvas.getBoundingClientRect();
+    Sig.ctx.clearRect(0, 0, rect.width, rect.height);
+  }
+
+  function sigRedraw(){
+    sigClearCanvas();
+    const c = Sig.ctx;
+    if(!c) return;
+    for(const stroke of Sig.strokes){
+      if(!stroke.length) continue;
+      c.beginPath();
+      c.moveTo(stroke[0].x, stroke[0].y);
+      for(let i=1;i<stroke.length;i++) c.lineTo(stroke[i].x, stroke[i].y);
+      c.stroke();
+    }
+  }
+
+  function sigPoint(ev){
+    const rect = Sig.canvas.getBoundingClientRect();
+    return { x: (ev.clientX - rect.left), y: (ev.clientY - rect.top) };
+  }
+
+  function sigStart(pt){
+    Sig.drawing = true;
+    Sig.current = [pt];
+    Sig.ctx.beginPath();
+    Sig.ctx.moveTo(pt.x, pt.y);
+  }
+  function sigMove(pt){
+    if(!Sig.drawing) return;
+    Sig.ctx.lineTo(pt.x, pt.y);
+    Sig.ctx.stroke();
+    Sig.current.push(pt);
+  }
+  function sigEnd(){
+    if(!Sig.drawing) return;
+    Sig.drawing = false;
+    if(Sig.current && Sig.current.length) Sig.strokes.push(Sig.current);
+    Sig.current = null;
+    sigUpdatePreview();
+  }
+
+  function sigUpdatePreview(){
+    const img = $("sigPreview");
+    const empty = $("sigPreviewEmpty");
+    if(!img || !empty) return;
+
+    if(!sigHasInk()){
+      img.style.display = "none";
+      empty.style.display = "block";
+      img.src = "";
+      return;
+    }
+
+    const rect = Sig.canvas.getBoundingClientRect();
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = Math.floor(rect.width);
+    exportCanvas.height = Math.floor(rect.height);
+    const ex = exportCanvas.getContext("2d");
+
+    ex.fillStyle = "#ffffff";
+    ex.fillRect(0,0,exportCanvas.width, exportCanvas.height);
+
+    ex.lineCap="round"; ex.lineJoin="round";
+    ex.strokeStyle="#000000"; ex.lineWidth=2.4;
+
+    for(const stroke of Sig.strokes){
+      if(!stroke.length) continue;
+      ex.beginPath();
+      ex.moveTo(stroke[0].x, stroke[0].y);
+      for(let i=1;i<stroke.length;i++) ex.lineTo(stroke[i].x, stroke[i].y);
+      ex.stroke();
+    }
+
+    img.src = exportCanvas.toDataURL("image/png");
+    img.style.display = "block";
+    empty.style.display = "none";
+  }
+
+  function sigFitCanvas(){
+    if(!Sig.canvas) return;
+    const rect = Sig.canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    Sig.canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    Sig.canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    Sig.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    Sig.ctx.lineCap = "round";
+    Sig.ctx.lineJoin = "round";
+    Sig.ctx.strokeStyle = "#000000";
+    Sig.ctx.lineWidth = 2.4;
+
+    sigRedraw();
+    sigUpdatePreview();
+  }
+
+  function sigWire(){
+    // mouse
+    Sig.canvas.addEventListener("mousedown", (e) => { sigSetStatus(""); sigStart(sigPoint(e)); });
+    window.addEventListener("mousemove", (e) => { if(!Sig.canvas) return; sigMove(sigPoint(e)); });
+    window.addEventListener("mouseup", sigEnd);
+
+    // touch
+    Sig.canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      sigSetStatus("");
+      const t = e.changedTouches[0];
+      sigStart(sigPoint(t));
+    }, { passive:false });
+
+    Sig.canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      sigMove(sigPoint(t));
+    }, { passive:false });
+
+    Sig.canvas.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      sigEnd();
+    }, { passive:false });
+  }
+
+  function sigSaveTemp(){
+    sigSetStatus("");
+    const auditId = $("auditSelect")?.value;
+    if(!auditId){
+      sigSetStatus("Selecciona una auditoría antes de guardar la firma.", "err");
+      return false;
+    }
+    if(!sigHasInk()){
+      sigSetStatus("Primero dibuja una firma.", "err");
+      return false;
+    }
+
+    const role = ($("sigRole")?.value || "auditor");
+    const displayName = ($("sigName")?.value || "").trim() || getUserDisplayName(profile, sessionUser);
+    const dataUrl = ($("sigPreview")?.src || Sig.canvas.toDataURL("image/png"));
+
+    const payload = {
+      v: 1,
+      created_at: new Date().toISOString(),
+      role,
+      display_name: displayName,
+      data_url: dataUrl,
+      signed_by: sessionUser?.id || null,
+      target: { kind:"audit_id", id: auditId },
+      audit_id: auditId
+    };
+
+    try{
+      sessionStorage.setItem("cm_temp_signature", JSON.stringify(payload));
+    }catch(_e){
+      sigSetStatus("No pude guardar la firma temporal (sessionStorage bloqueado/lleno).", "err");
+      return false;
+    }
+
+    sigSetStatus("Firma guardada OK Se incrustará en el PDF.", "ok");
+    return true;
+  }
+
+  function sigHasTempForAudit(auditId){
+    try{
+      const raw = sessionStorage.getItem("cm_temp_signature");
+      if(!raw) return false;
+      const t = JSON.parse(raw);
+      return t?.audit_id && String(t.audit_id) === String(auditId) && t?.data_url;
+    }catch(_e){
+      return false;
+    }
+  }
+
+
+  // =========================
+  // UI
+  // =========================
+  async function onAuditChange(){
+    const auditId = $("auditSelect").value;
+    if(!auditId){
+      $("quickInfo").textContent = "Selecciona una auditoría...";
+      $("verTbody").innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Selecciona una auditoría</td></tr>`;
+      return;
+    }
+
+    try{
+      setStatus("statusGen", "Cargando datos de auditoría...");
+      const bundle = await loadAuditBundle(auditId);
+      hasEvidenceByAnswerId = bundle?.hasEvidenceByAnswerId || {};
+const scores = computeSafetyScores(bundle);
+      const scoresByInspection = computeSafetyScoresByInspection(bundle);
+      const scoreGeneral = (scores.overallPercent !== null && scores.overallPercent !== undefined)
+        ? `<br><b>Score Safety general:</b> ${scores.overallPercent}%`
+        : ``;
+      const scoreInspection = (scoresByInspection?.length)
+        ? `<br><b>Por inspección:</b> ` + scoresByInspection.map(r => {
+            const iid = r.inspection_id ? String(r.inspection_id).slice(0,8) + "..." : "sin-id";
+            return `${escapeHtml(r.name)} (${iid}) ${r.percent===null?'-':(r.percent+'%')}${r.neutral ? ` · ${r.neutral} neutras` : ''}`;
+          }).join(" · ")
+        : ``;
+
+      $("quickInfo").innerHTML =
+        `<b>${escapeHtml(bundle.audit.title || "(sin título)")}</b><br>` +
+        `<span style="color:var(--muted)">
+          Punto: ${escapeHtml(bundle.audit.punto || "-")} ·
+          Fechas: ${(bundle.audit.start_date ? String(bundle.audit.start_date).slice(0,10) : "-")} -> ${(bundle.audit.end_date ? String(bundle.audit.end_date).slice(0,10) : "-")}<br>
+          Respuestas: ${(bundle.inspectionAnswers?.length || 0)} ·
+          Firmas: ${(bundle.signatures?.length || 0)}
+          ${scoreGeneral}${scoreInspection}
+        </span>`;
+
+      setStatus("statusGen", "Listo OK", "ok");
+      await loadVersions(auditId);
+    }catch(e){
+      setStatus("statusGen", "Error: " + (e?.message || e), "err");
+    }
+  }
+
+  $("auditSelect").addEventListener("change", async () => await withLoading(onAuditChange, "Cargando…", "Actualizando auditoría"));
+
+$("btnReload").addEventListener("click", async () => {
+  await withLoading(async () => {
+    await loadAudits();
+    await onAuditChange();
+  }, "Cargando…", "Recargando auditorías");
+});
+// --- Firma UI ---
+  function initSignatureUI(){
+    Sig.canvas = $("sigCanvas");
+    if(!Sig.canvas) return; // UI not present
+    Sig.ctx = Sig.canvas.getContext("2d");
+    sigWire();
+    setTimeout(sigFitCanvas, 60);
+    window.addEventListener("resize", () => setTimeout(sigFitCanvas, 60));
+
+    $("sigClear").addEventListener("click", () => {
+      Sig.strokes = [];
+      sigRedraw();
+      sigUpdatePreview();
+      sigSetStatus("Firma limpiada.", "");
+      try{ sessionStorage.removeItem("cm_temp_signature"); }catch(_e){}
+    });
+
+    $("sigSave").addEventListener("click", () => {
+      sigSaveTemp();
+    });
+  }
+
+  $("btnPreview").addEventListener("click", async () => {
+    beginLoading("Generando PDF…", "Previsualización");
+const auditId = $("auditSelect").value;
+    if(!auditId){ setStatus("statusGen", "Selecciona una auditoría.", "err"); return; }
+
+
+    // Firma requerida
+    if(!sigHasTempForAudit(auditId)){
+      setStatus("statusGen", "Debes firmar (Guardar firma) antes de previsualizar/generar el PDF.", "err");
+      return;
+    }
+    try{
+      $("btnPreview").disabled = true;
+      setStatus("statusGen", "Generando PDF (preview)...");
+      const bundle = await loadAuditBundle(auditId);
+      hasEvidenceByAnswerId = bundle?.hasEvidenceByAnswerId || {};
+const pdfBytes = await buildPdfBytes(bundle, $("notes").value || "", {
+        generatedAt: new Date().toISOString(),
+        userName: getUserDisplayName(profile, sessionUser)
+      });
+      await previewPdf(pdfBytes);
+      try{ sessionStorage.removeItem("cm_temp_signature"); }catch(_e){}
+      setStatus("statusGen", "Preview abierto OK", "ok");
+    }catch(e){
+      setStatus("statusGen", "Error: " + (e?.message || e), "err");
+    }finally{
+      $("btnPreview").disabled = false;
+      endLoading();
+    }
+  });
+
+  $("btnGenerate").addEventListener("click", async () => {
+    beginLoading("Generando PDF…", "Guardando versión");
+const auditId = $("auditSelect").value;
+    if(!auditId){ setStatus("statusGen", "Selecciona una auditoría.", "err"); return; }
+
+
+    // Firma requerida
+    if(!sigHasTempForAudit(auditId)){
+      setStatus("statusGen", "Debes firmar (Guardar firma) antes de generar el PDF.", "err");
+      return;
+    }
+    const version = $("version").value;
+    const isFinal = $("isFinal").value === "true";
+
+    try{
+      $("btnGenerate").disabled = true;
+      setStatus("statusGen", "Generando PDF...");
+      const bundle = await loadAuditBundle(auditId);
+      const pdfBytes = await buildPdfBytes(bundle, $("notes").value || "", {
+        generatedAt: new Date().toISOString(),
+        userName: getUserDisplayName(profile, sessionUser)
+      });
+
+      setStatus("statusGen", "Subiendo PDF y guardando versión...");
+      const saved = await uploadPdfAndInsert(auditId, version, isFinal, pdfBytes);
+
+      // ===== Enviar PDF a la página de Acciones (www.html) =====
+      // Guardamos la URL pública en localStorage con la clave que www.html ya busca:
+      //   pdf_url_<audit_id>
+      // Así el iframe puede previsualizarlo.
+      try{
+        const pub = sb.storage.from(REPORTS_BUCKET).getPublicUrl(saved.path);
+        const publicUrl = pub?.data?.publicUrl;
+        if(publicUrl){
+          localStorage.setItem(`pdf_url_${auditId}`, publicUrl);
+          // también dejamos una clave genérica por si luego la necesitas
+          localStorage.setItem('pdf_url', publicUrl);
+        }
+      }catch(_e){ /* no bloquea */ }
+
+      // Si había firma temporal, ya se usó: limpiarla para el siguiente informe
+      try{ sessionStorage.removeItem("cm_temp_signature"); }catch(_e){}
+
+      setStatus("statusGen", `Listo OK\nPDF: ${saved.path}\nHash: ${saved.hash}`, "ok");
+      await loadVersions(auditId);
+
+      // Si quieres que al guardar te lleve directo a Acciones y ya se vea el PDF:
+      // (si prefieres NO redirigir, comenta estas dos líneas)
+      try{ window.location.href = `www.html?audit_id=${encodeURIComponent(auditId)}`; }catch(_e){}
+    }catch(e){
+      setStatus("statusGen", "Error: " + (e?.message || e), "err");
+    }finally{
+      $("btnGenerate").disabled = false;
+      endLoading();
+    }
+  });
+
+  $("btnLogout").addEventListener("click", async () => {
+    await sb.auth.signOut();
+    location.href="/index.html";
+  });
+
+  // =========================
+  // INIT
+  // =========================
+  async function init(){
+    beginLoading("Cargando…", "Inicializando");
+    try{
+await bootUserTag();
+      const s = await requireSession();
+      if(!s) return;
+      sessionUser = s.user;
+      // En algunos casos session.user llega incompleto; reforzamos con getUser()
+      try{
+        const gu = await sb.auth.getUser();
+        if(gu?.data?.user) sessionUser = { ...sessionUser, ...gu.data.user };
+      }catch(_e){}
+
+
+            $("tagUser").textContent = "Usuario: " + getUserDisplayName(null, sessionUser);
+
+try{
+        profile = await loadMyProfile();
+      }catch(_e){
+        profile = { role:"user", area:"", full_name:"" };
+      }
+
+      $("tagUser").textContent = "Usuario: " + getUserDisplayName(profile, sessionUser);
+      $("tagRole").textContent = "Rol: " + (profile?.role || "user");
+      $("tagArea").textContent = "Área: " + (profile?.area || "-");
+      $("tagUid").textContent = "UID: " + sessionUser.id;
+
+      hideConfigIfNotAdmin();
+
+
+      initSignatureUI();
+      await loadAudits();
+      await onAuditChange();
+      }catch(e){
+      setStatus("statusGen","Error iniciando: " + (e?.message || e), "err");
+    }finally{
+      endLoading();
+    }
+  }
+
+
+
+// =============================
+// DRAWER SIDEBAR (MÓVIL)
+// =============================
+function _isMobileDrawer(){
+  return window.matchMedia && window.matchMedia("(max-width: 960px)").matches;
+}
+function _setDrawerOpen(open){
+  const sidebar = document.querySelector(".sidebar");
+  const overlay = document.getElementById("drawerOverlay");
+  if(!sidebar) return;
+  if(open){
+    sidebar.classList.add("open");
+    document.body.classList.add("drawer-open");
+    if(overlay){
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden","false");
+    }
+  }else{
+    sidebar.classList.remove("open");
+    document.body.classList.remove("drawer-open");
+    if(overlay){
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden","true");
+    }
+  }
+}
+function toggleMenu(){
+  const sidebar = document.querySelector(".sidebar");
+  if(!sidebar) return;
+  _setDrawerOpen(!sidebar.classList.contains("open"));
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const btn = document.getElementById("btnMenu");
+  const overlay = document.getElementById("drawerOverlay");
+  const sidebar = document.querySelector(".sidebar");
+
+  if(btn){
+    btn.addEventListener("click", (e)=>{ e.preventDefault(); toggleMenu(); });
+  }
+  if(overlay){
+    overlay.addEventListener("click", ()=> _setDrawerOpen(false));
+  }
+  if(sidebar){
+    sidebar.addEventListener("click", (e)=>{
+      const a = e.target?.closest ? e.target.closest("a") : null;
+      if(a && _isMobileDrawer()) _setDrawerOpen(false);
+    });
+  }
+  window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") _setDrawerOpen(false); });
+  window.addEventListener("resize", ()=>{ if(!_isMobileDrawer()) _setDrawerOpen(false); });
+});
+
+
+init();
+</script>
+<!-- ===== FIXES ANTI-BUCLE ===== -->
+<script>
+(function(){
+  try{
+    if(typeof currentInspections !== "undefined"){
+      const uniqueByTemplate = new Map();
+      (currentInspections || []).forEach(i => {
+        if (!i || !i.template_id) return;
+        const existing = uniqueByTemplate.get(i.template_id);
+        if (!existing) {
+          uniqueByTemplate.set(i.template_id, i);
+        } else {
+          const t1 = new Date(existing.created_at || 0).getTime();
+          const t2 = new Date(i.created_at || 0).getTime();
+          if (t2 > t1) uniqueByTemplate.set(i.template_id, i);
+        }
+      });
+      currentInspections = Array.from(uniqueByTemplate.values());
+
+      const processed = new Set();
+      currentInspections = currentInspections.filter(i => {
+        const key = i.id || i.template_id;
+        if (processed.has(key)) return false;
+        processed.add(key);
+        return true;
+      });
+    }
+  }catch(e){ console.error("Fix error:", e); }
+})();
+
+// Evitar doble click en generar PDF
+(function(){
+  let generating = false;
+  const btn = document.getElementById("btnGenerate");
+  if(btn){
+    btn.addEventListener("click", async (e)=>{
+      if(generating){
+        e.preventDefault();
+        return;
+      }
+      generating = true;
+      try{
+        // deja que el flujo original corra
+      }finally{
+        setTimeout(()=> generating = false, 2000);
+      }
+    }, true);
+  }
+})();
+</script>

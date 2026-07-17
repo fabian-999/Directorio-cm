@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+  
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon cm 2.png">
+
+
+  <meta charset="utf-8">
+  <title>CM Colombia · Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root{
+      --green:#2D8A3C;
+      --green-light:#7CC242;
+      --white:#ffffff;
+      --text:#1b3a24;
+      --muted:#5f7f69;
+      --border:#e4efe8;
+      --danger:#c0392b;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,.75),
+      rgba(255,255,255,.75)
+    ),
+    url("/imagen login.jpg") center / cover no-repeat;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+    .login-card{
+      width:100%;
+      max-width:420px;
+      background:var(--white);
+      border-radius:18px;
+      padding:32px;
+      box-shadow:0 20px 45px rgba(0,0,0,.15);
+      text-align:center;
+      border:1px solid var(--border);
+    }
+
+   .logo{
+  width: 200px;
+  margin-bottom: 4px; 
+}
+
+    h1{
+  margin:0;
+  font-size:22px;
+  color:var(--green);
+  font-weight:800;
+}
+
+
+
+
+    .subtitle{
+      margin-top:4px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    label{
+      display:block;
+      text-align:left;
+      margin-top:16px;
+      font-size:13px;
+      color:var(--text);
+      font-weight:600;
+    }
+
+    input{
+      width:100%;
+      margin-top:6px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      font-size:14px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:var(--green-light);
+      box-shadow:0 0 0 3px rgba(124,194,66,.2);
+    }
+
+    .input-wrap{
+      position:relative;
+    }
+
+    .input-wrap input{
+      padding-right:42px;
+    }
+
+    .eye-btn{
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      width:32px;
+      height:32px;
+      border:none;
+      background:transparent;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:15px;
+      color:var(--muted);
+    }
+
+    .eye-btn:hover{
+      background:rgba(0,0,0,.05);
+    }
+
+    .actions{
+      margin-top:22px;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:none;
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+    }
+
+    #btnLogin,
+    #btnUpdatePassword{
+      background:linear-gradient(180deg,var(--green-light),var(--green));
+      color:white;
+      box-shadow:0 8px 18px rgba(45,138,60,.35);
+    }
+
+    #btnReset{
+      margin-top:10px;
+      background:#f3faf6;
+      border:1px solid var(--border);
+      color:var(--green);
+    }
+
+    .error{
+      margin-top:14px;
+      color:var(--danger);
+      font-size:13px;
+      min-height:18px;
+    }
+
+    .ok{
+      margin-top:14px;
+      color:var(--green);
+      font-size:13px;
+      min-height:18px;
+    }
+
+    footer{
+      margin-top:18px;
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+
+    <img src="/LOGO_CM.png" class="logo" alt="CM Colombia">
+
+    <h1>Sistema de Auditorias</h1>
+    
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <label>Correo</label>
+      <input id="email" type="email" placeholder="correo@personal.com">
+
+      <label>Contraseña</label>
+      <div class="input-wrap">
+        <input id="password" type="password" placeholder="••••••••">
+        <button type="button" class="eye-btn" id="togglePasswordBtn">👁</button>
+      </div>
+
+      <div class="actions">
+        <button id="btnLogin">Entrar</button>
+      </div>
+
+      <button id="btnReset" type="button">¿Olvidaste tu contraseña?</button>
+    </div>
+
+    <!-- RESET PASSWORD -->
+    <div id="resetBox" style="display:none;">
+      <label>Nueva contraseña</label>
+      <div class="input-wrap">
+        <input id="newPassword" type="password">
+        <button type="button" class="eye-btn" id="toggleNewPasswordBtn">👁</button>
+      </div>
+
+      <label>Confirmar contraseña</label>
+      <div class="input-wrap">
+        <input id="confirmPassword" type="password">
+        <button type="button" class="eye-btn" id="toggleConfirmPasswordBtn">👁</button>
+      </div>
+
+      <div class="actions">
+        <button id="btnUpdatePassword">Actualizar contraseña</button>
+      </div>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="ok" class="ok"></div>
+
+    <footer>
+      © <span id="year"></span> <b>CM Colombia
+    </footer>
+
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
+
+    const loginBox = document.getElementById("loginBox");
+    const resetBox = document.getElementById("resetBox");
+
+    const errorBox = document.getElementById("error");
+    const okBox = document.getElementById("ok");
+
+    function setError(msg){
+      errorBox.textContent = msg || "";
+      okBox.textContent = "";
+    }
+
+    function setOk(msg){
+      okBox.textContent = msg || "";
+      errorBox.textContent = "";
+    }
+
+    sb.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        loginBox.style.display = "none";
+        resetBox.style.display = "block";
+      }
+    });
+
+    document.getElementById("btnLogin").onclick = async () => {
+      const { error } = await sb.auth.signInWithPassword({
+        email: email.value.trim(),
+        password: password.value
+      });
+
+      if (error) return setError(error.message);
+      window.location.replace("pages/dashboard.html");
+    };
+
+    document.getElementById("btnReset").onclick = async () => {
+      if (!email.value.trim()) return setError("Escribe tu correo.");
+      const { error } = await sb.auth.resetPasswordForEmail(
+        email.value.trim(),
+        { redirectTo: window.location.origin + "/index.html" }
+      );
+      if (error) return setError(error.message);
+      setOk("Revisa tu correo para cambiar la contraseña.");
+    };
+
+    document.getElementById("btnUpdatePassword").onclick = async () => {
+      if (newPassword.value.length < 8)
+        return setError("Mínimo 8 caracteres.");
+      if (newPassword.value !== confirmPassword.value)
+        return setError("Las contraseñas no coinciden.");
+
+      const { error } = await sb.auth.updateUser({
+        password: newPassword.value
+      });
+
+      if (error) return setError(error.message);
+      setOk("Contraseña actualizada.");
+      setTimeout(()=>location.replace("pages/dashboard.html"),1200);
+    };
+
+    function wireToggle(btnId, input){
+      const btn = document.getElementById(btnId);
+      btn.onclick = () => {
+        input.type = input.type === "password" ? "text" : "password";
+        btn.textContent = input.type === "password" ? "👁" : "🙈";
+      };
+    }
+
+    wireToggle("togglePasswordBtn", password);
+    wireToggle("toggleNewPasswordBtn", newPassword);
+    wireToggle("toggleConfirmPasswordBtn", confirmPassword);
+  </script>
+
+</body>
+</html>

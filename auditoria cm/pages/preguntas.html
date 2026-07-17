@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CM Colombia • Editor de Preguntas</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg1:#f3fbf5; --bg2:#eef7f1;
+      --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --border:#cfe6d6; --border2:#e7f3eb;
+      --brand:#1e7a34; --brand2:#2f9a4a;
+      --danger:#d92d20;
+      --shadow: 0 18px 45px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0; color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 0%, var(--bg1), transparent),
+                  radial-gradient(900px 500px at 90% 10%, var(--bg2), transparent),
+                  #f7faf8;
+      min-height:100vh;
+    }
+    header{
+      position: sticky; top:0; z-index:20;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border2);
+    }
+    .topbar{
+      max-width:1200px; margin:0 auto;
+      padding: 14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand .title{font-weight:900; color:var(--brand); line-height:1}
+    .brand .subtitle{font-size:12px; color:var(--muted); margin-top:3px}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px; border-radius:999px;
+      border:1px solid var(--border); background:#f3fbf5;
+      font-size: 13px; white-space:nowrap;
+    }
+    .pill b{color:var(--brand)}
+    .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+
+    main{max-width:1200px; margin:0 auto; padding: 18px 16px 40px;}
+    .layout{display:grid; grid-template-columns: 1fr 360px; gap:14px; align-items:start;}
+    @media (max-width: 980px){ .layout{grid-template-columns:1fr;} }
+
+    .card{
+      background:var(--card); border-radius:var(--radius);
+      box-shadow:var(--shadow); border:1px solid var(--border2);
+      padding:16px;
+    }
+    aside.card{ position: sticky; top: 88px; }
+    h2{margin:0 0 6px; font-size:22px;}
+    h3{margin:0 0 8px; font-size:16px;}
+    .muted{color:var(--muted); font-size:13px;}
+    label{font-size:12px; color:var(--muted); display:block; margin:10px 0 6px}
+    input, textarea, select{
+      width:100%; padding:10px 12px;
+      border:1px solid var(--border); border-radius:12px;
+      outline:none; font-size:14px; background:#fff;
+    }
+    textarea{min-height: 90px; resize:vertical;}
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(30,122,52,.45);
+      box-shadow: 0 0 0 4px rgba(47,154,74,.12);
+    }
+    input:disabled, textarea:disabled, select:disabled{
+      background:#f6f7f7; color:#6b7280; cursor:not-allowed;
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+      font-weight:800; font-size:14px;
+      transition: transform .05s ease, box-shadow .2s ease;
+      user-select:none;
+      text-decoration:none;
+      color:inherit;
+    }
+    .btn:hover{box-shadow: 0 10px 18px rgba(0,0,0,.08)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{background: linear-gradient(180deg, var(--brand2), var(--brand)); color:#fff; border-color: rgba(30,122,52,.35);}
+    .btn.danger{background:#fff; color:var(--danger); border-color: rgba(217,45,32,.35);}
+    .btn.small{padding:8px 12px; font-size:13px}
+    .btn.icon{width:38px; height:38px; padding:0; border-radius:12px}
+    .row{display:grid; grid-template-columns: 1fr; gap:10px}
+    @media (min-width: 720px){ .row.two{grid-template-columns: 1fr 1fr;} }
+
+    .status{
+      margin-top: 10px; padding: 10px 12px;
+      border-radius: 14px; border: 1px dashed var(--border);
+      background: #f6fffa; font-size: 13px; line-height: 1.35; white-space: pre-wrap;
+    }
+    .status.error{border-color: rgba(217,45,32,.35); background: #fff5f5; color: var(--danger);}
+    .status.ok{border-color: rgba(30,122,52,.35); background: #f1fff6; color: #14532d;}
+    .hidden{display:none !important}
+
+    .qcard{
+      border:1px solid var(--border2);
+      border-radius: 16px;
+      background:#fff;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .qhead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex; align-items:center;
+      padding: 4px 10px; border-radius:999px;
+      border:1px solid var(--border); background:#f3fbf5;
+      font-weight:900; font-size:12px; color:var(--brand);
+      white-space:nowrap;
+    }
+    .badge.blue{color:#1d4ed8; background:#eff6ff; border-color:#dbeafe}
+    .badge.gray{color:#334155; background:#f6f7f8; border-color:#e5e7eb}
+    .badge.red{color:#991b1b; background:#fff5f5; border-color: rgba(217,45,32,.25)}
+
+    .opt{
+      display:flex; gap:10px; align-items:center; margin-top:8px;
+    }
+    .opt input{flex:1}
+    .divider{height:1px; background: var(--border2); margin: 12px 0;}
+    .toggle{
+      display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:10px;
+    }
+    .toggle label{margin:0; display:flex; gap:8px; align-items:center; color:var(--text); font-size:13px}
+    .toggle input[type="checkbox"]{width:auto}
+
+    .mini{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    }
+  
+    /* ===== Mejoras de espaciado / legibilidad ===== */
+    main{padding: 22px 16px 56px;}
+    .layout{gap:22px;}
+    .card{padding:20px;}
+    .qcard{padding:18px; margin-top:18px;}
+    .divider{margin:16px 0;}
+    .row{gap:14px; margin-top:12px;}
+    .qcard label{margin-top:14px;}
+    .qcard .toggle{margin-top:14px; gap:18px;}
+    .qhead{margin-bottom:10px;}
+    input, textarea, select{padding:12px 14px;}
+    textarea{min-height:110px;}
+    .opt{margin-top:10px;}
+    .status{margin-top:14px;}
+
+  
+    /* ===== Sombras y separación visual ===== */
+    .qcard{
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+      border-radius: 14px;
+      margin-bottom: 22px;
+    }
+    .qhead{
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      margin-bottom: 12px;
+    }
+    .opt{
+      box-shadow: 0 3px 10px rgba(0,0,0,.06);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+</style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <div class="title">CM Colombia</div>
+        <div class="subtitle">Editor de preguntas (estilo Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="pill"><b id="whoEmail">—</b><span id="whoRole">—</span></div>
+      <button class="btn" id="btnBack">← Volver a Plantillas</button>
+      <a class="btn" id="btnLogout" href="#">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="layout">
+    <section class="card">
+      <div class="qhead">
+        <div>
+          <h2 id="tplTitle">Plantilla</h2>
+          <div class="muted" id="tplMeta">—</div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+          <span class="badge gray" id="mode">solo lectura</span>
+          <button class="btn primary" id="btnAdd">+ Agregar pregunta</button>
+          <button class="btn" id="btnReload">Actualizar</button>
+        </div>
+      </div>
+
+      <div id="list"></div>
+      <div id="mainStatus" class="status hidden"></div>
+    </section>
+
+    <aside class="card">
+      <h3>Agregar rápido</h3>
+      <div class="muted">Crea preguntas por tipo (múltiple, checklist, texto, likert…).</div>
+
+      <label>Tipo</label>
+      <select id="quickType">
+        <option value="multiple_choice">Selección múltiple</option>
+        <option value="checkboxes">Checklist</option>
+        <option value="short_text">Completar (corto)</option>
+        <option value="long_text">Completar (largo)</option>
+        <option value="likert">Likert (1–5)</option>
+        <option value="yes_no">Sí / No</option>
+        <option value="photo">Foto</option>
+      </select>
+
+      <label>Título / Pregunta</label>
+      <input id="quickText" placeholder="Ej: ¿El colaborador usa casco?">
+
+      <button class="btn primary" style="margin-top:12px; width:100%" id="btnQuickAdd">Agregar</button>
+
+      <div class="divider"></div>
+
+      <h3>Requisitos</h3>
+      <div class="muted">
+        - Para múltiples opciones / checklist / likert usamos <b>config (jsonb)</b>.<br/>
+        - Si tu tabla no tiene <code>config</code>, crea la columna:
+      </div>
+
+      <div id="sideStatus" class="status hidden"></div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  // ===================== CONFIG SUPABASE =====================
+  const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const $ = (id) => document.getElementById(id);
+
+  let session=null, meProfile=null;
+  let templateId=null;
+  let template=null;
+  let questions=[];
+  let debounceTimers = {};
+
+  function setBox(id, msg, isError=false){
+    const el = $(id); if(!el) return;
+    el.classList.remove("hidden","error","ok");
+    el.classList.add(isError ? "error" : "ok");
+    el.textContent = msg || "";
+    if(!msg) el.classList.add("hidden");
+  }
+
+  function isAdmin(){ return meProfile?.role === "admin"; }
+
+  async function requireSession(){
+    const { data, error } = await sb.auth.getSession();
+    if(error) throw error;
+    if(!data.session) throw new Error("No hay sesión. Inicia sesión primero.");
+    session = data.session;
+    return session;
+  }
+
+  async function loadMyProfile(){
+    const uid = session.user.id;
+    const { data, error } = await sb
+      .from("profiles")
+      .select("id, full_name, role, area, is_active")
+      .eq("id", uid)
+      .maybeSingle();
+
+    if(error) throw new Error("Error leyendo profiles: " + error.message);
+    if(!data) throw new Error("Sesión activa pero no existe perfil en profiles.");
+    meProfile = data;
+  }
+
+  function applyRoleUI(){
+    const whoEmail = $("whoEmail");
+    const whoRole = $("whoRole");
+    const mode = $("mode");
+    if(whoEmail) whoEmail.textContent = session?.user?.email ?? "Sin sesión";
+    if(whoRole) whoRole.textContent = meProfile?.role ? `• ${meProfile.role}` : "";
+    if(mode){
+      mode.textContent = isAdmin() ? "admin" : "solo lectura";
+      mode.className = isAdmin() ? "badge" : "badge gray";
+    }
+
+    const disabled = !isAdmin();
+    const btnAdd = $("btnAdd");
+    const btnQuickAdd = $("btnQuickAdd");
+    if(btnAdd) btnAdd.disabled = disabled;
+    if(btnQuickAdd) btnQuickAdd.disabled = disabled;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function normalizeToDbType(uiType){
+    switch(uiType){
+      case "multiple_choice":
+        return { qtype:"choice", config:{ options:["Opción 1","Opción 2"], allow_other:false } };
+      case "checkboxes":
+        return { qtype:"checklist", config:{ options:["Item 1","Item 2"] } };
+      case "short_text":
+        return { qtype:"text", config:{ multiline:false, placeholder:"" } };
+      case "long_text":
+        return { qtype:"text", config:{ multiline:true, placeholder:"" } };
+      case "likert":
+        return { qtype:"likert", config:{ min:1, max:5, labels:{ "1":"Muy mal", "5":"Excelente" } } };
+      case "photo":
+        return { qtype:"photo", config:{} };
+      default:
+        return { qtype:"yes_no", config:{} };
+    }
+  }
+
+  function prettyType(q){
+    const t = q.qtype;
+    const cfg = q.config || {};
+    if(t==="choice"){
+      const multi = (cfg.multiple === true || cfg.allow_multiple === true || cfg.multi === true || Number(cfg.max_select||0) > 1);
+      return multi ? "Selección múltiple (varias)" : "Selección múltiple";
+    }
+    if(t==="checklist") return "Checklist";
+    if(t==="likert") return `Likert (${cfg.min ?? 1}–${cfg.max ?? 5})`;
+    if(t==="photo") return "Foto";
+    if(t==="text") return cfg.multiline ? "Texto largo" : "Texto corto";
+    if(t==="yes_no") return "Sí / No";
+    return t || "—";
+  }
+
+  function defaultConfigForQtype(qtype){
+    if(qtype==="choice") return { options:["Opción 1","Opción 2"], allow_other:false };
+    if(qtype==="checklist") return { options:["Item 1","Item 2"] };
+    if(qtype==="likert") return { min:1, max:5, labels:{ "1":"Muy mal", "5":"Excelente" } };
+    if(qtype==="text") return { multiline:false, placeholder:"" };
+    return {};
+  }
+
+  async function loadTemplate(){
+    // ✅ quitado updated_at para evitar romper si no existe
+    const { data, error } = await sb
+      .from("checklist_templates")
+      .select("id, name, description, area, is_active, created_at")
+      .eq("id", templateId)
+      .single();
+
+    if(error) throw new Error("No pude cargar la plantilla: " + error.message);
+    template = data;
+
+    $("tplTitle").textContent = template.name || "Plantilla";
+    $("tplMeta").textContent = `${template.area || "-"} • ${template.is_active ? "Activa" : "Inactiva"} • ID: ${template.id}`;
+  }
+
+  async function loadQuestions(){
+    setBox("mainStatus","",false);
+
+    const { data, error } = await sb
+      .from("checklist_questions")
+      .select("id, template_id, position, text, qtype, config, severity_if_no, requires_evidence, requires_comment, is_active, created_at")
+      .eq("template_id", templateId)
+      .order("position", { ascending:true });
+
+    if(error){
+      setBox("mainStatus",
+        "Error cargando preguntas: " + error.message + "\n\n" +
+        "Si el error menciona 'config', crea la columna config (SQL al lado).",
+        true
+      );
+      questions = [];
+      render();
+      return;
+    }
+    questions = data || [];
+    render();
+  }
+
+  function render(){
+    const host = $("list");
+    if(!questions.length){
+      host.innerHTML = `<div class="status">Sin preguntas. Agrega la primera ✅</div>`;
+      return;
+    }
+    const sorted = [...questions].sort((a,b)=>(a.position??0)-(b.position??0));
+    host.innerHTML = sorted.map((q, idx)=> qCard(q, idx, sorted.length)).join("");
+  }
+
+  function qCard(q, idx, total){
+    const readonly = !isAdmin() ? "disabled" : "";
+    const cfg = q.config || {};
+    const options = Array.isArray(cfg.options) ? cfg.options : [];
+
+    let optionsBlock = "";
+if(q.qtype === "choice" || q.qtype === "checklist"){
+  // opciones base
+  const allowMulti = !!cfg.allow_multiple_correct;
+  const allowMultiAnswer = (cfg.multiple === true || cfg.allow_multiple === true || cfg.multi === true || Number(cfg.max_select||0) > 1);
+  const maxSelect = Number(cfg.max_select||0) || 0;
+  // compat: si antes existía correct_answer (string), lo convertimos a array
+  const legacy = cfg.correct_answer ? [cfg.correct_answer] : [];
+  const correctArr = Array.isArray(cfg.correct_answers) ? cfg.correct_answers : legacy;
+
+  optionsBlock = `
+    <div class="divider"></div>
+    <div class="muted"><b>Opciones</b> (puedes agregar, editar o borrar)</div>
+    <div id="opts_${q.id}">
+      ${options.map((op, i)=>`
+        <div class="opt">
+          <input ${readonly} value="${escapeHtml(op)}" oninput="updateOption('${q.id}', ${i}, this.value)">
+          <button class="btn icon danger" ${!isAdmin()?'disabled':''} title="Eliminar opción" onclick="removeOption('${q.id}', ${i})">🗑️</button>
+        </div>
+      `).join("")}
+    </div>
+    <div class="mini" style="margin-top:10px">
+      <button class="btn small" ${!isAdmin()?'disabled':''} onclick="addOption('${q.id}')">+ Opción</button>
+      ${q.qtype==="choice" ? `
+        <span class="badge gray">Otro</span>
+        <label style="margin:0; display:flex; gap:8px; align-items:center">
+          <input type="checkbox" ${readonly} ${cfg.allow_other ? "checked":""} onchange="setConfigKey('${q.id}','allow_other', this.checked)">
+          permitir "Otro"
+        </label>` : ``}
+    </div>
+
+    ${q.qtype==="choice" ? `
+      <div style="margin-top:14px; padding:12px; background:#f0f9ff; border-radius:8px; border-left:3px solid #0284c7">
+        <div class="toggle" style="margin-top:0">
+          <label style="margin:0">
+            <input type="checkbox" ${readonly} ${allowMulti ? "checked":""}
+              onchange="toggleMultiCorrect('${q.id}', this.checked)">
+            <b>Calificación: permitir varias opciones correctas</b>
+          </label>
+        </div>
+
+        <div class="toggle" style="margin-top:10px">
+          <label style="margin:0">
+            <input type="checkbox" ${readonly} ${allowMultiAnswer ? "checked":""}
+              onchange="toggleMultiAnswer('${q.id}', this.checked)">
+            <b>Respuesta del auditor: permitir seleccionar varias opciones</b>
+          </label>
+
+          <div style="flex:1; min-width:220px; ${allowMultiAnswer ? "" : "display:none;"}">
+            <label style="margin:0; font-size:12px; color:var(--muted)">Límite de selección (0 = sin límite)</label>
+            <input type="number" min="0" max="50" ${readonly} value="${maxSelect}"
+              oninput="setMaxSelect('${q.id}', this.value)">
+            <div style="width:100%; margin-top:8px; font-size:12px; color:var(--muted); line-height:1.35">
+              <div><b>¿Qué cambia esto?</b></div>
+              <div>• <b>Respuesta del auditor</b>: define si en la inspección se verá como <b>radio (1 opción)</b> o <b>checkbox (varias opciones)</b>.</div>
+              <div>• <b>Opciones correctas</b>: define qué selecciones cuentan como <b>OK</b> en el informe/score.</div>
+            </div>
+
+          </div>
+        </div>
+
+
+        <label style="margin-top:10px"><b>Opciones correctas (para el score)</b></label>
+
+        <div style="display:grid; gap:8px; margin-top:8px">
+          ${options.map((op) => {
+            const checked = correctArr.includes(op);
+            return `
+              <label style="margin:0; display:flex; gap:10px; align-items:center">
+                <input type="${allowMulti ? "checkbox" : "radio"}"
+                  name="correct_${q.id}"
+                  ${readonly}
+                  ${checked ? "checked":""}
+                  onchange="setCorrectChoice('${q.id}', '${escapeHtml(op)}', this.checked)">
+                <span>${escapeHtml(op)}</span>
+              </label>
+            `;
+          }).join("")}
+        </div>
+
+        <div class="muted" style="margin-top:10px">
+          ${allowMulti ? "Marca aquí qué opciones cuentan como correctas." : "Solo se permite una."}
+        </div>
+        <div style="margin-top:10px; font-size:12px; color:var(--muted)">
+          <b>Resumen:</b>
+          ${allowMultiAnswer ? `Respuesta: <b>múltiple</b>${maxSelect>0?` (máx. ${maxSelect})`:" (sin límite)"}` : `Respuesta: <b>única</b>`}
+          ·
+          ${allowMulti ? `Correctas: <b>varias</b>` : `Correctas: <b>una</b>`}
+        </div>
+
+      </div>
+    ` : ``}
+  `;
+}
+
+let likertBlock = "";
+    if(q.qtype === "likert"){
+      const min = cfg.min ?? 1;
+      const max = cfg.max ?? 5;
+      const lab1 = (cfg.labels && (cfg.labels["1"] ?? cfg.labels[1])) || "";
+      const lab5 = (cfg.labels && (cfg.labels[String(max)] ?? cfg.labels[max])) || "";
+      likertBlock = `
+        <div class="divider"></div>
+        <div class="row two">
+          <div>
+            <label>Mínimo</label>
+            <input ${readonly} type="number" min="1" max="10" value="${min}" oninput="setLikertRange('${q.id}', this.value, null)">
+          </div>
+          <div>
+            <label>Máximo</label>
+            <input ${readonly} type="number" min="2" max="10" value="${max}" oninput="setLikertRange('${q.id}', null, this.value)">
+          </div>
+        </div>
+        <div class="row two">
+          <div>
+            <label>Etiqueta mínimo (${min})</label>
+            <input ${readonly} value="${escapeHtml(lab1)}" oninput="setLikertLabel('${q.id}', '1', this.value)">
+          </div>
+          <div>
+            <label>Etiqueta máximo (${max})</label>
+            <input ${readonly} value="${escapeHtml(lab5)}" oninput="setLikertLabel('${q.id}', '${max}', this.value)">
+          </div>
+        </div>
+      `;
+    }
+
+    let textBlock = "";
+if(q.qtype === "text"){
+  textBlock = `
+    <div class="divider"></div>
+    <div class="toggle">
+      <label><input type="checkbox" ${readonly} ${cfg.multiline ? "checked":""}
+        onchange="setConfigKey('${q.id}','multiline', this.checked)"> Texto largo</label>
+      <div style="flex:1; min-width:220px">
+        <label style="margin-top:0">Placeholder</label>
+        <input ${readonly} value="${escapeHtml(cfg.placeholder||"")}"
+          oninput="debUpdate('${q.id}','config', {...(getQ('${q.id}').config||{}), placeholder:this.value})">
+      </div>
+    </div>
+  `;
+}
+
+// ✅ Sí/No con opción "Inversa" (NO correcto / SÍ incorrecto)
+let yesNoBlock = "";
+if(q.qtype === "yes_no"){
+  const inverse = !!cfg.inverse;
+  yesNoBlock = `
+    <div class="divider"></div>
+    <div class="toggle">
+      <label>
+        <input type="checkbox" ${readonly} ${inverse ? "checked":""}
+          onchange="setConfigKey('${q.id}','inverse', this.checked)">
+        <b>Inversa</b> (si está activa: <b>NO</b> será correcto y <b>SÍ</b> será incorrecto)
+      </label>
+    </div>
+  `;
+}
+
+const activeBadge = q.is_active ? `<span class="badge">activa</span>` : `<span class="badge red">inactiva</span>`;
+
+    return `
+      <div class="qcard" id="qcard_${q.id}">
+        <div class="qhead">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+            <span class="badge blue">Pregunta ${idx+1}</span>
+            ${activeBadge}
+            <span class="badge gray">${escapeHtml(prettyType(q))}</span>
+          </div>
+          <div class="mini">
+            <button class="btn icon" ${(!isAdmin() || idx===0) ? "disabled":""} title="Subir"
+              onclick="moveQuestion('${q.id}', -1)">⬆️</button>
+            <button class="btn icon" ${(!isAdmin() || idx===total-1) ? "disabled":""} title="Bajar"
+              onclick="moveQuestion('${q.id}', 1)">⬇️</button>
+            <button class="btn icon danger" ${!isAdmin() ? "disabled":""} title="Borrar pregunta"
+              onclick="deleteQuestion('${q.id}')">🗑️</button>
+          </div>
+        </div>
+
+        <label>Pregunta</label>
+        <input ${readonly} value="${escapeHtml(q.text||"")}" oninput="debUpdate('${q.id}','text', this.value)">
+
+        <div class="row two">
+          <div>
+            <label>Tipo</label>
+            <select ${readonly} onchange="changeType('${q.id}', this.value)">
+              <option value="yes_no" ${q.qtype==="yes_no"?"selected":""}>Sí / No</option>
+              <option value="choice" ${q.qtype==="choice"?"selected":""}>Selección múltiple</option>
+              <option value="checklist" ${q.qtype==="checklist"?"selected":""}>Checklist</option>
+              <option value="text" ${q.qtype==="text"?"selected":""}>Texto</option>
+              <option value="likert" ${q.qtype==="likert"?"selected":""}>Likert</option>
+              <option value="photo" ${q.qtype==="photo"?"selected":""}>Foto</option>
+            </select>
+          </div>
+          <div>
+            <label>Severidad si falla (o NO)</label>
+            <select ${readonly} onchange="debUpdate('${q.id}','severity_if_no', this.value)">
+              <option value="baja" ${q.severity_if_no==="baja"?"selected":""}>baja</option>
+              <option value="media" ${q.severity_if_no==="media"?"selected":""}>media</option>
+              <option value="alta" ${q.severity_if_no==="alta"?"selected":""}>alta</option>
+              <option value="critica" ${q.severity_if_no==="critica"?"selected":""}>critica</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toggle">
+          <label><input type="checkbox" ${readonly} ${q.requires_evidence ? "checked":""}
+            onchange="debUpdate('${q.id}','requires_evidence', this.checked)"> Evidencia obligatoria</label>
+
+          <label><input type="checkbox" ${readonly} ${q.requires_comment ? "checked":""}
+            onchange="debUpdate('${q.id}','requires_comment', this.checked)"> Comentario obligatorio</label>
+
+          <label><input type="checkbox" ${readonly} ${q.is_active ? "checked":""}
+            onchange="debUpdate('${q.id}','is_active', this.checked)"> Activa</label>
+        </div>
+
+        ${yesNoBlock}
+        ${optionsBlock}
+        ${likertBlock}
+        ${textBlock}
+
+        <div id="st_${q.id}" class="status hidden"></div>
+      </div>
+    `;
+  }
+
+  function getQ(id){ return questions.find(x=>x.id===id); }
+
+  function scheduleToast(qid, msg, isErr=false){
+    const el = document.getElementById("st_"+qid);
+    if(!el) return;
+    el.classList.remove("hidden","error","ok");
+    el.classList.add(isErr ? "error" : "ok");
+    el.textContent = msg;
+    if(msg){
+      setTimeout(()=>{ el.classList.add("hidden"); }, 2500);
+    }
+  }
+
+  function debUpdate(id, field, value){
+    if(!isAdmin()) return;
+
+    clearTimeout(debounceTimers[id+"_"+field]);
+    debounceTimers[id+"_"+field] = setTimeout(async ()=>{
+      try{
+        await updateQuestion(id, { [field]: value });
+        scheduleToast(id, "Guardado ✅", false);
+      }catch(e){
+        scheduleToast(id, "Error: " + (e.message||e), true);
+      }
+    }, 350);
+  }
+
+  async function updateQuestion(id, patch){
+    const { error } = await sb
+      .from("checklist_questions")
+      .update(patch)
+      .eq("id", id);
+
+    if(error) throw new Error(error.message);
+
+    const q = getQ(id);
+    if(q) Object.assign(q, patch);
+  }
+
+  async function changeType(id, newType){
+    if(!isAdmin()) return;
+
+    const cfg = defaultConfigForQtype(newType);
+    const patch = { qtype: newType, config: cfg };
+    if(newType==="text"){
+      patch.config = { multiline:false, placeholder:"" };
+    }
+
+    try{
+      await updateQuestion(id, patch);
+      scheduleToast(id, "Tipo actualizado ✅", false);
+      await loadQuestions();
+    }catch(e){
+      scheduleToast(id, "Error: " + (e.message||e), true);
+    }
+  }
+
+  async function addQuestionFrom(uiType, text){
+    if(!isAdmin()){
+      setBox("sideStatus","Solo admin puede agregar preguntas.", true);
+      return;
+    }
+    if(!text || !text.trim()){
+      setBox("sideStatus","Escribe el texto de la pregunta.", true);
+      return;
+    }
+
+    const mapped = normalizeToDbType(uiType);
+    const maxPos = questions.reduce((m,q)=>Math.max(m, q.position||0), 0);
+    const payload = {
+      template_id: templateId,
+      position: maxPos + 1,
+      text: text.trim(),
+      qtype: mapped.qtype,
+      config: mapped.config,
+      severity_if_no: "media",
+      requires_evidence: false,
+      requires_comment: false,
+      is_active: true,
+    };
+
+    const { error } = await sb.from("checklist_questions").insert(payload);
+    if(error){
+      setBox("sideStatus","Error insertando pregunta: " + error.message, true);
+      return;
+    }
+    setBox("sideStatus","Pregunta agregada ✅", false);
+    $("quickText").value = "";
+    await loadQuestions();
+  }
+
+  async function addEmptyQuestion(){ await addQuestionFrom("yes_no", "Nueva pregunta"); }
+
+  async function deleteQuestion(id){
+    if(!isAdmin()) return;
+
+    const q = getQ(id);
+    const ok = confirm(`¿Borrar esta pregunta?\n\n"${q?.text || ''}"\nNo se puede deshacer.`);
+    if(!ok) return;
+
+    const { error } = await sb.from("checklist_questions").delete().eq("id", id);
+    if(error){
+      setBox("mainStatus","Error borrando pregunta: " + error.message, true);
+      return;
+    }
+    setBox("mainStatus","Pregunta borrada ✅", false);
+
+    await loadQuestions();
+    await normalizePositions();
+    await loadQuestions();
+  }
+
+  async function moveQuestion(id, delta){
+    if(!isAdmin()) return;
+
+    const sorted = [...questions].sort((a,b)=>(a.position??0)-(b.position??0));
+    const idx = sorted.findIndex(x=>x.id===id);
+    const j = idx + delta;
+    if(idx<0 || j<0 || j>=sorted.length) return;
+
+    const a = sorted[idx];
+    const b = sorted[j];
+    const pa = a.position ?? (idx+1);
+    const pb = b.position ?? (j+1);
+
+    try{
+      await sb.from("checklist_questions").update({ position: pb }).eq("id", a.id);
+      await sb.from("checklist_questions").update({ position: pa }).eq("id", b.id);
+      await loadQuestions();
+      // desplazar la tarjeta movida a la vista para evitar tener que scrollear manualmente
+      setTimeout(()=>{
+        try{
+          const el = document.getElementById('qcard_' + a.id);
+          if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }catch(_e){}
+      }, 80);
+    }catch(e){
+      setBox("mainStatus","Error moviendo: " + (e.message||e), true);
+    }
+  }
+
+  async function normalizePositions(){
+    const sorted = [...questions].sort((a,b)=>(a.position??0)-(b.position??0));
+    for(let i=0;i<sorted.length;i++){
+      const q = sorted[i];
+      const desired = i+1;
+      if(q.position !== desired){
+        await sb.from("checklist_questions").update({ position: desired }).eq("id", q.id);
+      }
+    }
+  }
+
+  async function setConfigKey(qid, key, val){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    cfg[key] = val;
+    await updateQuestion(qid, { config: cfg });
+    await loadQuestions();
+  }
+
+
+// ✅ Selección múltiple: una correcta o varias correctas
+async function toggleMultiCorrect(qid, enabled){
+  if(!isAdmin()) return;
+  const q = getQ(qid);
+  const cfg = { ...(q.config || {}) };
+
+  const legacy = cfg.correct_answer ? [cfg.correct_answer] : [];
+  const current = Array.isArray(cfg.correct_answers) ? cfg.correct_answers : legacy;
+
+  cfg.allow_multiple_correct = !!enabled;
+
+  // Si se apaga multi, dejamos máximo 1
+  if(!cfg.allow_multiple_correct && current.length > 1){
+    cfg.correct_answers = [current[0]];
+  }else{
+    cfg.correct_answers = current;
+  }
+
+  // compat con el campo viejo
+  cfg.correct_answer = (cfg.correct_answers && cfg.correct_answers[0]) ? cfg.correct_answers[0] : "";
+
+  await updateQuestion(qid, { config: cfg });
+  await loadQuestions();
+}
+
+async function toggleMultiAnswer(qid, enabled){
+  if(!isAdmin()) return;
+  const q = getQ(qid);
+  const cfg = { ...(q.config || {}) };
+
+  cfg.multiple = !!enabled;
+  cfg.allow_multiple = !!enabled; // compat con otros clientes
+
+  // si habilitan multi y no hay max_select, dejamos 0 (sin límite)
+  if(cfg.multiple && (cfg.max_select === undefined || cfg.max_select === null)) cfg.max_select = 0;
+
+  await updateQuestion(qid, { config: cfg });
+  await loadQuestions();
+}
+
+async function setMaxSelect(qid, value){
+  if(!isAdmin()) return;
+  const q = getQ(qid);
+  const cfg = { ...(q.config || {}) };
+
+  let n = Number(value);
+  if(!Number.isFinite(n) || n < 0) n = 0;
+  cfg.max_select = n;
+
+  // si max_select > 1, asumimos multiple
+  if(n > 1){
+    cfg.multiple = true;
+    cfg.allow_multiple = true;
+  }
+  if(n === 1){
+    cfg.multiple = false;
+    cfg.allow_multiple = false;
+  }
+
+  debUpdate(qid, "config", cfg);
+}
+
+async function setCorrectChoice(qid, optionText, isChecked){
+  if(!isAdmin()) return;
+  const q = getQ(qid);
+  const cfg = { ...(q.config || {}) };
+
+  const allowMulti = !!cfg.allow_multiple_correct;
+
+  const legacy = cfg.correct_answer ? [cfg.correct_answer] : [];
+  let arr = Array.isArray(cfg.correct_answers) ? [...cfg.correct_answers] : [...legacy];
+
+  if(!allowMulti){
+    arr = [optionText];
+  }else{
+    if(isChecked){
+      if(!arr.includes(optionText)) arr.push(optionText);
+    }else{
+      arr = arr.filter(x => x !== optionText);
+    }
+  }
+
+  cfg.correct_answers = arr;
+  cfg.correct_answer = (arr[0] || ""); // compat
+
+  await updateQuestion(qid, { config: cfg });
+  await loadQuestions();
+}
+
+  async function addOption(qid){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    const opts = Array.isArray(cfg.options) ? [...cfg.options] : [];
+    opts.push(q.qtype==="choice" ? `Opción ${opts.length+1}` : `Item ${opts.length+1}`);
+    cfg.options = opts;
+    await updateQuestion(qid, { config: cfg });
+    await loadQuestions();
+  }
+
+  
+async function removeOption(qid, idx){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    const opts = Array.isArray(cfg.options) ? [...cfg.options] : [];
+    const removed = opts[idx];
+    opts.splice(idx,1);
+    cfg.options = opts;
+
+    // Si borran una opción marcada como correcta, la removemos
+    if(Array.isArray(cfg.correct_answers)){
+      cfg.correct_answers = cfg.correct_answers.filter(x => x !== removed);
+      cfg.correct_answer = cfg.correct_answers[0] || "";
+    }else if(cfg.correct_answer && cfg.correct_answer === removed){
+      cfg.correct_answer = "";
+    }
+
+    await updateQuestion(qid, { config: cfg });
+    await loadQuestions();
+  }
+
+  
+async function updateOption(qid, idx, value){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    const opts = Array.isArray(cfg.options) ? [...cfg.options] : [];
+    const prev = opts[idx];
+    opts[idx] = value;
+    cfg.options = opts;
+
+    // Si una opción correcta cambia de texto, migramos el valor
+    if(Array.isArray(cfg.correct_answers)){
+      cfg.correct_answers = cfg.correct_answers.map(x => x === prev ? value : x);
+      cfg.correct_answer = cfg.correct_answers[0] || "";
+    }else if(cfg.correct_answer && cfg.correct_answer === prev){
+      cfg.correct_answer = value;
+    }
+
+    clearTimeout(debounceTimers[qid+"_opt_"+idx]);
+    debounceTimers[qid+"_opt_"+idx] = setTimeout(async ()=>{
+      try{ await updateQuestion(qid, { config: cfg }); }catch(e){}
+    }, 250);
+  }
+
+  async function setLikertRange(qid, minV, maxV){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    const min = minV !== null ? Number(minV) : (cfg.min ?? 1);
+    const max = maxV !== null ? Number(maxV) : (cfg.max ?? 5);
+    if(!Number.isFinite(min) || !Number.isFinite(max) || max <= min){
+      scheduleToast(qid, "Rango inválido", true);
+      return;
+    }
+    cfg.min = min;
+    cfg.max = max;
+    cfg.labels = cfg.labels || {};
+    if(cfg.labels["1"] === undefined) cfg.labels["1"] = "Muy mal";
+    if(cfg.labels[String(max)] === undefined) cfg.labels[String(max)] = "Excelente";
+    await updateQuestion(qid, { config: cfg });
+    await loadQuestions();
+  }
+
+  async function setLikertLabel(qid, key, val){
+    if(!isAdmin()) return;
+    const q = getQ(qid);
+    const cfg = { ...(q.config || {}) };
+    cfg.labels = { ...(cfg.labels || {}) };
+    cfg.labels[String(key)] = val;
+    debUpdate(qid, "config", cfg);
+  }
+
+  async function init(){
+    try{
+      const sp = new URLSearchParams(location.search);
+      templateId = sp.get("template_id") || sp.get("templateId") || sp.get("id");
+      if(!templateId) throw new Error("Falta template_id en la URL. Vuelve a Plantillas y abre una plantilla.");
+
+      await requireSession();
+      await loadMyProfile();
+      applyRoleUI();
+
+      const backBtn = $("btnBack");
+      if(backBtn) backBtn.onclick = ()=> window.location.href = `/pages/plantillas.html`;
+
+      const logout = $("btnLogout");
+      if(logout) logout.onclick = async (e)=>{
+        e.preventDefault();
+        await sb.auth.signOut();
+        window.location.href = "/index.html";
+      };
+
+      const btnReload = $("btnReload");
+      if(btnReload) btnReload.onclick = loadQuestions;
+
+      const btnAdd = $("btnAdd");
+      if(btnAdd) btnAdd.onclick = addEmptyQuestion;
+
+      const btnQuickAdd = $("btnQuickAdd");
+      if(btnQuickAdd) btnQuickAdd.onclick = ()=> addQuestionFrom($("quickType").value, $("quickText").value);
+
+      await loadTemplate();
+      await loadQuestions();
+
+      setBox("mainStatus", isAdmin() ? "Listo ✅ (admin)" : "Listo ✅ (solo lectura)", false);
+    }catch(e){
+      setBox("mainStatus", e?.message || String(e), true);
+    }
+  }
+
+  window.debUpdate = debUpdate;
+  window.changeType = changeType;
+  window.deleteQuestion = deleteQuestion;
+  window.moveQuestion = moveQuestion;
+  window.addOption = addOption;
+  window.removeOption = removeOption;
+  window.updateOption = updateOption;
+  window.setConfigKey = setConfigKey;
+  window.toggleMultiCorrect = toggleMultiCorrect;
+  window.toggleMultiAnswer = toggleMultiAnswer;
+  window.setMaxSelect = setMaxSelect;
+  window.setCorrectChoice = setCorrectChoice;
+  window.setLikertRange = setLikertRange;
+  window.setLikertLabel = setLikertLabel;
+  window.getQ = getQ;
+
+  init();
+</script>
+</body>
+</html>

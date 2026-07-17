@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>CM Colombia • Plantillas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body{font-family:system-ui;margin:0;background:#f6faf7;color:#1f2937}
+    header{background:#fff;border-bottom:1px solid #e5e7eb}
+    .top{max-width:1200px;margin:auto;padding:14px;display:flex;justify-content:space-between;align-items:center}
+    h1{margin:0;font-size:20px;color:#166534}
+    main{max-width:1200px;margin:auto;padding:20px}
+    .card{background:#fff;border-radius:14px;padding:16px;border:1px solid #e5e7eb;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;font-size:14px}
+    th{background:#f0fdf4;text-align:left}
+    .btn{padding:8px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-weight:600}
+    .btn.primary{background:#16a34a;color:#fff;border-color:#16a34a}
+    .btn.danger{color:#b91c1c;border-color:#fecaca}
+    .btn.icon{width:34px;height:34px;padding:0}
+    .badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .badge.on{background:#dcfce7;color:#166534}
+    .badge.off{background:#fee2e2;color:#991b1b}
+    .right{text-align:right}
+    .muted{color:#6b7280;font-size:13px}
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="top">
+    <h1>📋 Plantillas de Inspección</h1>
+    <div>
+      <a class="btn" href="/index.html"> Salir</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <button class="btn primary" id="btnNew">+ Nueva plantilla</button>
+    <span class="muted" id="status"></span>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Plantilla</th>
+          <th>Área</th>
+          <th>Estado</th>
+          <th>Preguntas</th>
+          <th class="right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="5">Cargando…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+
+let session = null;
+let profile = null;
+let templates = [];
+
+function isAdmin(){ return profile?.role === "admin"; }
+
+async function init(){
+  const { data } = await sb.auth.getSession();
+  if(!data.session){
+    location.href = "/pages/index.html";
+    return;
+  }
+  session = data.session;
+
+  const p = await sb.from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  profile = p.data;
+  await loadTemplates();
+
+  $("btnNew").onclick = createTemplate;
+}
+
+async function getTemplateName(id){
+  const row = templates.find(t => t.id === id);
+  if(row?.name) return row.name;
+  const { data } = await sb.from("checklist_templates").select("name").eq("id", id).maybeSingle();
+  return data?.name || "la plantilla";
+}
+
+async function getInspectionIdsByTemplate(id){
+  const { data, error } = await sb
+    .from("inspections")
+    .select("id")
+    .eq("template_id", id);
+  if(error) throw error;
+  return (data || []).map(x => x.id).filter(Boolean);
+}
+
+async function deleteInChunks(table, column, ids, chunkSize=100){
+  if(!ids?.length) return;
+  for(let i=0;i<ids.length;i+=chunkSize){
+    const chunk = ids.slice(i, i + chunkSize);
+    const { error } = await sb.from(table).delete().in(column, chunk);
+    if(error) throw error;
+  }
+}
+
+async function loadTemplates(){
+  const { data, error } = await sb
+    .from("checklist_templates")
+    .select("id,name,area,is_active");
+
+  if(error){
+    $("status").textContent = error.message;
+    return;
+  }
+
+  const { data: qs } = await sb
+    .from("checklist_questions")
+    .select("template_id");
+
+  const count = {};
+  qs?.forEach(q=>count[q.template_id]=(count[q.template_id]||0)+1);
+
+  templates = data.map(t=>({...t,q_count:count[t.id]||0}));
+  render();
+}
+
+function render(){
+  const tb = $("tbody");
+  if(!templates.length){
+    tb.innerHTML = `<tr><td colspan="5">No hay plantillas</td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = templates.map(t=>`
+    <tr>
+      <td><b>${t.name}</b></td>
+      <td>${t.area||"-"}</td>
+      <td>
+        <span class="badge ${t.is_active?'on':'off'}">
+          ${t.is_active?'Activa':'Inactiva'}
+        </span>
+      </td>
+      <td>${t.q_count}</td>
+      <td class="right">
+        <button class="btn"
+          onclick="editQuestions('${t.id}')">✏️</button>
+        <button class="btn" onclick="startInspection('${t.id}')">▶️ Iniciar</button>
+
+        ${isAdmin()?`
+          <button class="btn icon danger"
+            onclick="deleteTemplate('${t.id}')">🗑️</button>
+        `:""}
+      </td>
+    </tr>
+  `).join("");
+}
+
+function editQuestions(id){
+  location.href = `/pages/preguntas.html?template_id=${id}`;
+}
+
+function startInspection(id){
+  // Guarda selección por si después quieres usarla
+  try{ localStorage.setItem('cm_selected_template_id', id); }catch(e){}
+  location.href = `/pages/inspecciones.html?template_id=${id}`;
+}
+
+async function createTemplate(){
+  if(!isAdmin()) return alert("Solo admin");
+
+  const name = prompt("Nombre de la plantilla");
+  if(!name) return;
+
+  await sb.from("checklist_templates").insert({
+    name,
+    is_active:true,
+    created_by: session.user.id
+  });
+
+  loadTemplates();
+}
+
+async function deleteTemplate(id){
+  if(!isAdmin()) return;
+
+  const tplName = await getTemplateName(id);
+
+  try{
+    $("status").textContent = `Revisando dependencias de ${tplName}...`;
+
+    const inspectionIds = await getInspectionIdsByTemplate(id);
+    const inspectionCount = inspectionIds.length;
+
+    let msg = `Esto borrará la plantilla "${tplName}" y TODAS sus preguntas.`;
+    if(inspectionCount){
+      msg += `\n\nTambién se eliminarán ${inspectionCount} inspecci${inspectionCount===1?'ón':'ones'} relacionada${inspectionCount===1?'':'s'} y sus respuestas.`;
+    }
+    msg += `\n\n¿Continuar?`;
+
+    if(!confirm(msg)){
+      $("status").textContent = "";
+      return;
+    }
+
+    $("status").textContent = `Eliminando ${tplName}...`;
+
+    if(inspectionIds.length){
+      try {
+        await deleteInChunks("inspection_answers", "inspection_id", inspectionIds);
+      } catch(err){
+        console.warn("No se pudieron borrar inspection_answers por inspection_id", err);
+      }
+
+      const { error: delInspectionsErr } = await sb
+        .from("inspections")
+        .delete()
+        .eq("template_id", id);
+      if(delInspectionsErr) throw delInspectionsErr;
+    }
+
+    const { error: qErr } = await sb
+      .from("checklist_questions")
+      .delete()
+      .eq("template_id", id);
+    if(qErr) throw qErr;
+
+    const { error: tErr } = await sb
+      .from("checklist_templates")
+      .delete()
+      .eq("id", id);
+    if(tErr) throw tErr;
+
+    $("status").textContent = `Plantilla ${tplName} eliminada.`;
+    await loadTemplates();
+  }catch(error){
+    console.error(error);
+    $("status").textContent = "";
+    alert(`No se pudo eliminar la plantilla.\n\n${error?.message || error}`);
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

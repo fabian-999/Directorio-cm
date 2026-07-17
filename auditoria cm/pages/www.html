@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>CM Colombia | Acciones de Auditoría</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f6fbf7;
+  color:#122016;
+}
+.wrap{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  border:1px solid #dfeee3;
+}
+h1{
+  margin:0;
+  color:#2e7d32;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:20px;
+}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #dfeee3;
+  box-sizing:border-box;
+}
+textarea{
+  min-height:90px;
+}
+button{
+  background:#2e7d32;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+button.ghost{
+  background:white;
+  border:1px solid #2e7d32;
+  color:#2e7d32;
+}
+button.warn{
+  background:#fff;
+  border:1px solid #c62828;
+  color:#c62828;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  vertical-align:top;
+}
+th{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#5b6e61;
+}
+.pdfbox{
+  border:1px solid #dfeee3;
+  border-radius:12px;
+  overflow:hidden;
+}
+iframe{
+  width:100%;
+  height:520px;
+  border:none;
+}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.err{
+  color:#c62828;
+  margin:8px 0;
+  white-space:pre-wrap;
+}
+.ok{
+  color:#2e7d32;
+  margin:8px 0;
+  white-space:pre-wrap;
+}
+.small{
+  font-size:12px;
+  color:#6b7a6f;
+}
+.row-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.section-box{
+  margin-top:18px;
+  padding:14px;
+  border:1px solid #dfeee3;
+  border-radius:14px;
+  background:#fbfefb;
+}
+canvas{
+  width:100%;
+  max-width:420px;
+  height:160px;
+  border:1px dashed #b6d6bf;
+  border-radius:12px;
+  background:#fff;
+  display:block;
+}
+.signature-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <div class="topbar">
+      <h1>Acciones de Auditoría</h1>
+      <div>
+        <button class="ghost" id="btnBack">Volver</button>
+        <button class="ghost" id="btnOpenPdf">Abrir en pestaña</button>
+      </div>
+    </div>
+
+    <div id="msgErr" class="err"></div>
+    <div id="msgOk" class="ok"></div>
+
+    <div class="grid">
+
+      <div>
+        <h3>Crear acción</h3>
+
+        <select id="findingSelect">
+          <option value="">Cargando hallazgos...</option>
+        </select>
+
+        <br><br>
+
+        <input id="desc" placeholder="Descripción de la acción">
+
+        <br><br>
+
+        <select id="responsible"></select>
+
+        <br><br>
+
+        <input id="due" type="date">
+
+        <br><br>
+
+        <select id="status">
+          <option value="open">Abierta</option>
+          <option value="in_progress">En progreso</option>
+          <option value="closed">Cerrada</option>
+        </select>
+
+        <br><br>
+
+        <textarea id="closure" placeholder="Notas de cierre"></textarea>
+
+        <div class="row-actions">
+          <button id="btnCreate">Guardar acción</button>
+          <button class="ghost" id="btnAppendPdf">Anexar acciones al PDF</button>
+          <button class="warn" id="btnClearTemp">Limpiar acciones</button>
+          <button id="btnFinalizar" style="background:#7ff3a2;">Finalizar y guardar</button>
+        </div>
+
+        <div class="section-box">
+          <h3 style="margin-top:0;">Firma del revisor</h3>
+
+          <select id="reviewerSelect">
+            <option value="">Selecciona revisor</option>
+          </select>
+
+          <br><br>
+
+          <canvas id="reviewerSignature" width="420" height="160"></canvas>
+                
+          <div class="signature-actions">
+            <button class="ghost" id="btnClearSignature" type="button">Limpiar firma</button>
+          </div>
+
+          <div class="small" style="margin-top:10px;">
+            La firma del revisor se anexará debajo de las acciones en el PDF final.
+          </div>
+        </div>
+
+        <h3 style="margin-top:25px">Acciones registradas</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Hallazgo</th>
+              <th>Descripción</th>
+              <th>Responsable</th>
+              <th>Vence</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="actionsTbody"></tbody>
+        </table>
+
+        <div class="small" style="margin-top:10px;">
+          Estas acciones quedan temporales en tu navegador y se anexan al PDF cuando presionas <b>Anexar acciones al PDF</b>.
+        </div>
+      </div>
+
+      <div>
+        <h3>Previsualización PDF</h3>
+
+        <div class="pdfbox">
+          <div style="padding:10px;border-bottom:1px solid #eee">
+            PDF
+          </div>
+          <iframe id="pdfFrame"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const auditId = new URLSearchParams(location.search).get("audit_id");
+
+const findingSelect = document.getElementById("findingSelect");
+const actionsTbody = document.getElementById("actionsTbody");
+const pdfFrame = document.getElementById("pdfFrame");
+const msgErr = document.getElementById("msgErr");
+const msgOk = document.getElementById("msgOk");
+
+const reviewerSelect = document.getElementById("reviewerSelect");
+const signatureCanvas = document.getElementById("reviewerSignature");
+const sigCtx = signatureCanvas.getContext("2d");
+
+let findings = [];
+let selectedFindingsExact = [];
+let profilesMap = new Map();
+let tempActions = [];
+let originalPdfUrl = "";
+let currentPdfUrl = "";
+let currentBlobUrl = "";
+
+const TEMP_KEY = `temp_actions_${auditId}`;
+const REVIEWER_KEY = `temp_reviewer_${auditId}`;
+const SIGNATURE_KEY = `temp_reviewer_signature_${auditId}`;
+const FINAL_REDIRECT_URL = new URLSearchParams(location.search).get("return_to") || "index.html";
+const FINAL_REPORT_PREFIX = "final";
+const WATERMARK_LOGO_PNG_BASE64 = "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";
+
+let isDrawing = false;
+let hasSignature = false;
+
+function setErr(txt=""){ msgErr.textContent = txt; }
+function setOk(txt=""){ msgOk.textContent = txt; }
+
+function setButtonState(btn, loading, loadingText){
+  if(!btn) return;
+  if(loading){
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = loadingText || "Procesando...";
+    btn.disabled = true;
+    btn.style.opacity = "0.7";
+    btn.style.cursor = "wait";
+  }else{
+    btn.textContent = btn.dataset.originalText || btn.textContent;
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+  }
+}
+
+function revokeCurrentBlobUrl(){
+  if(currentBlobUrl){
+    URL.revokeObjectURL(currentBlobUrl);
+    currentBlobUrl = "";
+  }
+}
+
+function refreshPdfFrame(url){
+  if(!url){
+    pdfFrame.removeAttribute("src");
+    setErr("URL de PDF vacía.");
+    return;
+  }
+
+  if(String(url).startsWith("blob:")){
+    pdfFrame.src = url;
+  }else{
+    const viewerUrl = `${url}${url.includes("?") ? "&" : "?"}v=${Date.now()}`;
+    pdfFrame.src = viewerUrl;
+  }
+
+  document.getElementById("btnOpenPdf").onclick = () => window.open(url, "_blank");
+}
+
+function normalizeText(text){
+  if(!text) return "";
+  let t = String(text).trim();
+  const pos = t.indexOf("]");
+  if(pos !== -1){
+    t = t.substring(pos + 1).trim();
+  }
+  return t.replace(/\s+/g, " ").replace(/[؟?]+$/g, "").trim().toLowerCase();
+}
+
+function visibleText(text){
+  if(!text) return "";
+  let t = String(text).trim();
+  const pos = t.indexOf("]");
+  if(pos !== -1){
+    t = t.substring(pos + 1).trim();
+  }
+  return t.trim();
+}
+
+function getFindingSourceText(f){
+  return f?.condition || f?.question || f?.pregunta || f?.finding_label || "";
+}
+
+function pickFindingLabel(f){
+  const text = visibleText(getFindingSourceText(f));
+  return text || "Hallazgo";
+}
+
+function buildSelectedFindingOption(item, index){
+  return {
+    id: `selected:${index}`,
+    source: 'selected',
+    order_index: index,
+    audit_id: auditId,
+    template_id: item?.template_id || null,
+    section: item?.section || null,
+    condition: item?.condition || item?.question || item?.pregunta || '',
+    cause: item?.cause || '',
+    effect: item?.effect || '',
+    recommendation: item?.recommendation || '',
+    created_at: item?.created_at || new Date().toISOString()
+  };
+}
+
+function decodeSelectedFindingsBase64(value){
+  if(!value) return [];
+  try{
+    let normalized = String(value).trim();
+    try{ normalized = decodeURIComponent(normalized); }catch(_e){}
+    normalized = normalized.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+    while(normalized.length % 4 !== 0) normalized += '=';
+    const json = decodeURIComponent(escape(atob(normalized)));
+    return extractFindingsArrayFromAny(json);
+  }catch(_e){
+    return [];
+  }
+}
+
+function getSelectedFindingsFromStorage(){
+  const params = new URLSearchParams(location.search);
+
+  const base64Candidates = [
+    params.get("selected_findings_b64"),
+    params.get("selectedFindingsB64"),
+    params.get("hallazgos_b64")
+  ];
+
+  for(const encoded of base64Candidates){
+    const extracted = decodeSelectedFindingsBase64(encoded);
+    if(extracted.length) return extracted;
+  }
+
+  const paramCandidates = [
+    params.get("selected_findings"),
+    params.get("selectedFindings"),
+    params.get("hallazgos")
+  ];
+
+  for(const candidate of paramCandidates){
+    if(!candidate) continue;
+    try{
+      const decoded = decodeURIComponent(candidate);
+      const extracted = extractFindingsArrayFromAny(decoded);
+      if(extracted.length) return extracted;
+    }catch(_e){
+      const extracted = extractFindingsArrayFromAny(candidate);
+      if(extracted.length) return extracted;
+    }
+  }
+
+  const keys = [
+    `selected_findings:${auditId}`,
+    `selected_findings_${auditId}`,
+    `pdf_selected_findings:${auditId}`,
+    `pdf_selected_findings_${auditId}`,
+    `report_selected_findings:${auditId}`,
+    `report_selected_findings_${auditId}`,
+    `selected_findings_payload:${auditId}`,
+    `selected_findings_payload_${auditId}`,
+    `selected_findings_context:${auditId}`,
+    `selected_findings_context_${auditId}`,
+    `selected_findings_debug_${auditId}`,
+    "selected_findings",
+    "pdf_selected_findings",
+    "report_selected_findings",
+    "latest_selected_findings"
+  ];
+
+  for(const key of keys){
+    try{
+      const rawSession = sessionStorage.getItem(key);
+      const extracted = extractFindingsArrayFromAny(rawSession);
+      if(extracted.length) return extracted;
+    }catch(_e){}
+
+    try{
+      const rawLocal = localStorage.getItem(key);
+      const extracted = extractFindingsArrayFromAny(rawLocal);
+      if(extracted.length) return extracted;
+    }catch(_e){}
+  }
+
+  return [];
+}
+
+function extractFindingsArrayFromAny(raw){
+  if(!raw) return [];
+
+  let value = raw;
+  if(typeof value === 'string'){
+    try{
+      value = JSON.parse(value);
+    }catch(_e){
+      return [];
+    }
+  }
+
+  if(Array.isArray(value)){
+    return value.filter(Boolean);
+  }
+
+  if(typeof value !== 'object') return [];
+
+  const keys = [
+    'selected_findings',
+    'selectedFindings',
+    'findings',
+    'hallazgos',
+    'items',
+    'data',
+    'payload'
+  ];
+
+  for(const key of keys){
+    if(Array.isArray(value[key])){
+      return value[key].filter(Boolean);
+    }
+  }
+
+  for(const key of keys){
+    if(value[key]){
+      const nested = extractFindingsArrayFromAny(value[key]);
+      if(nested.length) return nested;
+    }
+  }
+
+  return [];
+}
+
+async function getSelectedFindingsFromReportVersion(){
+  try{
+    const { data, error } = await sb
+      .from('report_versions')
+      .select('*')
+      .eq('audit_id', auditId)
+      .order('generated_at', { ascending:false })
+      .limit(1);
+
+    if(error || !data?.length) return [];
+
+    const row = data[0] || {};
+    const candidateFields = [
+      row.selected_findings,
+      row.selected_findings_json,
+      row.findings,
+      row.findings_json,
+      row.findings_snapshot,
+      row.report_payload,
+      row.report_data,
+      row.metadata,
+      row.meta,
+      row.payload
+    ];
+
+    for(const candidate of candidateFields){
+      const extracted = extractFindingsArrayFromAny(candidate);
+      if(extracted.length) return extracted;
+    }
+
+    return [];
+  }catch(_e){
+    return [];
+  }
+}
+
+function saveTempActions(){
+  localStorage.setItem(TEMP_KEY, JSON.stringify(tempActions));
+}
+
+function loadTempActionsFromStorage(){
+  try{
+    const raw = localStorage.getItem(TEMP_KEY);
+    tempActions = raw ? JSON.parse(raw) : [];
+    if(!Array.isArray(tempActions)) tempActions = [];
+  }catch(_e){
+    tempActions = [];
+  }
+
+  tempActions = tempActions.map((a, idx) => ({
+    ...a,
+    id: a.id || `temp:${idx}:${Date.now()}`,
+    finding_key: a.finding_key || a.finding_id || '',
+    finding_label: a.finding_label || 'Hallazgo'
+  }));
+}
+
+function saveReviewerSelection(){
+  localStorage.setItem(REVIEWER_KEY, reviewerSelect.value || "");
+}
+
+function loadReviewerSelection(){
+  const saved = localStorage.getItem(REVIEWER_KEY) || "";
+  reviewerSelect.value = saved;
+}
+
+function saveSignature(){
+  localStorage.setItem(SIGNATURE_KEY, signatureCanvas.toDataURL("image/png"));
+}
+
+function loadSignature(){
+  const dataUrl = localStorage.getItem(SIGNATURE_KEY);
+  if(!dataUrl){
+    clearSignatureCanvas(false);
+    return;
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    sigCtx.clearRect(0,0,signatureCanvas.width,signatureCanvas.height);
+    sigCtx.drawImage(img, 0, 0, signatureCanvas.width, signatureCanvas.height);
+    hasSignature = true;
+  };
+  img.src = dataUrl;
+}
+
+function clearSignatureCanvas(save = true){
+  sigCtx.clearRect(0,0,signatureCanvas.width,signatureCanvas.height);
+  sigCtx.fillStyle = "#ffffff";
+  sigCtx.fillRect(0,0,signatureCanvas.width,signatureCanvas.height);
+  sigCtx.strokeStyle = "#b6d6bf";
+  sigCtx.setLineDash([6,4]);
+  sigCtx.beginPath();
+  sigCtx.moveTo(20, signatureCanvas.height - 28);
+  sigCtx.lineTo(signatureCanvas.width - 20, signatureCanvas.height - 28);
+  sigCtx.stroke();
+  sigCtx.setLineDash([]);
+  sigCtx.fillStyle = "#6b7a6f";
+  sigCtx.font = "12px system-ui";
+  sigCtx.fillText("Firma del revisor", 20, signatureCanvas.height - 34);
+  hasSignature = false;
+  if(save){
+    localStorage.removeItem(SIGNATURE_KEY);
+  }
+}
+
+function getCanvasPos(e){
+  const rect = signatureCanvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (signatureCanvas.width / rect.width),
+    y: (clientY - rect.top) * (signatureCanvas.height / rect.height)
+  };
+}
+
+function startDraw(e){
+  isDrawing = true;
+  const p = getCanvasPos(e);
+  sigCtx.beginPath();
+  sigCtx.moveTo(p.x, p.y);
+  e.preventDefault();
+}
+
+function draw(e){
+  if(!isDrawing) return;
+  const p = getCanvasPos(e);
+  sigCtx.lineWidth = 2;
+  sigCtx.lineCap = "round";
+  sigCtx.strokeStyle = "#122016";
+  sigCtx.lineTo(p.x, p.y);
+  sigCtx.stroke();
+  hasSignature = true;
+  e.preventDefault();
+}
+
+function endDraw(){
+  if(!isDrawing) return;
+  isDrawing = false;
+  saveSignature();
+}
+
+async function loadProfiles(){
+  const { data, error } = await sb
+    .from("profiles")
+    .select("id,full_name");
+
+  if(error){
+    setErr("No pude cargar responsables: " + error.message);
+    return;
+  }
+
+  const responsibleSel = document.getElementById("responsible");
+  responsibleSel.innerHTML = '<option value="">Responsable</option>';
+
+  reviewerSelect.innerHTML = '<option value="">Selecciona revisor</option>';
+
+  (data || []).forEach(p=>{
+    profilesMap.set(p.id, p.full_name || p.id);
+
+    const opt1 = document.createElement("option");
+    opt1.value = p.id;
+    opt1.textContent = p.full_name || p.id;
+    responsibleSel.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = p.id;
+    opt2.textContent = p.full_name || p.id;
+    reviewerSelect.appendChild(opt2);
+  });
+
+  loadReviewerSelection();
+}
+
+async function loadDbFindings(){
+  const { data, error } = await sb
+    .from("findings")
+    .select("*")
+    .eq("audit_id", auditId)
+    .order("created_at", { ascending:false });
+
+  if(error){
+    console.log(error);
+    return [];
+  }
+  return data || [];
+}
+
+async function syncMissingFindings(selected, dbFindings){
+  const dbLabels = new Set(
+    dbFindings.map(f => normalizeText(getFindingSourceText(f))).filter(Boolean)
+  );
+
+  const missing = selected.filter(s => {
+    const text = normalizeText(s.condition || s.question || s.pregunta || "");
+    return text && !dbLabels.has(text);
+  });
+
+  if(!missing.length) return [];
+
+  const payload = missing.map(x => ({
+    audit_id: auditId,
+    condition: x.condition || x.question || x.pregunta || null,
+    criteria: x.criteria || null,
+    cause: x.cause || null,
+    effect: x.effect || null,
+    recommendation: x.recommendation || null,
+    section: x.section || null,
+    inspection_id: x.inspection_id || null,
+    template_id: x.template_id || null,
+    owner_user_id: x.owner_user_id || null,
+    due_date: x.due_date || null,
+    created_by: x.created_by || null,
+    status: "draft",
+    severity: "low",
+    created_at: new Date().toISOString()
+  }));
+
+  const { data, error } = await sb
+    .from("findings")
+    .upsert(payload, {
+      onConflict: "audit_id,template_id,section,condition"
+    })
+    .select("*");
+
+  if(error){
+    setErr("No pude sincronizar los hallazgos del PDF con la tabla findings: " + error.message);
+    return [];
+  }
+
+  return data || [];
+}
+
+function filterFindingsToCurrentPdf(dbFindings, selected){
+  if(!selected.length) return dbFindings;
+
+  const selectedLabels = new Set(
+    selected.map(s => normalizeText(
+      s.condition || s.question || s.pregunta || ""
+    )).filter(Boolean)
+  );
+
+  return dbFindings.filter(f => {
+    const label = normalizeText(getFindingSourceText(f));
+    return selectedLabels.has(label);
+  });
+}
+
+function mergeUniqueFindings(items){
+  const out = [];
+  const seen = new Set();
+
+  for(const item of (items || [])){
+    if(!item) continue;
+    const key = [
+      normalizeText(getFindingSourceText(item)),
+      item.template_id || '',
+      item.section || '',
+      item.id || ''
+    ].join('|');
+
+    if(seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+
+  return out;
+}
+
+async function loadFindings(){
+  findingSelect.innerHTML = '<option>Cargando hallazgos...</option>';
+  setErr("");
+  setOk("");
+
+  let selected = getSelectedFindingsFromStorage();
+
+  if(!Array.isArray(selected) || !selected.length){
+    selected = await getSelectedFindingsFromReportVersion();
+  }
+
+  selectedFindingsExact = Array.isArray(selected) ? selected : [];
+
+  if(selectedFindingsExact.length){
+    let dbFindings = await loadDbFindings();
+    const synced = await syncMissingFindings(selectedFindingsExact, dbFindings);
+    dbFindings = mergeUniqueFindings([...(synced || []), ...(dbFindings || [])]);
+
+    const filteredDb = filterFindingsToCurrentPdf(dbFindings, selectedFindingsExact);
+    findings = filteredDb.length
+      ? filteredDb
+      : mergeUniqueFindings(selectedFindingsExact.map(buildSelectedFindingOption));
+
+    renderFindings();
+    setOk(`Mostrando ${findings.length} hallazgo(s) del PDF actual.`);
+    return;
+  }
+
+  const dbFindings = await loadDbFindings();
+  if(dbFindings.length > 0){
+    findings = mergeUniqueFindings(dbFindings).slice(0, 10);
+    renderFindings();
+    setOk(`No llegó la selección exacta del PDF. Estoy mostrando ${findings.length} hallazgo(s) disponibles para esta auditoría como respaldo.`);
+    return;
+  }
+
+  findings = [];
+  renderFindings();
+  setErr('No encontré hallazgos asociados al PDF actual ni hallazgos disponibles en la auditoría.');
+}
+
+function renderFindings(){
+  const previousValue = findingSelect.value || '';
+  findingSelect.innerHTML = '<option value="">Selecciona un hallazgo</option>';
+
+  if(!findings.length){
+    findingSelect.innerHTML = '<option>No hay hallazgos del PDF actual</option>';
+    return;
+  }
+
+  findings.forEach((f, index) => {
+    const opt = document.createElement("option");
+    opt.value = f.id || `finding:${index}`;
+    opt.textContent = pickFindingLabel(f);
+    findingSelect.appendChild(opt);
+  });
+
+  if(previousValue && [...findingSelect.options].some(o => o.value === previousValue)){
+    findingSelect.value = previousValue;
+  }
+}
+
+function renderTempActions(){
+  if(!tempActions.length){
+    actionsTbody.innerHTML = "<tr><td colspan='5'>No hay acciones</td></tr>";
+    return;
+  }
+
+  actionsTbody.innerHTML = tempActions.map(a => {
+    const f = findings.find(x => (x.id || '') === (a.finding_key || a.finding_id || ''));
+    const label = a.finding_label || pickFindingLabel(f) || "Hallazgo";
+
+    return `
+      <tr>
+        <td>${label}</td>
+        <td>${a.description || ""}</td>
+        <td>${a.responsible_name || ""}</td>
+        <td>${a.due_date || ""}</td>
+        <td>${a.status || ""}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+document.getElementById("btnCreate").onclick = () => {
+  const findingId = findingSelect.value;
+  const description = document.getElementById("desc").value.trim();
+  const responsible = document.getElementById("responsible").value;
+  const due = document.getElementById("due").value;
+  const status = document.getElementById("status").value;
+  const closure = document.getElementById("closure").value.trim();
+
+  if(!findingId || !description){
+    alert("Selecciona hallazgo y descripción");
+    return;
+  }
+
+  const f = findings.find(x => (x.id || '') === findingId);
+  const action = {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+    finding_id: findingId,
+    finding_key: findingId,
+    finding_label: pickFindingLabel(f),
+    description,
+    responsible_user_id: responsible || null,
+    responsible_name: profilesMap.get(responsible) || "",
+    due_date: due || "",
+    status,
+    closure_notes: closure || "",
+    created_at: new Date().toISOString()
+  };
+
+  tempActions.unshift(action);
+  saveTempActions();
+  renderTempActions();
+
+  setOk("Acción guardada temporalmente. Ahora puedes anexarla al PDF.");
+
+  document.getElementById("desc").value = "";
+  document.getElementById("closure").value = "";
+  document.getElementById("due").value = "";
+  document.getElementById("status").value = "open";
+};
+
+document.getElementById("btnClearTemp").onclick = () => {
+  if(!confirm("¿Quieres borrar las acciones temporales de esta auditoría?")) return;
+  tempActions = [];
+  saveTempActions();
+  renderTempActions();
+  setOk("Acciones temporales eliminadas.");
+};
+
+document.getElementById("btnClearSignature").onclick = () => {
+  clearSignatureCanvas(true);
+  setOk("Firma limpiada.");
+};
+
+reviewerSelect.addEventListener("change", saveReviewerSelection);
+
+async function loadPdf(){
+  const { data, error } = await sb
+    .from("report_versions")
+    .select("*")
+    .eq("audit_id", auditId)
+    .order("generated_at", { ascending:false })
+    .limit(1);
+
+  if(error){
+    setErr("No pude cargar el PDF: " + error.message);
+    return;
+  }
+
+  if(!data?.length){
+    setErr("No encontré PDF para esta auditoría.");
+    return;
+  }
+
+  const path = data[0].pdf_path;
+  originalPdfUrl = SUPABASE_URL + "/storage/v1/object/public/reports/" + path;
+  currentPdfUrl = originalPdfUrl;
+
+  refreshPdfFrame(currentPdfUrl);
+}
+
+function wrapText(text, maxChars = 95){
+  const words = String(text || "").split(/\s+/);
+  const lines = [];
+  let line = "";
+
+  for(const w of words){
+    const test = line ? line + " " + w : w;
+    if(test.length > maxChars){
+      if(line) lines.push(line);
+      line = w;
+    }else{
+      line = test;
+    }
+  }
+
+  if(line) lines.push(line);
+  return lines;
+}
+
+function drawWatermark(page, logoImage){
+  const { width, height } = page.getSize();
+
+  const imgWidth = 175;
+  const imgHeight = 72;
+
+  for(let y = -10; y < height + 100; y += 150){
+    for(let x = -20; x < width + 140; x += 205){
+      page.drawImage(logoImage, {
+        x,
+        y,
+        width: imgWidth,
+        height: imgHeight,
+        opacity: 0.10,
+        rotate: PDFLib.degrees(32)
+      });
+    }
+  }
+}
+
+async function applyLogoWatermarkToDocument(pdfDoc){
+  const logoImage = await pdfDoc.embedPng(WATERMARK_LOGO_PNG_BASE64);
+  pdfDoc.getPages().forEach(pg => drawWatermark(pg, logoImage));
+}
+
+async function appendActionsToPdf(){
+  if(!originalPdfUrl){
+    setErr("Primero debe cargarse el PDF original.");
+    return null;
+  }
+
+  if(!tempActions.length){
+    setErr("No hay acciones temporales para anexar.");
+    return null;
+  }
+
+  const reviewerId = reviewerSelect.value;
+  const reviewerName = profilesMap.get(reviewerId) || "";
+
+  if(!reviewerId){
+    setErr("Selecciona el revisor antes de anexar al PDF.");
+    return null;
+  }
+
+  if(!hasSignature){
+    setErr("Debes firmar en el apartado de firma del revisor.");
+    return null;
+  }
+
+  try{
+    setErr("");
+    setOk("Generando PDF con acciones anexas...");
+
+    const existingPdfBytes = await fetch(originalPdfUrl).then(r => r.arrayBuffer());
+    const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
+
+    const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+    const signaturePng = localStorage.getItem(SIGNATURE_KEY);
+    const signatureImage = await pdfDoc.embedPng(signaturePng);
+
+    const pageWidth = 595.28;
+    const pageHeight = 841.89;
+    const margin = 45;
+    const lineHeight = 16;
+
+    let page = pdfDoc.addPage([pageWidth, pageHeight]);
+    let y = pageHeight - margin;
+
+    const addHeader = (pg, pageNumText) => {
+      pg.drawText("Acciones Correctivas Anexas", {
+        x: margin,
+        y: pageHeight - margin,
+        size: 18,
+        font: fontBold
+      });
+
+      pg.drawText(`Auditoría: ${auditId}`, {
+        x: margin,
+        y: pageHeight - margin - 24,
+        size: 10,
+        font
+      });
+
+      pg.drawText(pageNumText, {
+        x: pageWidth - 120,
+        y: pageHeight - margin - 4,
+        size: 10,
+        font
+      });
+
+      return pageHeight - margin - 50;
+    };
+
+    let annexPageNumber = 1;
+    y = addHeader(page, `Anexo ${annexPageNumber}`);
+
+    const ensureSpace = (neededLines = 1) => {
+      const needed = neededLines * lineHeight + 24;
+      if(y - needed < margin){
+        annexPageNumber += 1;
+        page = pdfDoc.addPage([pageWidth, pageHeight]);
+        y = addHeader(page, `Anexo ${annexPageNumber}`);
+      }
+    };
+
+    tempActions.forEach((a, index) => {
+      const f = findings.find(x => (x.id || '') === (a.finding_key || a.finding_id || ''));
+      const hallazgo = a.finding_label || pickFindingLabel(f) || "Hallazgo";
+
+      const block = [
+        `Hallazgo: ${hallazgo}`,
+        `Descripción: ${a.description || ""}`,
+        `Responsable: ${a.responsible_name || "—"}`,
+        `Fecha límite: ${a.due_date || "—"}`,
+        `Estado: ${a.status || "—"}`,
+        `Notas de cierre: ${a.closure_notes || "—"}`
+      ];
+
+      const wrapped = [];
+      block.forEach(line => {
+        wrapped.push(...wrapText(line, 85));
+      });
+
+      ensureSpace(wrapped.length + 3);
+
+      page.drawText(`Acción ${index + 1}`, {
+        x: margin,
+        y,
+        size: 13,
+        font: fontBold
+      });
+      y -= lineHeight + 4;
+
+      wrapped.forEach(line => {
+        page.drawText(line, {
+          x: margin + 10,
+          y,
+          size: 10,
+          font
+        });
+        y -= lineHeight;
+      });
+
+      y -= 10;
+      page.drawLine({
+        start: { x: margin, y },
+        end: { x: pageWidth - margin, y },
+        thickness: 0.8,
+        color: PDFLib.rgb(0.7, 0.7, 0.7)
+      });
+      y -= 18;
+    });
+
+    ensureSpace(12);
+
+    page.drawText("Firma del revisor", {
+      x: margin,
+      y,
+      size: 13,
+      font: fontBold
+    });
+    y -= 18;
+
+    page.drawText(`Nombre: ${reviewerName || "—"}`, {
+      x: margin,
+      y,
+      size: 10,
+      font
+    });
+    y -= 18;
+
+    page.drawText(`Fecha: ${new Date().toLocaleDateString()}`, {
+      x: margin,
+      y,
+      size: 10,
+      font
+    });
+    y -= 18;
+
+    page.drawImage(signatureImage, {
+      x: margin,
+      y: y - 90,
+      width: 220,
+      height: 90
+    });
+
+    page.drawLine({
+      start: { x: margin, y: y - 95 },
+      end: { x: margin + 240, y: y - 95 },
+      thickness: 1,
+      color: PDFLib.rgb(0.2, 0.2, 0.2)
+    });
+
+    await applyLogoWatermarkToDocument(pdfDoc);
+
+    const finalBytes = await pdfDoc.save();
+    const blob = new Blob([finalBytes], { type: "application/pdf" });
+
+    revokeCurrentBlobUrl();
+    currentBlobUrl = URL.createObjectURL(blob);
+    currentPdfUrl = currentBlobUrl;
+
+    refreshPdfFrame(currentPdfUrl);
+    setOk("PDF actualizado con acciones, firma del revisor y marcas de agua en todas las páginas.");
+
+    return { blob, bytes: finalBytes, reviewerId, reviewerName };
+  } catch (e) {
+    setErr("No pude anexar las acciones al PDF: " + (e?.message || String(e)));
+    return null;
+  }
+}
+
+async function saveActionsSnapshot(){
+  const reviewerId = reviewerSelect.value || null;
+  const reviewerName = profilesMap.get(reviewerId) || "";
+
+  const payload = tempActions.map(a => ({
+    audit_id: auditId,
+    finding_id: (a.finding_id && String(a.finding_id).startsWith("selected:")) ? null : (a.finding_id || null),
+    description: a.description || "",
+    responsible_user_id: a.responsible_user_id || null,
+    due_date: a.due_date || null,
+    status: a.status || "open",
+    closure_notes: a.closure_notes || null,
+    finding_label: a.finding_label || null,
+    responsible_name: a.responsible_name || null,
+    reviewer_user_id: reviewerId,
+    reviewer_name: reviewerName,
+    created_at: a.created_at || new Date().toISOString()
+  }));
+
+  if(!payload.length) return { ok:true, count:0 };
+
+  try{
+    const { error } = await sb.from("actions").insert(payload);
+    if(error){
+      console.warn("No se pudieron guardar las acciones en la tabla actions:", error.message);
+      return { ok:false, error:error.message };
+    }
+    return { ok:true, count:payload.length };
+  }catch(e){
+    console.warn("No se pudieron guardar las acciones:", e);
+    return { ok:false, error:e?.message || String(e) };
+  }
+}
+
+async function saveFinalPdfToStorage(blob){
+  const stamp = new Date().toISOString().replace(/[.:]/g, "-");
+  const filePath = `${FINAL_REPORT_PREFIX}/audit_${auditId}_${stamp}.pdf`;
+
+  const { error } = await sb.storage
+    .from("reports")
+    .upload(filePath, blob, {
+      contentType: "application/pdf",
+      upsert: true
+    });
+
+  if(error) throw new Error("Error guardando PDF final: " + error.message);
+
+  const { data: publicData } = sb.storage.from("reports").getPublicUrl(filePath);
+  return { filePath, publicUrl: publicData?.publicUrl || "" };
+}
+
+async function saveFinalReportVersion(filePath, publicUrl){
+  try{
+    await sb.from("report_versions").insert({
+      audit_id: auditId,
+      pdf_path: filePath,
+      generated_at: new Date().toISOString(),
+      version_type: "final_with_actions",
+      public_url: publicUrl || null
+    });
+  }catch(e){
+    console.warn("No se pudo registrar la nueva versión del reporte:", e);
+  }
+}
+
+async function finalizeAuditActions(){
+  const btn = document.getElementById("btnFinalizar");
+  setButtonState(btn, true, "Guardando...");
+
+  try{
+    setErr("");
+    setOk("");
+
+    const generated = await appendActionsToPdf();
+    if(!generated?.blob){
+      return;
+    }
+
+    setOk("Guardando PDF final...");
+    const savedPdf = await saveFinalPdfToStorage(generated.blob);
+
+    const actionSave = await saveActionsSnapshot();
+    await saveFinalReportVersion(savedPdf.filePath, savedPdf.publicUrl);
+
+    localStorage.setItem(`final_pdf_${auditId}`, JSON.stringify({
+      audit_id: auditId,
+      pdf_path: savedPdf.filePath,
+      pdf_url: savedPdf.publicUrl || "",
+      saved_at: new Date().toISOString()
+    }));
+
+    localStorage.removeItem(TEMP_KEY);
+    tempActions = [];
+    renderTempActions();
+
+    currentPdfUrl = savedPdf.publicUrl || currentPdfUrl;
+    if(currentPdfUrl){
+      refreshPdfFrame(currentPdfUrl);
+    }
+
+    const msg = actionSave.ok
+      ? "Todo quedó guardado. Abriendo el PDF final..."
+      : "PDF final guardado. Las acciones quedaron en el PDF, pero la tabla actions no se actualizó automáticamente. Abriendo el PDF final...";
+
+    setOk(msg);
+
+    setTimeout(() => {
+      if(savedPdf.publicUrl){
+        window.location.href = savedPdf.publicUrl;
+      }else if(currentPdfUrl){
+        window.location.href = currentPdfUrl;
+      }else{
+        window.location.href = FINAL_REDIRECT_URL;
+      }
+    }, 900);
+  } catch (e) {
+    setErr("No pude finalizar y guardar: " + (e?.message || String(e)));
+  } finally {
+    setButtonState(btn, false);
+  }
+}
+
+document.getElementById("btnAppendPdf").onclick = appendActionsToPdf;
+document.getElementById("btnFinalizar").onclick = finalizeAuditActions;
+document.getElementById("btnBack").onclick = () => history.back();
+
+signatureCanvas.addEventListener("mousedown", startDraw);
+signatureCanvas.addEventListener("mousemove", draw);
+signatureCanvas.addEventListener("mouseup", endDraw);
+signatureCanvas.addEventListener("mouseleave", endDraw);
+
+signatureCanvas.addEventListener("touchstart", startDraw, { passive:false });
+signatureCanvas.addEventListener("touchmove", draw, { passive:false });
+signatureCanvas.addEventListener("touchend", endDraw);
+
+async function refreshFindingsKeepingSelection(){
+  const prev = findingSelect.value;
+  await loadFindings();
+  if(prev && [...findingSelect.options].some(o => o.value === prev)){
+    findingSelect.value = prev;
+  }
+  renderTempActions();
+}
+
+window.addEventListener('focus', refreshFindingsKeepingSelection);
+window.addEventListener('storage', (e) => {
+  if((e.key || '').includes('selected_findings')){
+    refreshFindingsKeepingSelection();
+  }
+});
+
+async function init(){
+  if(!auditId){
+    setErr("Falta audit_id en la URL.");
+    return;
+  }
+
+  clearSignatureCanvas(false);
+  loadSignature();
+  loadTempActionsFromStorage();
+
+  await loadProfiles();
+  await loadFindings();
+  renderTempActions();
+  await loadPdf();
+}
+
+init();
+</script>
+</body>
+</html>

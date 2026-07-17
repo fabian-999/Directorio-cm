@@ -1,0 +1,2096 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CM Colombia • Hallazgos</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+function _on(id, ev, fn){
+  const el = document.getElementById(id);
+  if(el) el.addEventListener(ev, fn);
+}
+</script>
+<script>
+function pageUrl(filename, params){
+  const base = "/pages/";
+  const qs = params ? ("?" + new URLSearchParams(params).toString()) : "";
+  return base + filename + qs;
+}
+</script>
+
+  <style>
+    :root{
+      --green:#2e7d32;
+      --green2:#3aa23f;
+      --bg:#f4fbf6;
+      --card:#ffffff;
+      --line:#d8eadc;
+      --text:#0f1a12;
+      --muted:#5a6b5f;
+      --danger:#c62828;
+      --shadow:0 12px 30px rgba(16,24,16,.10);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:linear-gradient(180deg,#fff 0%,var(--bg) 42%,#fff 100%);
+      color:var(--text);
+    }
+
+    header{background:#fff;border-bottom:1px solid var(--line);}
+    .topbar{
+      max-width:1200px;margin:auto;padding:16px 18px;
+      display:flex;justify-content:space-between;align-items:center;
+      gap:12px;
+    }
+    .brand b{color:var(--green)}
+    .pill{
+      padding:8px 12px;border:1px solid var(--line);
+      border-radius:999px;font-size:12px;color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      padding:8px 14px;border-radius:999px;
+      background:#fff;cursor:pointer;font-weight:900;
+      transition:transform .05s ease, box-shadow .2s ease;
+      user-select:none;
+    }
+    .btn:hover{box-shadow:0 10px 18px rgba(0,0,0,.08)}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{
+      background:linear-gradient(180deg,var(--green2),var(--green));
+      color:#fff;border:none;
+    }
+    .btn-danger{border-color:#f2c4c4;color:var(--danger)}
+    .btn-ghost{background:#f8fbf8}
+
+    main{max-width:1200px;margin:auto;padding:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{
+      background:#fff;border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:18px;
+    }
+
+    h2{margin:0 0 10px;color:var(--green)}
+    label{font-size:12px;color:var(--muted);display:block;margin-top:10px}
+    input,select,textarea{
+      width:100%;padding:10px;border-radius:12px;
+      border:1px solid var(--line);font-size:13px;
+      outline:none;
+    }
+    textarea{min-height:70px}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;font-size:12px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{background:#eef8f0;color:var(--green);text-align:left}
+
+    .actions{display:flex;gap:6px;flex-wrap:wrap}
+    .danger{color:var(--danger);font-size:12px;margin-top:8px;white-space:pre-wrap}
+    .ok{color:var(--green);font-size:12px;margin-top:8px;white-space:pre-wrap}
+    .muted{color:var(--muted);font-size:12px}
+
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background:#f3fbf5;
+      color:var(--green);
+      font-weight:900;
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .badge.gray{color:#334155;background:#f6f7f8;border-color:#e5e7eb}
+    .badge.bad{color:#b71c1c;background:#fff5f5;border-color:#f2c4c4}
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .split{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:16px;
+    }
+    .modal-backdrop.show{display:flex}
+    .modal{
+      width:min(980px, 100%);
+      max-height: min(85vh, 900px);
+      overflow:auto;
+      background:#fff;
+      border-radius:18px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 20px 70px rgba(0,0,0,.35);
+      padding:16px;
+    }
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .modal-title{margin:0;color:var(--green);font-size:18px;font-weight:950}
+
+    .modal-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+
+    .qrow{
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fbfffc;
+    }
+    .qrow + .qrow{margin-top:10px}
+
+    .qtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .qtitle{font-weight:950}
+    .qmeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .chip{
+      font-size:11px;
+      font-weight:900;
+      border:1px solid var(--line);
+      padding:3px 10px;
+      border-radius:999px;
+      background:#f6fff7;
+      color:var(--green);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .chip.bad{background:#fff5f5;border-color:#f2c4c4;color:#b71c1c}
+
+    .qcomment{
+      margin-top:8px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#ffffff;
+      white-space:pre-wrap;
+    }
+
+    .check{
+      display:flex;gap:10px;align-items:flex-start;
+    }
+    .check input{margin-top:2px}
+
+    .hide-for-inspector{ display:none !important; }
+    textarea.readonly{background:#f2f6f3; color:#2b3a2f;}
+
+    .toast-host{
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 20000;
+      pointer-events: none;
+    }
+    .toast{
+      pointer-events: auto;
+      width: min(420px, calc(100vw - 32px));
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(0,0,0,.22);
+      overflow: hidden;
+      transform: translateY(-6px);
+      opacity: 0;
+      animation: toastIn .18s ease-out forwards;
+    }
+    @keyframes toastIn{ to { transform: translateY(0); opacity: 1; } }
+    @keyframes toastOut{ to { transform: translateY(-6px); opacity: 0; } }
+
+    .toast .bar{ height: 4px; background: #e5e7eb; }
+    .toast.error .bar{ background: #ef4444; }
+    .toast.ok .bar{ background: #22c55e; }
+    .toast.warn .bar{ background: #f59e0b; }
+
+    .toast .content{
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 10px;
+      padding: 12px 12px 12px 14px;
+      align-items: start;
+    }
+    .toast .icon{
+      width: 34px; height: 34px; border-radius: 12px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 950;
+      color: #fff;
+    }
+    .toast.error .icon{ background:#ef4444; }
+    .toast.ok .icon{ background:#22c55e; }
+    .toast.warn .icon{ background:#f59e0b; }
+
+    .toast .title{ font-weight: 950; margin: 2px 0 2px; }
+    .toast .msg{
+      font-size: 12px;
+      color: #334155;
+      white-space: pre-wrap;
+      line-height: 1.25rem;
+    }
+    .toast .close{
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 950;
+      padding: 6px 10px;
+      border-radius: 10px;
+      color: #334155;
+    }
+    .toast .close:hover{ background: rgba(0,0,0,.05); }
+  </style>
+</head>
+
+<body>
+<div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <b>CM Colombia</b><br>
+      <span style="font-size:12px;color:#5a6b5f">Auditorías • Hallazgos</span>
+    </div>
+    <div class="actions">
+      <div class="pill" id="pillUser">Sin sesión</div>
+      <button class="btn btn-ghost" onclick="location.href='audits.html'">← Auditorías</button>
+      <button class="btn btn-danger" id="btnLogout" type="button">Salir</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <section class="card">
+      <h2>Listado de hallazgos (por sección)</h2>
+
+      <label>Audit ID</label>
+      <input id="audit_id" placeholder="UUID auditoría">
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn btn-primary" onclick="loadFindings()">Actualizar</button>
+        <span class="muted" id="hintTpls"></span>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <span class="badge gray" id="badgeInspection">Inspección: —</span>
+        <span class="muted" id="hintInspection"></span>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row" style="justify-content:space-between">
+        <div class="split">
+          <span class="badge" id="sumBlocks">Secciones: 0</span>
+          <span class="badge gray" id="sumFindings">Negativos (escritos): 0</span>
+        </div>
+        <div class="split">
+          <label style="margin:0; min-width:240px">
+            <span class="muted">Filtrar sección</span>
+            <select id="blockFilter">
+              <option value="">Todas</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px"><input type="checkbox" id="selectAllFindings" title="Seleccionar todos"></th>
+            <th>Sección</th>
+            <th>Negativos con comentario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="4">Cargando…</td></tr>
+        </tbody>
+      </table>
+
+      <div class="row" style="margin-top:12px; justify-content:space-between">
+        <div class="split">
+          <span class="badge gray" id="selectedCount">Seleccionados: 0</span>
+        </div>
+        <div class="split">
+          <button class="btn btn-ghost" onclick="clearSelectedFindings()" id="btnClearSel" style="display:none">Deseleccionar todos</button>
+          <button class="btn btn-primary" onclick="exportSelectedFindingsToLocalStorage()" id="btnExportFindings" style="display:none">💾 Guardar al PDF</button>
+        </div>
+      </div>
+
+      <div class="danger" id="errList"></div>
+      <div class="ok" id="okList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Crear hallazgo (sección seleccionada)</h2>
+
+      <label>Plantilla / Sección</label>
+      <select id="tplSelect" multiple size="6">
+        <option value="">General / Manual</option>
+      </select>
+
+      <label class="hide-for-inspector">Severidad</label>
+      <select id="severity" class="hide-for-inspector">
+        <option value="low">low</option>
+        <option value="medium" selected>medium</option>
+        <option value="high">high</option>
+      </select>
+
+      <label class="hide-for-inspector">Estado</label>
+      <select id="status" class="hide-for-inspector">
+        <option value="draft" selected>draft</option>
+        <option value="open">open</option>
+        <option value="closed">closed</option>
+      </select>
+
+      <div class="row" style="justify-content:space-between">
+        <span class="badge" id="selectedSectionBadge">Sección: —</span>
+        <button class="btn btn-ghost" type="button" onclick="openSectionPickerFromButton()">📌 Traer comentarios</button>
+      </div>
+
+      <label style="margin-top:12px">Condición (comentarios negativos)</label>
+      <textarea id="condition" placeholder="Aquí se llenan los comentarios negativos seleccionados..."></textarea>
+
+      <label class="hide-for-inspector">Componentes para el PDF (opcional)</label>
+      <textarea id="pdf_components" class="hide-for-inspector" placeholder="Escribe aquí los componentes que deben pasar directamente al PDF..."></textarea>
+
+      <label class="hide-for-inspector">Criterio (plantilla / estándar)</label>
+      <textarea id="criteria" class="hide-for-inspector" placeholder="Ej: Plantilla: X · Área: Y"></textarea>
+
+      <label>Causa</label>
+      <textarea id="cause"></textarea>
+
+      <label>Efecto</label>
+      <textarea id="effect"></textarea>
+
+      <label>Recomendación</label>
+      <textarea id="recommendation"></textarea>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn btn-primary" type="button" onclick="appendFindingToPDF(event)">Anexar hallazgo al PDF</button>
+        <button class="btn" type="button" onclick="saveAndGoPDF(event)">Guardar y ver PDF</button>
+        <button class="btn" type="button" onclick="createFindingsFromNegatives()">⚡ Crear desde negativos</button>
+        <button class="btn" type="button" onclick="clearForm()">Limpiar</button>
+      </div>
+      <div id="pdfSelection" style="margin-top:10px"></div>
+      <div class="danger" id="errForm"></div>
+      <div class="ok" id="okForm"></div>
+    </section>
+
+  </div>
+</main>
+
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3 class="modal-title" id="modalTitle">Comentarios negativos</h3>
+        <div class="muted" id="modalSub"></div>
+      </div>
+      <button class="btn" onclick="closeModal()">Cerrar</button>
+    </div>
+    <div class="hr"></div>
+
+    <div id="modalList">
+      <div class="muted">—</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://xqlabhsjpqqpezvfsohd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_BgF_8jI43XBSoBGSS6n8NA_qYXhyD8z";
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+  });
+
+  function qs(name){ return new URLSearchParams(window.location.search).get(name); }
+  function esc(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+  function normalizeText(s){
+    return String(s||"")
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  const OPEN_NEUTRAL = [
+    "n/a","na","no aplica","no aplica.","no aplica:","sin informacion","sin información",
+    "sin dato","sin datos","sin evidencia reportada"
+  ];
+  const OPEN_POSITIVE = [
+    "todo bien","sin novedad","ok","okay","bien","excelente","cumple","perfecto","correcto",
+    "sin problema","sin problemas","conforme","satisfactorio","satisfactoria"
+  ];
+
+  const OPEN_NEG_WORDS = [
+    "nada","ninguno","ninguna","ningun","ningún","ninguna evidencia","sin nada","no hay nada",
+    "mal","malo","mala","pesimo","pésimo","horrible","regular","deficiente","inadecuado","inadecuada",
+    "insuficiente","incompleto","incompleta","deteriorado","deteriorada","danado","danada","dañado","dañada",
+    "roto","rota","averiado","averiada","inoperativo","inoperativa","vencido","vencida","caducado","caducada",
+    "falta","faltan","faltante","ausente","pendiente","incumple","incumplimiento","no cumple",
+    "no hay","no tiene","no funciona","no sirve","sin evidencia","sin documento","sin internet",
+    "riesgo","peligro","grave","urgente","critico","crítico",
+    "queja","quejas","reclamo","reclamos","mala atencion","mala atención","demora","lento","lenta","retraso",
+    "sucio","sucia","desorden","desordenado","desordenada"
+  ];
+
+  const OPEN_NEG_RX = [
+    /\bno\s+(hay|tiene|cuenta|funciona|sirve|existe|aplica|cumple|se\s+evidencia|se\s+observa|se\s+encuentra)\b/,
+    /\bsin\s+(evidencia|documento|internet|equipo|computador|pc|señal|senal|senalizacion|señalizacion|presupuesto|mantenimiento|control)\b/,
+    /\bfalta(n)?\b/,
+    /\bincumpl\w*\b/,
+    /\briesgo\b|\bpeligro\b|\bgrave\b|\burgente\b/,
+    /\bdañad[oa]\b|\bdanad[oa]\b|\broto\b|\baveriad[oa]\b|\binoperativ[oa]\b/,
+    /\bfalla\b|\bfallo\b|\berror\b|\bproblema\b/
+  ];
+
+  function isNegativeOpenText(text){
+    const t = normalizeText(text);
+    if(!t) return false;
+
+    const emptyNeg = new Set(["nada","ninguno","ninguna","ningun","ningún","no hay","no hay nada","sin nada"]);
+    if(emptyNeg.has(t)) return true;
+
+    for(const n of OPEN_NEUTRAL){
+      if(t === n || t.startsWith(n+" ")) return false;
+    }
+    for(const p of OPEN_POSITIVE){
+      if(t === p || t.includes(p)) return false;
+    }
+
+    for(const rx of OPEN_NEG_RX){
+      if(rx.test(t)) return true;
+    }
+
+    for(const w of OPEN_NEG_WORDS){
+      if(w.includes(" ")){
+        if(t.includes(w)) return true;
+      }else{
+        const rx = new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+        if(rx.test(t)) return true;
+      }
+    }
+
+    if(/\bno\b/.test(t) || /\bsin\b/.test(t)) return true;
+    if(t.length <= 4) return true;
+
+    return false;
+  }
+
+  function hasWrittenComment(c){ return String(c || "").trim().length > 0; }
+
+  let completedSigSet = new Set();
+
+  function sigForNegItem(it){
+    try{
+      if(it && it.answer_id) return `aid:${it.answer_id}`;
+      return `k:${it.tplKey}|q:${it.qid}|c:${String(it.comment||"")}`;
+    }catch(_e){
+      return "";
+    }
+  }
+
+  function loadCompletedSigSet(){
+    completedSigSet = new Set();
+    try{
+      const store = JSON.parse(localStorage.getItem("exportedFindings") || "{}") || {};
+      const arr = store.completedCommentSigs || [];
+      for(const s of arr) completedSigSet.add(String(s));
+    }catch(_e){}
+  }
+
+  function parseLikert(answer){
+    const raw = String(answer ?? "").trim();
+    if(!raw) return null;
+    const m = raw.match(/([1-5])/);
+    if(m) return Number(m[1]);
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+  function parseYesNo(answer){
+    const s = normalizeText(String(answer ?? ""));
+    if(!s) return null;
+    if(["si","sí","yes","y","true"].includes(s)) return true;
+    if(["no","n","false"].includes(s)) return false;
+    return null;
+  }
+
+  function negativityScore(text){
+    const t = normalizeText(text);
+    if(!t) return 0;
+
+    const neutralStrong = [
+      "n/a","na","no aplica","no aplica.", "no aplica:", "sin informacion", "sin información",
+      "sin dato","sin datos","sin evidencia reportada"
+    ];
+    for(const n of neutralStrong){
+      if(t === n || t.startsWith(n+" ")) return -2;
+    }
+
+    const positiveStrong = [
+      "todo bien","sin novedad","ok","okay","bien","excelente","cumple","perfecto","correcto",
+      "sin problema","sin problemas","conforme","satisfactorio","satisfactoria"
+    ];
+    for(const p of positiveStrong){
+      if(t === p || t.includes(p)) return -5;
+    }
+
+    const strongRx = [
+      /no\s+(hay|tiene|cuenta|funciona|sirve|existe|aplica|cumple|se\s+evidencia|se\s+encuentra|se\s+observa)/,
+      /sin\s+(evidencia|documento|internet|equipo|computador|pc|señal|senal|senalizacion|señalizacion|presupuesto|mantenimiento|control)/,
+      /\bfalta(n)?\b/,
+      /\bincumpl\w*\b/,
+      /\bno\s+cumple\b/,
+      /\briesgo\b|\bpeligro\b|\bgrave\b|\burgente\b/,
+      /\bdañad[oa]\b|\bdanad[oa]\b|\broto\b|\baveriad[oa]\b|\binoperativ[oa]\b/,
+      /\bfalla\b|\bfallo\b|\berror\b|\bproblema\b/
+    ];
+
+    const negWords = [
+      "mal","malo","mala","regular","deficiente","inadecuado","inadecuada","insuficiente",
+      "sucio","sucia","desorden","desordenado","deteriorado","deteriorada","dañado","dañada","danado","danada",
+      "vencido","vencida","caducado","caducada","incompleto","incompleta","ausente",
+      "pendiente","por mejorar","requiere","necesita","no tiene","no hay",
+      "no está","no esta","no se","no funciona","no sirve","no cumple","incumple","riesgo","peligro",
+      "queja","quejas","reclamo","reclamos","demora","lento","lenta","tarde","retraso",
+      "falla","fallo","error","problema","observa","se observa","se evidencia","presenta"
+    ];
+
+    let score = 0;
+    for(const rx of strongRx){
+      if(rx.test(t)) score += 3;
+    }
+
+    let hits = 0;
+    const seen = new Set();
+    for(const w of negWords){
+      if(seen.has(w)) continue;
+      if(t.includes(w)){
+        seen.add(w);
+        hits += 1;
+      }
+    }
+    score += hits;
+
+    if(/\bno\b/.test(t)) score += 1;
+    if(/\bsin\b/.test(t)) score += 1;
+
+    if(t.length <= 6 && score > 0) score += 1;
+
+    return score;
+  }
+
+  function isNegativeText(text){
+    return negativityScore(text) >= 1;
+  }
+
+  const HALLAZGOS_SESSION_KEY = "hallazgos_session_id";
+  function getCurrentHallazgosSessionId(){
+    try{
+      let sid = localStorage.getItem(HALLAZGOS_SESSION_KEY) || sessionStorage.getItem(HALLAZGOS_SESSION_KEY) || "";
+      if(!sid){
+        sid = `hs_${Date.now()}_${Math.random().toString(36).slice(2,10)}`;
+      }
+      try{ localStorage.setItem(HALLAZGOS_SESSION_KEY, sid); }catch(_e){}
+      try{ sessionStorage.setItem(HALLAZGOS_SESSION_KEY, sid); }catch(_e){}
+      return sid;
+    }catch(_e){
+      return `hs_${Date.now()}`;
+    }
+  }
+
+  let sessionUser = null;
+
+  let tplInfoById = new Map();
+  let sectionsById = {};
+  let currentInspectionId = "";
+  let currentInspectionIds = [];
+
+  let questionsById = new Map();
+
+  let negativeItems = [];
+  let modalCurrentItems = [];
+  let currentCommentItem = null;
+
+  let selectedTplKeys = [];
+  let selectedTplKey = "";
+  let selectedTemplateId = "";
+
+  let modalOpenTplKeys = [];
+  let pickedItemsForFinding = [];
+
+  async function requireSession(){
+    const { data } = await sb.auth.getSession();
+    if(!data.session){
+      location.href = "/index.html";
+      return;
+    }
+    sessionUser = data.session.user;
+    document.getElementById("pillUser").textContent = sessionUser.email;
+  }
+
+  btnLogout.onclick = async ()=>{ await sb.auth.signOut(); location.href = "/index.html"; };
+
+  async function tryLoadTemplateInfo(tplIds){
+    tplInfoById = new Map();
+    if(!tplIds.length) return;
+
+    const { data, error } = await sb
+      .from("checklist_templates")
+      .select("id,name,area")
+      .in("id", tplIds);
+
+    if(error) return;
+    for(const t of (data||[])){
+      tplInfoById.set(String(t.id), { name: t.name || "", area: t.area || "" });
+    }
+  }
+
+  function parseTplKey(key){
+    const k = String(key || "");
+    if(k.startsWith("tpl:")) return { type:"tpl", id: k.slice(4) };
+    if(k && k !== "__manual__" && k !== "__sin_seccion__") return { type:"sec", id: k };
+    return { type:"other", id: "" };
+  }
+
+  function tplLabel(key){
+    const { type, id } = parseTplKey(key);
+    if(!key || key === "__sin_seccion__") return "Sin sección";
+    if(type === "tpl"){
+      const info = tplInfoById.get(String(id));
+      return (info?.name || `Plantilla ${String(id).slice(0,8)}…`);
+    }
+    if(type === "sec"){
+      const s = sectionsById[String(id)];
+      if(s?.title) return s.title;
+      return `Sección ${String(id).slice(0,8)}…`;
+    }
+    return "General / Manual";
+  }
+
+  function tplArea(key){
+    const { type, id } = parseTplKey(key);
+    if(type === "tpl"){
+      const info = tplInfoById.get(String(id));
+      return info?.area || "";
+    }
+    return "";
+  }
+
+  function parseInspectionIdsFromQS(){
+    const p = new URLSearchParams(window.location.search);
+
+    const repeated = p.getAll("inspection_ids").filter(Boolean);
+    if(repeated.length){
+      const flat = repeated.flatMap(v => String(v).split(",")).map(s => s.trim()).filter(Boolean);
+      return Array.from(new Set(flat));
+    }
+
+    const csv = p.get("inspection_ids");
+    if(csv){
+      const ids = String(csv).split(",").map(s => s.trim()).filter(Boolean);
+      return Array.from(new Set(ids));
+    }
+
+    const single = p.get("inspection_id");
+    if(single) return [String(single).trim()].filter(Boolean);
+
+    return [];
+  }
+
+  async function resolveInspectionIds(auditId){
+    const fromQS = parseInspectionIdsFromQS();
+    if(fromQS.length) return fromQS;
+
+    if(!auditId) return [];
+
+    const { data, error } = await sb
+      .from("inspections")
+      .select("id,created_at,status")
+      .eq("audit_id", auditId)
+      .order("created_at", { ascending:true });
+
+    if(error) return [];
+
+    const ids = (data || [])
+      .map(r => String(r.id || "").trim())
+      .filter(Boolean);
+
+    return Array.from(new Set(ids));
+  }
+
+  async function fetchAnswersForInspections(inspectionIds){
+    const ids = (inspectionIds || []).map(String).filter(Boolean);
+    if(!ids.length) return [];
+    const { data, error } = await sb
+      .from("inspection_answers")
+      .select("*")
+      .in("inspection_id", ids);
+
+    if(error) throw new Error("No pude leer inspection_answers (multi): " + error.message);
+    return data || [];
+  }
+
+  async function fetchQuestionsByIds(qids){
+    if(!qids.length) return new Map();
+
+    const { data, error } = await sb
+      .from("checklist_questions")
+      .select("*")
+      .in("id", qids);
+
+    if(error) throw new Error("No pude leer checklist_questions: " + error.message);
+
+    const m = new Map();
+    for(const q of (data||[])){
+      m.set(String(q.id), q);
+    }
+    return m;
+  }
+
+  function isBadAnswerByType(qtype, answer){
+    const qt = String(qtype||"").toLowerCase();
+
+    if(qt === "likert"){
+      const n = parseLikert(answer);
+      if(n === null) return false;
+      return n <= 3;
+    }
+
+    const yn = parseYesNo(answer);
+    if(yn === false) return true;
+
+    const s = normalizeText(String(answer||""));
+    if(s === "no") return true;
+    return false;
+  }
+
+  function safeParseJson(v, fallback){
+    try{
+      if(v == null) return fallback;
+      if(typeof v === "object") return v;
+      const s = String(v).trim();
+      if(!s) return fallback;
+      return JSON.parse(s);
+    }catch(_e){
+      return fallback;
+    }
+  }
+
+  function parseAnswerToList(raw){
+    if(raw == null) return [];
+    if(Array.isArray(raw)) return raw.map(x=>String(x).trim()).filter(Boolean);
+    const s = String(raw).trim();
+    if(!s) return [];
+    if(s.startsWith("[") && s.endsWith("]")){
+      const j = safeParseJson(s, []);
+      if(Array.isArray(j)) return j.map(x=>String(x).trim()).filter(Boolean);
+    }
+    return s.split(/[,;\n]/g).map(x=>x.trim()).filter(Boolean);
+  }
+
+  function getQuestionConfig(q){
+    return safeParseJson(q?.config ?? q?.cfg ?? q?.settings ?? q?.meta ?? q?.params ?? q?.jsonb ?? q?.options_config, {}) || {};
+  }
+
+  function getCorrectListFromConfig(cfg){
+    const raw = cfg?.correct_answers ?? cfg?.correctAnswers ?? cfg?.correct ?? cfg?.correct_options ?? cfg?.correctOptions ?? cfg?.required_items ?? cfg?.requiredItems ?? null;
+    if(Array.isArray(raw)) return raw.map(x=>String(x).trim()).filter(Boolean);
+    const j = safeParseJson(raw, null);
+    if(Array.isArray(j)) return j.map(x=>String(x).trim()).filter(Boolean);
+    return [];
+  }
+
+  function buildNegativeItemsFromAnswers(answersRows){
+    const items = [];
+
+    for(const a of answersRows){
+      const q = questionsById.get(String(a.question_id));
+      const qText = q?.text || "(Pregunta)";
+      const qtype = (q?.qtype || "text").toLowerCase();
+      const tplId = q?.template_id ? String(q.template_id) : "";
+      const secId = (q?.section_id ?? q?.checklist_section_id ?? q?.section ?? q?.section_uuid ?? q?.sectionId);
+
+      const secKey = secId ? String(secId) : (tplId ? `tpl:${tplId}` : "__sin_seccion__");
+      const tplKey = secKey;
+
+      const rawAns = (a.answer ?? a.answer_text ?? a.answerText ?? a.text_answer ?? a.textAnswer ??
+                      a.value ?? a.value_text ?? a.valueText ?? a.response ?? a.response_text ??
+                      a.open_answer ?? a.openAnswer ?? a.free_text ?? a.freeText ?? a.text ?? a.open_text ?? "");
+      const comm = String(a.comment || "").trim();
+      const notes = String(a.notes || "").trim();
+      const written = comm || notes;
+
+      const ans = rawAns;
+      const ansText = (typeof rawAns === "string") ? rawAns.trim() : String(rawAns ?? "").trim();
+
+      let neg = false;
+      let why = "";
+      let commentToShow = "";
+
+      if(qtype === "likert"){
+        const byAnswer = isBadAnswerByType(qtype, ans);
+        const byComment = hasWrittenComment(written) && isNegativeText(written);
+
+        if((byAnswer && hasWrittenComment(written)) || byComment){
+          neg = true;
+          why = byAnswer ? "Likert ≤ 3" : "Comentario negativo";
+          commentToShow = written || "";
+        }
+      } else if(qtype === "yes_no" || qtype === "choice" || qtype === "checklist"){
+        const cfg = getQuestionConfig(q);
+        const correctList = getCorrectListFromConfig(cfg);
+        const allowMulti = (cfg?.multiple === true || cfg?.allow_multiple === true || cfg?.multi === true ||
+                            cfg?.allow_multiple_answers === true || cfg?.allowMultipleAnswers === true ||
+                            Number(cfg?.max_select||0) > 1 || (correctList.length > 1) ||
+                            (cfg?.allow_multiple_correct === true || cfg?.allowMultipleCorrect === true || cfg?.multiple_correct === true));
+
+        const selectedList = parseAnswerToList(ans);
+
+        if(allowMulti && correctList.length){
+          const sel = new Set(selectedList.map(x=>normalizeText(x)));
+          const req = correctList.map(x=>String(x));
+          const missing = req.filter(x => !sel.has(normalizeText(x)));
+          if(missing.length){
+            neg = true;
+            why = "Faltan ítems requeridos";
+            const missTxt = missing.join(", ");
+            commentToShow = (written && written.trim())
+              ? `${written.trim()} (Faltan: ${missTxt})`
+              : `Faltan: ${missTxt}`;
+          }
+        }
+
+        if(!neg){
+          const byAnswer = isBadAnswerByType(qtype, ans);
+          const byComment = hasWrittenComment(written) && isNegativeText(written);
+
+          if((byAnswer && hasWrittenComment(written)) || byComment){
+            neg = true;
+            why = byAnswer ? "Negativo por respuesta" : "Comentario negativo";
+            commentToShow = written || "";
+          }
+        }
+      } else {
+        const byAnswerText = ansText && isNegativeOpenText(ansText);
+        const byComment = hasWrittenComment(written) && isNegativeOpenText(written);
+
+        if(byComment || byAnswerText){
+          neg = true;
+          why = byComment ? "Comentario negativo" : "Texto negativo";
+          commentToShow = byComment ? written : ansText;
+        }
+      }
+
+      if(!neg) continue;
+      if(!String(commentToShow||"").trim()) continue;
+
+      items.push({
+        tplKey, tplId,
+        qid: String(a.question_id),
+        iid: String(a.inspection_id),
+        qText,
+        qType: qtype,
+        answer: ans,
+        comment: commentToShow,
+        why,
+        answer_id: String(a.id)
+      });
+    }
+
+    return items;
+  }
+
+  function groupBySection(items){
+    const groups = new Map();
+    for(const it of items){
+      if(!groups.has(it.tplKey)) groups.set(it.tplKey, []);
+      groups.get(it.tplKey).push(it);
+    }
+    return groups;
+  }
+
+  function renderSectionFilter(sectionKeys){
+    const bf = document.getElementById("blockFilter");
+    const cur = bf.value || "";
+
+    bf.innerHTML = `<option value="">Todas</option>` + sectionKeys.map(k=>{
+      const name = (k === "__manual__") ? "General / Manual" : tplLabel(k);
+      return `<option value="${esc(k)}">${esc(name)}</option>`;
+    }).join("");
+
+    bf.value = cur;
+  }
+
+  function selectSection(tplKeyOrKeys){
+    const keys = Array.isArray(tplKeyOrKeys)
+      ? tplKeyOrKeys.filter(Boolean).map(String)
+      : [String(tplKeyOrKeys || "")].filter(Boolean);
+
+    selectedTplKeys = keys.length ? keys : [];
+    selectedTplKey = selectedTplKeys[0] || "";
+
+    if(selectedTplKeys.length === 1){
+      const firstItem = negativeItems.find(i => i.tplKey === selectedTplKey && i.tplId);
+      selectedTemplateId = firstItem ? String(firstItem.tplId) : "";
+    }else{
+      selectedTemplateId = "";
+    }
+
+    const badge = document.getElementById("selectedSectionBadge");
+
+    if(!selectedTplKeys.length){
+      badge.textContent = "Sección: —";
+      return;
+    }
+
+    if(selectedTplKeys.length === 1){
+      const k = selectedTplKey;
+      const title = (k === "__manual__") ? "General / Manual" : tplLabel(k);
+      badge.textContent = `Sección: ${title}`;
+    }else{
+      badge.textContent = `Secciones: ${selectedTplKeys.map(k => tplLabel(k)).join(" · ")}`;
+    }
+
+    if(!criteria.value.trim()){
+      const titles = selectedTplKeys.map(k => (k === "__manual__") ? "General / Manual" : tplLabel(k));
+      const uniq = Array.from(new Set(titles));
+      const area = (selectedTplKeys.length === 1) ? tplArea(selectedTplKey) : "";
+      const base = (uniq.length === 1)
+        ? (area ? `Plantilla: ${uniq[0]} · Área: ${area}` : `Plantilla: ${uniq[0]}`)
+        : `Plantillas: ${uniq.join(", ")}`;
+
+      criteria.value = `Sección${uniq.length>1 ? "es" : ""}: ${uniq.join(", ")}
+${base}`;
+    }
+
+    try{
+      const sel = document.getElementById("tplSelect");
+      if(sel){
+        const opts = Array.from(sel.options);
+        opts.forEach(o => { o.selected = false; });
+        for(const k of selectedTplKeys){
+          const v = (k === "__manual__") ? "" : k;
+          const opt = opts.find(o => String(o.value) === String(v));
+          if(opt) opt.selected = true;
+        }
+      }
+    }catch(_e){}
+  }
+
+  async function openSectionPickerFromButton(){
+    if(!selectedTplKeys || !selectedTplKeys.length){
+      const first = Array.from(new Set(negativeItems.map(i => i.tplKey)))[0];
+      if(first) selectSection([first]);
+    }
+
+    if(selectedTplKeys && selectedTplKeys.length){
+      if(selectedTplKeys.length === 1){
+        openModalForSection(selectedTplKeys[0]);
+      }else{
+        openModalForSections(selectedTplKeys);
+      }
+    }
+  }
+
+  function closeModal(){
+    const backdrop = document.getElementById("modalBackdrop");
+    backdrop.classList.remove("show");
+    backdrop.setAttribute("aria-hidden","true");
+    modalOpenTplKeys = [];
+  }
+
+  document.getElementById("modalBackdrop").addEventListener("click", (e)=>{
+    if(e.target.id === "modalBackdrop") closeModal();
+  });
+
+  function openModalForSection(tplKey){
+    modalOpenTplKeys = [tplKey];
+
+    const title = document.getElementById("modalTitle");
+    const sub = document.getElementById("modalSub");
+    const list = document.getElementById("modalList");
+
+    const sectionName = (tplKey === "__manual__") ? "General / Manual" : tplLabel(tplKey);
+    const area = (tplKey === "__manual__") ? "" : tplArea(tplKey);
+
+    const items = negativeItems.filter(i => i.tplKey === tplKey);
+    items.sort((a,b)=> a.qText.localeCompare(b.qText));
+    modalCurrentItems = items;
+
+    title.textContent = "Comentarios negativos por preguntas";
+    const inspLabel = currentInspectionIds.length > 1
+      ? `${currentInspectionIds.length} inspecciones`
+      : `inspección ${String(currentInspectionId||"").slice(0,8)}…`;
+    sub.textContent = `${sectionName}${area ? ` · ${area}` : ""} · ${items.length} comentarios · ${inspLabel}`;
+
+    if(!items.length){
+      list.innerHTML = `<div class="muted">No hay comentarios negativos en esta sección.</div>`;
+    }else{
+      list.innerHTML = items.map((it, idx)=>{
+        const ansShow = (it.qType === "likert")
+          ? `Likert: ${String(it.answer ?? "")}`
+          : (it.qType === "yes_no" || it.qType === "choice")
+            ? `Respuesta: ${String(it.answer ?? "")}`
+            : (it.qType === "checklist")
+              ? `Respuesta: ${(Array.isArray(it.answer) ? it.answer : [it.answer]).filter(Boolean).join(", ")}`
+              : "Texto";
+
+        return `
+          <div class="qrow">
+            <div class="check">
+              <div style="flex:1">
+                <div class="qtop">
+                  <div>
+                    <div class="qtitle">${esc(it.qText)}</div>
+                    <div class="qmeta" style="margin-top:6px">
+                      <span class="chip bad">${esc(ansShow)}</span>
+                      <span class="chip bad">${esc(it.why)}</span>
+                      <span class="chip">Con comentario</span>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button class="btn" type="button" onclick="startFindingFromModalIndex(${idx})">➕ Hallazgo</button>
+                  </div>
+                </div>
+                <div class="qcomment">${esc(it.comment)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("\n");
+    }
+
+    const backdrop = document.getElementById("modalBackdrop");
+    backdrop.classList.add("show");
+    backdrop.setAttribute("aria-hidden","false");
+  }
+
+  function openModalForSections(tplKeys){
+    const keys = (tplKeys || []).filter(Boolean).map(String);
+    if(!keys.length) return;
+
+    modalOpenTplKeys = keys;
+
+    const title = document.getElementById("modalTitle");
+    const sub = document.getElementById("modalSub");
+    const list = document.getElementById("modalList");
+
+    const items = negativeItems
+      .filter(i => keys.includes(String(i.tplKey)))
+      .sort((a,b) => {
+        const ka = String(a.tplKey || "");
+        const kb = String(b.tplKey || "");
+        if(ka !== kb) return ka.localeCompare(kb);
+        return String(a.qText || "").localeCompare(String(b.qText || ""));
+      });
+
+    modalCurrentItems = items;
+
+    title.textContent = "Comentarios negativos por secciones";
+    sub.textContent = `Secciones: ${keys.map(k => tplLabel(k)).join(" · ")} · ${items.length} comentarios`;
+
+    if(!items.length){
+      list.innerHTML = `<div class="muted">No hay comentarios negativos en las secciones seleccionadas.</div>`;
+    }else{
+      list.innerHTML = items.map((it, idx)=>{
+        const ansShow = (it.qType === "likert")
+          ? `Likert: ${String(it.answer ?? "")}`
+          : (it.qType === "yes_no" || it.qType === "choice")
+            ? `Respuesta: ${String(it.answer ?? "")}`
+            : (it.qType === "checklist")
+              ? `Respuesta: ${(Array.isArray(it.answer) ? it.answer : [it.answer]).filter(Boolean).join(", ")}`
+              : "Texto";
+
+        return `
+          <div class="qrow">
+            <div class="check">
+              <div style="flex:1">
+                <div class="qtop">
+                  <div>
+                    <div class="qtitle">${esc(tplLabel(it.tplKey))} · ${esc(it.qText)}</div>
+                    <div class="qmeta" style="margin-top:6px">
+                      <span class="chip bad">${esc(ansShow)}</span>
+                      <span class="chip bad">${esc(it.why)}</span>
+                      <span class="chip">Con comentario</span>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button class="btn" type="button" onclick="startFindingFromModalIndex(${idx})">➕ Hallazgo</button>
+                  </div>
+                </div>
+                <div class="qcomment">${esc(it.comment)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("\n");
+    }
+
+    const backdrop = document.getElementById("modalBackdrop");
+    backdrop.classList.add("show");
+    backdrop.setAttribute("aria-hidden","false");
+  }
+
+  function isOpenQType(qType){
+    const t = String(qType||"").toLowerCase();
+    return t.includes("open") || t === "text" || t === "open_text" || t === "free_text";
+  }
+
+  function startFindingFromModalIndex(idx){
+    const it = modalCurrentItems?.[idx];
+    if(!it){
+      alert("No pude ubicar el comentario seleccionado.");
+      return;
+    }
+
+    selectSection([it.tplKey]);
+    currentCommentItem = it;
+
+    const line = `${it.qText}: ${it.comment}`;
+    condition.value = line;
+
+    const condEl = document.getElementById("condition");
+    if(condEl){
+      const open = isOpenQType(it.qType);
+      condEl.readOnly = !open;
+      condEl.classList.toggle("readonly", !open);
+      condEl.title = !open ? "Condición bloqueada: esta pregunta no es abierta" : "";
+    }
+
+    okForm.textContent = "Creando hallazgo para 1 comentario. Completa Causa/Efecto/Recomendación y guarda.";
+    errForm.textContent = "";
+
+    setTimeout(()=>{ try{ document.getElementById("cause")?.focus(); }catch(_e){} }, 0);
+    closeModal();
+  }
+
+  function goEvidenceFromHallazgos(answerId, questionId, inspectionId){
+    try{
+      const params = new URLSearchParams();
+      params.set("inspection_id", inspectionId || currentInspectionId);
+      params.set("question_id", questionId);
+      params.set("answer_id", answerId);
+      const aid = document.getElementById("audit_id").value.trim();
+      if(aid){
+        params.set("audit_id", aid);
+        params.set("kind", "audit");
+        params.set("id", aid);
+      }
+      location.href = `evidencias.html?${params.toString()}`;
+    }catch(e){
+      alert("No pude abrir evidencias.");
+    }
+  }
+
+  async function loadFindings(){
+    try{
+      errList.textContent = okList.textContent = "";
+      tbody.innerHTML = `<tr><td colspan="4">Cargando…</td></tr>`;
+
+      const auditId = audit_id.value.trim();
+      if(!auditId){
+        errList.textContent = "Falta audit_id";
+        tbody.innerHTML = `<tr><td colspan="4">—</td></tr>`;
+        return;
+      }
+
+      currentInspectionIds = await resolveInspectionIds(auditId);
+      currentInspectionId = currentInspectionIds[0] || "";
+
+      if(currentInspectionIds.length){
+        if(currentInspectionIds.length === 1){
+          badgeInspection.textContent = `Inspección: ${currentInspectionId.slice(0,8)}…`;
+          hintInspection.textContent = qs("inspection_id")
+            ? "Mostrando SOLO la inspección enviada por URL."
+            : "Mostrando la única inspección asociada a esta auditoría.";
+        }else{
+          badgeInspection.textContent = `Inspecciones: ${currentInspectionIds.length}`;
+          hintInspection.textContent = qs("inspection_ids")
+            ? "Mostrando las inspecciones enviadas por URL (múltiples)."
+            : "Mostrando todas las inspecciones asociadas a esta auditoría.";
+        }
+      }else{
+        badgeInspection.textContent = "Inspección: —";
+        hintInspection.textContent = "No pude detectar inspección para este audit_id.";
+      }
+
+      if(!currentInspectionIds.length){
+        tbody.innerHTML = `<tr><td colspan="4">No hay inspección para este audit_id.</td></tr>`;
+        return;
+      }
+
+      const answersRows = await fetchAnswersForInspections(currentInspectionIds);
+      const qids = Array.from(new Set(answersRows.map(r=>String(r.question_id))));
+      questionsById = await fetchQuestionsByIds(qids);
+
+      sectionsById = {};
+      for(const q of questionsById.values()){
+        const sid = (q?.section_id ?? q?.checklist_section_id);
+        if(sid === null || sid === undefined) continue;
+
+        const sidKey = String(sid);
+        if(sectionsById[sidKey]) continue;
+
+        const title =
+          q?.section_title ||
+          q?.section_name ||
+          q?.section ||
+          q?.block ||
+          q?.group ||
+          q?.area ||
+          null;
+
+        sectionsById[sidKey] = { title: title ? String(title) : `Sección ${sidKey.slice(0,8)}…` };
+      }
+
+      negativeItems = buildNegativeItemsFromAnswers(answersRows);
+
+      loadCompletedSigSet();
+      negativeItems = (negativeItems || []).filter(it => !completedSigSet.has(sigForNegItem(it)));
+
+      const tplIds = Array.from(new Set(
+        Array.from(questionsById.values()).map(q => q.template_id).filter(Boolean).map(String)
+      ));
+      await tryLoadTemplateInfo(tplIds);
+
+      const groups = groupBySection(negativeItems);
+
+      const allKeysSet = new Set();
+      for(const q of Array.from(questionsById.values())){
+        const tid = q && q.template_id ? String(q.template_id) : "";
+        const sec = (q && q.section) ? String(q.section) : "";
+        const sid = (q?.section_id ?? q?.checklist_section_id);
+        const k = (sid !== null && sid !== undefined)
+          ? String(sid)
+          : (tid ? `tpl:${tid}` : (sec || "__sin_seccion__"));
+        allKeysSet.add(k);
+      }
+      for(const k of allKeysSet){
+        if(!groups.has(k)) groups.set(k, []);
+      }
+      const keys = Array.from(allKeysSet).sort((a,b)=> a.localeCompare(b));
+
+      renderSectionFilter(keys);
+
+      try{
+        const sel = document.getElementById("tplSelect");
+        if(sel){
+          const curVals = Array.from(sel.selectedOptions || []).map(o => String(o.value || ""));
+          sel.innerHTML = `<option value="">General / Manual</option>` + keys
+            .filter(k => k && k !== "__manual__")
+            .map(k => `<option value="${esc(k)}">${esc(tplLabel(k))}</option>`)
+            .join("");
+          Array.from(sel.options).forEach(opt => {
+            opt.selected = curVals.includes(String(opt.value || ""));
+          });
+        }
+      }catch(_e){}
+
+      const chosen = blockFilter.value || "";
+      const visibleKeys = chosen ? keys.filter(k=>k===chosen) : keys;
+
+      sumBlocks.textContent = `Secciones: ${visibleKeys.length}`;
+      sumFindings.textContent = `Negativos (escritos): ${negativeItems.length}`;
+
+      if(!negativeItems.length){
+        okList.textContent = "✅ No hay comentarios negativos escritos (del momento).";
+        tbody.innerHTML = `<tr><td colspan="4">✅ No hay comentarios negativos escritos para esta auditoría.</td></tr>`;
+        document.getElementById('btnExportFindings').style.display = 'none';
+        document.getElementById('btnClearSel').style.display = 'none';
+        return;
+      }
+
+      okList.textContent = `${negativeItems.length} comentarios negativos escritos`;
+
+      tbody.innerHTML = visibleKeys.map(k=>{
+        const items = groups.get(k) || [];
+        const name = (k === "__manual__") ? "General / Manual" : tplLabel(k);
+        const area = (k === "__manual__") ? "" : tplArea(k);
+
+        return `
+          <tr class="finding-row" data-section="${esc(k)}">
+            <td><input type="checkbox" class="finding-checkbox" data-section="${esc(k)}" title="Seleccionar sección"></td>
+            <td>
+              <div style="font-weight:950;color:var(--green)">${esc(name)}</div>
+              ${area ? `<div class="muted">${esc(area)}</div>` : ""}
+            </td>
+            <td>
+              <span class="badge bad">${items.length}</span>
+              <div class="muted" style="margin-top:6px">${items.length} negativos con comentario</div>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn" onclick="selectSection('${esc(k)}')">🧩 Seleccionar</button>
+                <button class="btn btn-primary" onclick="openModalForSection('${esc(k)}')">💬 Ver comentarios</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("\n");
+
+      document.querySelectorAll('.finding-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+      });
+
+      const selectAllEl = document.getElementById('selectAllFindings');
+      const cloned = selectAllEl.cloneNode(true);
+      selectAllEl.parentNode.replaceChild(cloned, selectAllEl);
+      cloned.addEventListener('change', toggleSelectAll);
+
+      updateSelectedCount();
+
+      if(!selectedTplKey && visibleKeys.length){
+        selectSection(visibleKeys[0]);
+      }
+    }catch(e){
+      console.error(e);
+      errList.textContent = (e && e.message) ? e.message : String(e);
+      tbody.innerHTML = `<tr><td colspan="4">⚠️ Error cargando. Revisa consola.</td></tr>`;
+    }
+  }
+
+  function updateSelectedCount(){
+    const checked = document.querySelectorAll('.finding-checkbox:checked').length;
+    const total = document.querySelectorAll('.finding-checkbox').length;
+    const badge = document.getElementById('selectedCount');
+    const btnExport = document.getElementById('btnExportFindings');
+    const btnClear = document.getElementById('btnClearSel');
+    const selectAll = document.getElementById('selectAllFindings');
+
+    badge.textContent = `Seleccionados: ${checked}/${total}`;
+    if(checked > 0){
+      btnExport.style.display = 'inline-flex';
+      btnClear.style.display = 'inline-flex';
+    } else {
+      btnExport.style.display = 'none';
+      btnClear.style.display = 'none';
+    }
+
+    selectAll.checked = total > 0 && checked === total;
+    selectAll.indeterminate = checked > 0 && checked < total;
+  }
+
+  function toggleSelectAll(e){
+    const checked = e.target.checked;
+    document.querySelectorAll('.finding-checkbox').forEach(cb => {
+      cb.checked = checked;
+    });
+    updateSelectedCount();
+  }
+
+  function clearSelectedFindings(){
+    document.querySelectorAll('.finding-checkbox').forEach(cb => {
+      cb.checked = false;
+    });
+    updateSelectedCount();
+  }
+
+  function exportSelectedFindingsToLocalStorage(){
+    const selected = [];
+    document.querySelectorAll('.finding-checkbox:checked').forEach(cb => {
+      const section = cb.dataset.section;
+      selected.push(section);
+    });
+
+    if(selected.length === 0){
+      alert('Selecciona al menos un hallazgo');
+      return;
+    }
+
+    const parametersBySection = {};
+    for (const sectionKey of selected) {
+      const items = (negativeItems || []).filter(i => String(i.tplKey) === String(sectionKey));
+      parametersBySection[sectionKey] = items.map(i => ({
+        qid: i.qid ?? null,
+        qText: i.qText ?? "",
+        comment: i.comment ?? "",
+        why: i.why ?? "",
+        qType: i.qType ?? "",
+        answer_id: i.answer_id ?? null,
+        inspection_id: i.iid ?? currentInspectionId ?? null
+      }));
+    }
+
+    const sessionId = getCurrentHallazgosSessionId();
+    const data = {
+      timestamp: new Date().toISOString(),
+      auditId: document.getElementById('audit_id').value,
+      inspectionId: currentInspectionId,
+      inspectionIds: currentInspectionIds,
+      session_id: sessionId,
+      selectedSections: selected,
+      parametersBySection
+    };
+
+    localStorage.setItem('exportedFindings', JSON.stringify(data));
+    alert(`✅ ${selected.length} hallazgo(s) guardado(s) con parámetros. Ahora abre el PDF de informes.`);
+  }
+
+  blockFilter.addEventListener("change", loadFindings);
+
+  const __tplSel = document.getElementById("tplSelect");
+  if(__tplSel){
+    __tplSel.addEventListener("change", () => {
+      const selected = Array.from(__tplSel.selectedOptions).map(o => String(o.value||""));
+      const keys = selected.map(v => v ? v : "__manual__");
+      selectSection(keys.length ? keys : ["__manual__"]);
+    });
+  }
+
+  function clearForm(){
+    condition.value = "";
+    const pc = document.getElementById("pdf_components");
+    if(pc) pc.value = "";
+    criteria.value = "";
+    cause.value = "";
+    effect.value = "";
+    recommendation.value = "";
+    errForm.textContent = okForm.textContent = "";
+    currentCommentItem = null;
+    pickedItemsForFinding = [];
+    const condEl = document.getElementById("condition");
+    if(condEl){ condEl.readOnly = false; condEl.classList.remove("readonly"); condEl.title = ""; }
+  }
+
+  async function createFinding(){
+    errForm.textContent = okForm.textContent = "";
+
+    const auditId = audit_id.value.trim();
+    if(!auditId){
+      errForm.textContent = "Falta audit_id";
+      return;
+    }
+
+    if(currentCommentItem){
+      const c = (cause.value||"").trim();
+      const e = (effect.value||"").trim();
+      const r = (recommendation.value||"").trim();
+      if(!c || !e || !r){
+        errForm.textContent = "Completa Causa, Efecto y Recomendación para este comentario antes de guardar.";
+        return;
+      }
+
+      const parsedKey2 = parseTplKey(selectedTplKey);
+      const tid2 = selectedTemplateId ? String(selectedTemplateId) : (parsedKey2.type === "tpl" ? String(parsedKey2.id) : "");
+      const section2 = (parsedKey2.type === "sec") ? String(parsedKey2.id) : (parsedKey2.type === "tpl" ? `tpl:${String(parsedKey2.id)}` : null);
+
+      const item = currentCommentItem;
+
+      const payload = {
+        mode: "per_comment",
+        saved_at: new Date().toISOString(),
+        audit_id: auditId,
+        inspection_id: item.iid || currentInspectionId || null,
+        inspection_ids: currentInspectionIds && currentInspectionIds.length ? currentInspectionIds.slice() : (item.iid ? [item.iid] : []),
+        template_id: tid2 || null,
+        section: section2,
+
+        tplKey: String(item.tplKey||""),
+        qid: String(item.qid||""),
+        qText: String(item.qText||""),
+        qType: String(item.qType||""),
+        answer_id: item.answer_id || null,
+        comment: String(item.comment||""),
+        why: String(item.why||""),
+
+        severity: severity.value,
+        status: (status?.value||"draft"),
+        criteria: criteria.value,
+        condition: condition.value,
+        cause: cause.value,
+        effect: effect.value,
+        recommendation: recommendation.value
+      };
+
+      const key = "exportedFindings";
+      let store = {};
+      try{ store = JSON.parse(localStorage.getItem(key) || "{}") || {}; }catch(_e){ store = {}; }
+      if(!store.auditId) store.auditId = auditId;
+      if(!store.inspectionIds) store.inspectionIds = [];
+      const usedInspectionId = (item.iid || currentInspectionId || "").trim();
+      if(usedInspectionId && !store.inspectionIds.includes(usedInspectionId)) store.inspectionIds.push(usedInspectionId);
+
+      if(!store.commentFindings) store.commentFindings = [];
+      const sig = item.answer_id ? `aid:${item.answer_id}` : `k:${item.tplKey}|q:${item.qid}|c:${item.comment}`;
+      store.commentFindings = store.commentFindings.filter(x => {
+        const s = x?.answer_id ? `aid:${x.answer_id}` : `k:${x.tplKey}|q:${x.qid}|c:${x.comment}`;
+        return s !== sig;
+      });
+      store.commentFindings.push(payload);
+
+      if(!store.completedCommentSigs) store.completedCommentSigs = [];
+      if(!store.completedCommentSigs.includes(sig)) store.completedCommentSigs.push(sig);
+
+      localStorage.setItem(key, JSON.stringify(store));
+
+      try{ await loadFindings(); }catch(_e){}
+      okForm.textContent = "Hallazgo guardado para este comentario ✅";
+      errForm.textContent = "";
+
+      currentCommentItem = null;
+      pickedItemsForFinding = [];
+      condition.value = "";
+      cause.value = "";
+      effect.value = "";
+      recommendation.value = "";
+      const condEl = document.getElementById("condition");
+      if(condEl){ condEl.readOnly = false; condEl.classList.remove("readonly"); condEl.title = ""; }
+
+      return;
+    }
+
+    const tplKey = selectedTplKey;
+    const parsedKey = parseTplKey(tplKey);
+
+    const tid = selectedTemplateId ? String(selectedTemplateId) : (parsedKey.type === "tpl" ? String(parsedKey.id) : "");
+    const sectionToSave = (parsedKey.type === "sec") ? String(parsedKey.id) : (parsedKey.type === "tpl" ? `tpl:${String(parsedKey.id)}` : null);
+
+    let cond = condition.value || "";
+
+    const pdfComponents = (document.getElementById("pdf_components")?.value || "").trim();
+    const markerParts = [];
+    if(currentInspectionId) markerParts.push(`INSPECTION:${currentInspectionId}`);
+    if(tid) markerParts.push(`TPL:${tid}`);
+    const marker = markerParts.length ? `[${markerParts.join(" ")}]` : "";
+
+    if(marker && !cond.includes(marker)){
+      cond = cond.trim() ? `${marker} ${cond.trim()}` : `${marker} `;
+    }
+
+    if(pdfComponents){
+      const block = `\n\nComponentes para el PDF:\n${pdfComponents}`;
+      if(!cond.includes("Componentes para el PDF:")) cond = (cond || "").trimEnd() + block;
+    }
+
+    let safeStatus = (status?.value || "").trim();
+    try{
+      const { data: stRows } = await sb.from("findings").select("status").limit(50);
+      const allowed = new Set((stRows||[]).map(r => String(r.status||"").trim()).filter(Boolean));
+      if(allowed.size){
+        if(!allowed.has(safeStatus)) safeStatus = Array.from(allowed)[0];
+      }
+    }catch(_e){}
+    if(!safeStatus) safeStatus = "draft";
+
+    const row = {
+      audit_id: auditId,
+      template_id: tid || null,
+      inspection_id: currentInspectionId || null,
+      section: sectionToSave,
+
+      severity: severity.value,
+      status: safeStatus,
+      condition: cond,
+      criteria: criteria.value,
+      cause: cause.value,
+      effect: effect.value,
+      recommendation: recommendation.value,
+      created_by: sessionUser?.id
+    };
+
+    const { data, error } = await sb.from("findings").upsert(row, { onConflict: "audit_id,template_id,section" }).select("id").single();
+    if(error){
+      const detail = [error.message, error.details, error.hint].filter(Boolean).join(" | ");
+      errForm.textContent = detail || "Error creando hallazgo";
+      return;
+    }
+
+    try{
+      const keyLS = "exportedFindings";
+      const store = JSON.parse(localStorage.getItem(keyLS) || "{}") || {};
+      if(!store.completedCommentSigs) store.completedCommentSigs = [];
+      for(const it of (pickedItemsForFinding || [])){
+        const sig = sigForNegItem(it);
+        if(sig && !store.completedCommentSigs.includes(sig)) store.completedCommentSigs.push(sig);
+      }
+      localStorage.setItem(keyLS, JSON.stringify(store));
+      pickedItemsForFinding = [];
+      await loadFindings();
+    }catch(_e){}
+
+    okForm.textContent = "Hallazgo creado ✅ Abriendo PDF...";
+    const newId = data?.id;
+    if(newId){
+      setTimeout(()=>{
+        const params = new URLSearchParams();
+        params.set("finding_id", newId);
+        params.set("audit_id", auditId);
+        if(currentInspectionIds && currentInspectionIds.length){
+          if(currentInspectionIds.length === 1) params.set("inspection_id", currentInspectionId);
+          else params.set("inspection_ids", currentInspectionIds.join(","));
+        }
+        if(selectedTplKey && selectedTplKey !== "__manual__") params.set("tpl", selectedTplKey);
+        location.href = `informes.html?${params.toString()}`;
+      }, 350);
+      return;
+    }
+    setTimeout(()=> okForm.textContent = "", 2000);
+    await loadFindings();
+  }
+
+  function buildConditionForKey(tplKey){
+    const secName = (tplKey === "__manual__") ? "General / Manual" : tplLabel(tplKey);
+    const items = negativeItems.filter(i => i.tplKey === tplKey)
+      .slice()
+      .sort((a,b)=> a.qText.localeCompare(b.qText));
+
+    if(!items.length) return { cond: "", count: 0, secName };
+
+    const lines = [];
+    lines.push(`【${secName}】`);
+    for(const it of items){
+      lines.push(`• ${it.qText}: ${it.comment}`);
+    }
+    return { cond: lines.join("\n").trim(), count: items.length, secName };
+  }
+
+  async function createFindingsFromNegatives(){
+    errForm.textContent = okForm.textContent = "";
+
+    const auditId = audit_id.value.trim();
+    if(!auditId){
+      errForm.textContent = "Falta audit_id";
+      return;
+    }
+
+    let keys = (selectedTplKeys && selectedTplKeys.length) ? selectedTplKeys.slice() : [];
+
+    if(!keys.length){
+      keys = Array.from(document.querySelectorAll('.finding-checkbox:checked'))
+        .map(cb => String(cb.dataset.section || ""))
+        .filter(Boolean);
+    }
+
+    if(!keys.length){
+      alert("Selecciona al menos una sección (en el selector o en la tabla).");
+      return;
+    }
+
+    let created = 0;
+    let totalComments = 0;
+
+    let safeStatus = (status?.value || "").trim();
+    try{
+      const { data: stRows } = await sb.from("findings").select("status").limit(50);
+      const allowed = new Set((stRows||[]).map(r => String(r.status||"").trim()).filter(Boolean));
+      if(allowed.size){
+        if(!allowed.has(safeStatus)) safeStatus = Array.from(allowed)[0];
+      }
+    }catch(_e){}
+    if(!safeStatus) safeStatus = "draft";
+
+    for(const k of keys){
+      selectSection([k]);
+
+      const { cond, count } = buildConditionForKey(k);
+      if(!cond || !cond.trim()){
+        continue;
+      }
+
+      const tplKey = selectedTplKey;
+      const parsedKey = parseTplKey(tplKey);
+
+      const tid = selectedTemplateId
+        ? String(selectedTemplateId)
+        : (parsedKey.type === "tpl" ? String(parsedKey.id) : "");
+
+      const sectionToSave = (parsedKey.type === "sec")
+        ? String(parsedKey.id)
+        : (parsedKey.type === "tpl" ? `tpl:${String(parsedKey.id)}` : null);
+
+      let condWithMarker = cond;
+      const markerParts = [];
+      if(currentInspectionId) markerParts.push(`INSPECTION:${currentInspectionId}`);
+      if(tid) markerParts.push(`TPL:${tid}`);
+      const marker = markerParts.length ? `[${markerParts.join(" ")}]` : "";
+      if(marker && !condWithMarker.includes(marker)){
+        condWithMarker = `${marker} ${condWithMarker}`.trim();
+      }
+
+      const row = {
+        audit_id: auditId,
+        template_id: tid || null,
+        inspection_id: currentInspectionId || null,
+        section: sectionToSave,
+
+        severity: severity.value,
+        status: safeStatus,
+        condition: condWithMarker,
+        criteria: criteria.value,
+        cause: cause.value,
+        effect: effect.value,
+        recommendation: recommendation.value,
+        created_by: sessionUser?.id
+      };
+
+      const { error } = await sb.from("findings")
+        .upsert(row, { onConflict: "audit_id,template_id,section" });
+
+      if(error){
+        const detail = [error.message, error.details, error.hint].filter(Boolean).join(" | ");
+        errForm.textContent = `Error en ${tplLabel(k)}: ${detail || "upsert falló"}`;
+        return;
+      }
+
+      created += 1;
+      totalComments += count;
+    }
+
+    if(!created){
+      okForm.textContent = "No se crearon hallazgos (no había negativos escritos en las secciones seleccionadas).";
+      setTimeout(()=> okForm.textContent = "", 3500);
+      return;
+    }
+
+    okForm.textContent = `✅ Listo: ${created} hallazgo(s) creados/actualizados desde ${totalComments} comentario(s) negativo(s).`;
+    setTimeout(()=> okForm.textContent = "", 4000);
+    await loadFindings();
+  }
+
+  (async ()=>{
+    await requireSession();
+
+    const aid = qs("audit_id");
+    if(aid) audit_id.value = aid;
+
+    if(aid) loadFindings();
+  })();
+
+  (function(){
+    function esc2(s){
+      return String(s||"").replace(/[&<>"']/g, function(m){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m];
+      });
+    }
+
+    function showToast(type, title, message, ms){
+      ms = (typeof ms === "number") ? ms : 10000;
+      var host = document.getElementById("toastHost");
+      if(!host) return;
+
+      var icon = (type === "ok") ? "✓" : (type === "warn" ? "!" : "×");
+      var el = document.createElement("div");
+      el.className = "toast " + (type || "error");
+      el.innerHTML = (
+        '<div class="bar"></div>' +
+        '<div class="content">' +
+          '<div class="icon">'+ esc2(icon) +'</div>' +
+          '<div>' +
+            '<div class="title">'+ esc2(title || (type==="ok"?"Listo":"Atención")) +'</div>' +
+            '<div class="msg">'+ esc2(message || "") +'</div>' +
+          '</div>' +
+          '<button class="close" type="button" aria-label="Cerrar">✕</button>' +
+        '</div>'
+      );
+
+      var close = function(){
+        el.style.animation = "toastOut .18s ease-in forwards";
+        setTimeout(function(){ el.remove(); }, 180);
+      };
+      el.querySelector(".close").addEventListener("click", close);
+      host.appendChild(el);
+      if(ms > 0) setTimeout(close, ms);
+    }
+
+    window.__showToast = showToast;
+
+    function watch(el, type, title){
+      if(!el) return;
+      var last = "";
+      var obs = new MutationObserver(function(){
+        var txt = (el.textContent || "").trim();
+        if(!txt) return;
+        if(txt === last) return;
+        last = txt;
+        showToast(type, title, txt);
+      });
+      obs.observe(el, { childList:true, subtree:true, characterData:true });
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      watch(document.getElementById("errForm"), "error", "Faltan campos");
+      watch(document.getElementById("okForm"), "ok", "Listo");
+      watch(document.getElementById("errList"), "error", "Atención");
+      watch(document.getElementById("okList"), "ok", "Listo");
+    });
+  })();
+
+  function _escapeHtml(s){return String(s||'').replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+
+  function _pdfKey(auditId){
+    return `selected_findings:${auditId || ''}`;
+  }
+
+  function _toast(msg, kind){
+    try{
+      const host = document.getElementById('toastHost');
+      if(!host){ console[kind==='err'?'error':'log'](msg); return; }
+      const el = document.createElement('div');
+      el.className = 'toast ' + (kind==='err' ? 'toast-err' : 'toast-ok');
+      el.textContent = msg;
+      host.appendChild(el);
+      setTimeout(()=>{ el.classList.add('show'); }, 10);
+      setTimeout(()=>{ el.classList.remove('show'); }, 2800);
+      setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 3300);
+    }catch(e){
+      console.error(e);
+    }
+  }
+  function toastOk(msg){ _toast(msg, 'ok'); }
+  function toastErr(msg){ _toast(msg, 'err'); }
+  function showError(msg){ toastErr(msg); }
+
+  function _getAuditIdSafe(){
+    const el = document.getElementById('audit_id') || document.getElementById('auditId') || document.getElementById('auditIdInput');
+    const v = (el && el.value ? el.value.trim() : '');
+    if(v) return v;
+    try{
+      const last = localStorage.getItem('last_audit_id') || localStorage.getItem('audit_id');
+      return (last||'').trim();
+    }catch(e){
+      return '';
+    }
+  }
+
+  const __memPdfStore = window.__memPdfStore || (window.__memPdfStore = {});
+  function _storageGet(key){
+    try { return sessionStorage.getItem(key); } catch(_e){}
+    try { return localStorage.getItem(key); } catch(_e){}
+    return __memPdfStore[key] || null;
+  }
+  function _storageSet(key, val){
+    try { sessionStorage.setItem(key, val); } catch(_e){}
+    try { localStorage.setItem(key, val); } catch(_e){}
+    __memPdfStore[key] = val;
+  }
+  function _readSelected(auditId){
+    try{
+      const raw = _storageGet(_pdfKey(auditId));
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){
+      console.warn('read selected error', e);
+      return [];
+    }
+  }
+  function _writeSelected(auditId, arr){
+    const sessionId = getCurrentHallazgosSessionId();
+    const safeArr = (arr || []).map(it => ({
+      ...(it || {}),
+      audit_id: (it && it.audit_id) ? it.audit_id : auditId,
+      inspection_id: (it && it.inspection_id) ? it.inspection_id : (currentInspectionId || null),
+      inspection_ids: (it && Array.isArray(it.inspection_ids) && it.inspection_ids.length) ? it.inspection_ids : (Array.isArray(currentInspectionIds) ? currentInspectionIds.slice() : []),
+      session_id: (it && it.session_id) ? it.session_id : sessionId
+    }));
+    const payload = JSON.stringify(safeArr);
+    _storageSet(_pdfKey(auditId), payload);
+    _storageSet("selected_findings_for_report", payload);
+  }
+
+  function _currentFormFinding() {
+    const tplSelect = document.getElementById('tplSelect');
+
+    const selectedValues = tplSelect
+      ? Array.from(tplSelect.selectedOptions || []).map(o => String(o.value || "")).filter(Boolean)
+      : [];
+
+    const selectedKeys = selectedValues.length
+      ? selectedValues
+      : (Array.isArray(selectedTplKeys) && selectedTplKeys.length ? selectedTplKeys.slice() : ["__manual__"]);
+
+    let template_ids = [];
+    try {
+      if (typeof parseTplKey === 'function') {
+        template_ids = selectedKeys
+          .map(k => {
+            const parsed = parseTplKey(k);
+            return (parsed && parsed.type === 'tpl') ? String(parsed.id || "") : "";
+          })
+          .filter(Boolean);
+      }
+    } catch (e) {}
+
+    const section = selectedKeys.join(", ");
+
+    const condition = (document.getElementById('condition') || document.getElementById('cond'))?.value?.trim?.() || '';
+    const cause = document.getElementById('cause')?.value?.trim?.() || '';
+    const effect = document.getElementById('effect')?.value?.trim?.() || '';
+    const recommendation = (document.getElementById('recommendation') || document.getElementById('reco'))?.value?.trim?.() || '';
+
+    const template_labels = tplSelect
+      ? Array.from(tplSelect.selectedOptions || []).map(o => o.textContent.trim()).filter(Boolean)
+      : [];
+
+    return {
+      audit_id: _getAuditIdSafe(),
+      inspection_id: currentInspectionId || null,
+      inspection_ids: Array.isArray(currentInspectionIds) ? currentInspectionIds.slice() : [],
+      session_id: getCurrentHallazgosSessionId(),
+      template_id: template_ids[0] || null,
+      template_ids,
+      template_label: template_labels[0] || 'Manual',
+      template_labels,
+      section,
+      section_keys: selectedKeys,
+      condition,
+      cause,
+      effect,
+      recommendation
+    };
+  }
+
+  function _renderPdfSelection(){
+    const auditId = _getAuditIdSafe();
+    const box = document.getElementById('pdfSelection');
+    if(!box) return;
+    if(!auditId){
+      box.innerHTML = '<div class="muted">Para preparar el PDF, primero escribe el <b>Audit ID</b> y dale <b>Actualizar</b>.</div>';
+      return;
+    }
+    const list = _readSelected(auditId);
+    if(!list.length){
+      box.innerHTML = '<div class="muted">Sin hallazgos seleccionados para el PDF.</div>';
+      return;
+    }
+    const items = list.map((f, i) => {
+      const title = (f.section || f.template_id || `Hallazgo ${i+1}`);
+      const cond = (f.condition || '').slice(0, 140);
+      return `<div class="card" style="padding:10px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+          <div><b>${i+1}.</b> ${_escapeHtml(title)}</div>
+          <button class="btn btn-sm" type="button" onclick="removeSelectedFinding(${i})">Quitar</button>
+        </div>
+        <div class="muted" style="margin-top:6px">${_escapeHtml(cond || '(sin condición)')}</div>
+      </div>`;
+    }).join('');
+    box.innerHTML = `<div class="muted" style="margin-top:6px">Hallazgos que <b>sí</b> irán al PDF (solo esta auditoría):</div>${items}`;
+  }
+
+  function removeSelectedFinding(index){
+    const auditId = _getAuditIdSafe();
+    const list = _readSelected(auditId);
+    list.splice(index, 1);
+    _writeSelected(auditId, list);
+    _renderPdfSelection();
+  }
+
+  function _clearInputsAfterAppend(){
+    try{
+      const ids = ["condition","cause","effect","recommendation","pdf_components"];
+      for(const id of ids){
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+      }
+      const condEl = document.getElementById("condition");
+      if(condEl){
+        condEl.readOnly = false;
+        condEl.classList.remove("readonly");
+        condEl.title = "";
+      }
+      try{ currentCommentItem = null; }catch(_e){}
+      try{ pickedItemsForFinding = []; }catch(_e){}
+      try{ document.getElementById("cause")?.focus(); }catch(_e){}
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+  function appendFindingToPDF(e){
+    try{ if(e && e.preventDefault) e.preventDefault(); }catch(_e){}
+    const auditId = _getAuditIdSafe();
+    if(!auditId){
+      showError('Primero escribe el Audit ID y dale Actualizar.');
+      return;
+    }
+    const f = _currentFormFinding();
+    if(!f.condition && !f.cause && !f.effect && !f.recommendation){
+      showError('Escribe al menos un campo (Condición/Causa/Efecto/Recomendación) antes de anexar.');
+      return;
+    }
+    const list = _readSelected(auditId);
+    list.push(f);
+    _writeSelected(auditId, list);
+    _renderPdfSelection();
+    toastOk('Hallazgo anexado. Ahora puedes anexar otro o darle "Guardar y ver PDF".');
+    _clearInputsAfterAppend();
+  }
+
+  function saveAndGoPDF(e){
+    try{
+      if(e && e.preventDefault) e.preventDefault();
+      const auditId = _getAuditIdSafe();
+      if(!auditId){
+        showError("Primero escribe el Audit ID y dale Actualizar.");
+        return;
+      }
+
+      let list = _readSelected(auditId);
+      const f = _currentFormFinding();
+      const hasCurrent = !!(f.condition || f.cause || f.effect || f.recommendation);
+
+      if(!list.length && hasCurrent){
+        list = [f];
+      }
+
+      if(list.length && hasCurrent){
+        const last = list[list.length-1] || {};
+        const same = JSON.stringify({
+          c:last.condition, ca:last.cause, e:last.effect, r:last.recommendation, s:last.section, t:last.template_id
+        }) === JSON.stringify({
+          c:f.condition, ca:f.cause, e:f.effect, r:f.recommendation, s:f.section, t:f.template_id
+        });
+        if(!same) list.push(f);
+      }
+
+      _writeSelected(auditId, list);
+
+      const targetParams = {
+        audit_id: auditId,
+        auditId: auditId,
+        use_selected_findings: "1"
+      };
+      if(currentInspectionIds && currentInspectionIds.length){
+        if(currentInspectionIds.length === 1) targetParams.inspection_id = currentInspectionIds[0];
+        else targetParams.inspection_ids = currentInspectionIds.join(",");
+      }
+      const target = pageUrl("informes.html", targetParams);
+
+      try{
+        window.location.assign(target);
+      }catch(_e){
+        window.location.href = target;
+      }
+    }catch(err){
+      showError("Error en Guardar y ver PDF: " + (err?.message || err));
+      console.error(err);
+    }
+  }
+
+  const _oldSetAuditUI = window.setAuditUI;
+  window.setAuditUI = function(){
+    try{ if(typeof _oldSetAuditUI === 'function') _oldSetAuditUI.apply(this, arguments); }catch(_e){}
+    _renderPdfSelection();
+  };
+  document.addEventListener('DOMContentLoaded', _renderPdfSelection);
+</script>
+</body>
+</html>
